@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>Leetcode2660. 保龄球游戏的获胜者</title>
+      <link href="/2023/12/27/algorithms/leetcode/leetcode-determine-the-winner-of-a-bowling-game/"/>
+      <url>/2023/12/27/algorithms/leetcode/leetcode-determine-the-winner-of-a-bowling-game/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://leetcode.cn/problems/determine-the-winner-of-a-bowling-game/description">题目链接</a></p><h1 id="思路">思路</h1><p>简单模拟即可<br>但是需要注意的是因为涉及到前两轮的数据, 因此可以在数组的前面添加哨兵节点来减少条件判断</p><h1 id="代码">代码</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">isWinner</span>(<span class="params">self, player1: <span class="type">List</span>[<span class="built_in">int</span>], player2: <span class="type">List</span>[<span class="built_in">int</span>]</span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        player1 = [<span class="number">0</span>, <span class="number">0</span>] + player1</span><br><span class="line">        player2 = [<span class="number">0</span>, <span class="number">0</span>] + player2</span><br><span class="line">        n = <span class="built_in">len</span>(player1)</span><br><span class="line">        cnt1 = <span class="number">0</span></span><br><span class="line">        cnt2 = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>, n):</span><br><span class="line">            <span class="keyword">if</span> player1[i-<span class="number">1</span>] == <span class="number">10</span> <span class="keyword">or</span> player1[i-<span class="number">2</span>]==<span class="number">10</span>:</span><br><span class="line">                cnt1 += player1[i] * <span class="number">2</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                cnt1 += player1[i]</span><br><span class="line">            <span class="keyword">if</span> player2[i-<span class="number">1</span>] == <span class="number">10</span> <span class="keyword">or</span> player2[i-<span class="number">2</span>]==<span class="number">10</span>:</span><br><span class="line">                cnt2 += player2[i] * <span class="number">2</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                cnt2 += player2[i]</span><br><span class="line">        <span class="keyword">if</span> cnt1 &gt; cnt2:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> cnt1 &lt; cnt2:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">2</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 算法 </category>
+          
+          <category> 模拟 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Leetcode </tag>
+            
+            <tag> python3 </tag>
+            
+            <tag> 模拟 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>线性插值与双线性插值</title>
       <link href="/2023/12/25/deep_learning/common_knowledge/bilinear_interpolation/"/>
       <url>/2023/12/25/deep_learning/common_knowledge/bilinear_interpolation/</url>
