@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>RoI Warp</title>
+      <link href="/2024/01/02/deep_learning/common_knowledge/roi_warp/"/>
+      <url>/2024/01/02/deep_learning/common_knowledge/roi_warp/</url>
+      
+        <content type="html"><![CDATA[<p>参考了<a href="https://towardsdatascience.com/understanding-region-of-interest-part-2-roi-align-and-roi-warp-f795196fc193">这篇博客</a></p><h1 id="roi-warp">RoI Warp</h1><p>RoI Warp和<a href="https://zhangtingyu11.github.io/2024/01/02/deep_learning/common_knowledge/roi_align/">RoI Align</a>类似, 唯一的区别就是在获取RoI特征时进行了取整的操作<br><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240102154717.png" alt=""></p><h1 id="数据丢失">数据丢失</h1><p><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240102154929.png" alt=""><br>上图表示RoI Warp的数据丢失, 其中红框是RoI, 蓝色是丢失的数据, 绿色是新增的数据, 橘色是原始的数据</p><h1 id="roialign-roiwarp对性能的影响">RoIAlign, RoIWarp对性能的影响</h1><p><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240102155125.png" alt=""><br>可以看到RoIAlign是性能最好的</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 深度学习 </category>
+          
+          <category> 深度学习基础知识 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习基础知识 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>RoI Align</title>
       <link href="/2024/01/02/deep_learning/common_knowledge/roi_align/"/>
       <url>/2024/01/02/deep_learning/common_knowledge/roi_align/</url>
