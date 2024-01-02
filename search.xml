@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>RoI Align</title>
+      <link href="/2024/01/02/deep_learning/common_knowledge/roi_align/"/>
+      <url>/2024/01/02/deep_learning/common_knowledge/roi_align/</url>
+      
+        <content type="html"><![CDATA[<p>参考了<a href="https://towardsdatascience.com/understanding-region-of-interest-part-2-roi-align-and-roi-warp-f795196fc193">这篇博客</a></p><h1 id="动机">动机</h1><p>设计RoI Align的原因是之前的<a href="https://zhangtingyu11.github.io/2024/01/02/deep_learning/common_knowledge/roi_pooling/">RoI Pooling</a>涉及两次取整的操作, 一次是在原图映射到RoI特征时, 另外一次是在做池化的过程中</p><h1 id="roi-align">RoI Align</h1><p>RoI Align希望减少取整引入的误差, 因此在原图映射到RoI特征的时候, 不会进行取整的操作<br>在进行池化划分网格的时候也不会进行取整的操作, 如下图所示<br><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240102153409.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240102153353.png" alt=""><br>可以看到, 特征图上的RoI的长宽都是小数, 划分的网格的长宽也是小数</p><p>在每一个划分的网格中均匀选择四个采样点, 如下图所示<br><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240102153521.png" alt=""></p><p>使用<a href="https://zhangtingyu11.github.io/2023/12/25/deep_learning/common_knowledge/bilinear_interpolation/">双线性插值</a>来计算采样点的特征, 然后可以使用平均池化来求这个网格的最终特征</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 深度学习 </category>
+          
+          <category> 深度学习基础知识 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习基础知识 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>RoI Pooling</title>
       <link href="/2024/01/02/deep_learning/common_knowledge/roi_pooling/"/>
       <url>/2024/01/02/deep_learning/common_knowledge/roi_pooling/</url>
