@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>post</title>
+      <link href="/2024/01/09/deep_learning/common_knowledge/foreach_func/"/>
+      <url>/2024/01/09/deep_learning/common_knowledge/foreach_func/</url>
+      
+        <content type="html"><![CDATA[<p>最近在看梯度裁剪的时候看到里面调用了<code>_foreach_mul_</code>函数, 说是效率会更高, 因此写了一个代码进行了对比</p><h1 id="函数介绍">函数介绍</h1><p>对于<code>_foreach_mul_</code>函数, 总共接收两个参数, 第一个参数是一个Tensor组成的序列, 第二个参数可以是一个标量, 也可以是一个标量序列, 也可以是一个Tensor序列</p><p>如果第二个参数是一个标量, <code>_foreach_mul_</code>函数就将第一个序列中的每一个Tensor都乘上这个标量, 在序列中做原地修改</p><p>如果第二个参数是一个标量序列, <code>_foreach_mul_</code>函数就将第一个序列中的每一个Tensor都乘上标量序列中对应的标量, 在序列中做原地修改</p><p>如果第二个参数是一个Tensor序列, <code>_foreach_mul_</code>函数就将第一个序列中的每一个Tensor都乘上Tensor序列中对应的Tensor, 在序列中做原地修改</p><h1 id="效率对比">效率对比</h1><p>根据一下代码对比了<code>_foreach_mul_</code>和for循环的时间对比</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch <span class="keyword">import</span> nn</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_millisecond</span>():</span><br><span class="line">    t = time.time()</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">int</span>(<span class="built_in">round</span>(t * <span class="number">1000</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个包含一个线性层的神经网络</span></span><br><span class="line">net = nn.Sequential(nn.Linear(<span class="number">2</span>, <span class="number">1</span>),</span><br><span class="line">                    nn.Linear(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置损失函数和优化器</span></span><br><span class="line">criterion = nn.MSELoss()</span><br><span class="line">optimizer = torch.optim.SGD(net.parameters(), lr=<span class="number">0.01</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 随机生成输入数据</span></span><br><span class="line">ipt = torch.randn(<span class="number">4</span>, <span class="number">2</span>)</span><br><span class="line"><span class="comment"># 随机生成目标数据</span></span><br><span class="line">target = torch.randn(<span class="number">4</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将网络设置为训练模式</span></span><br><span class="line">net.train()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 前向传播</span></span><br><span class="line">output = net(ipt)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算损失</span></span><br><span class="line">loss = criterion(output, target)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 反向传播</span></span><br><span class="line">optimizer.zero_grad()  <span class="comment"># 清零梯度</span></span><br><span class="line">loss.backward()  <span class="comment"># 计算梯度</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取梯度</span></span><br><span class="line">grads = [torch.randn(<span class="number">2</span>, <span class="number">2</span>) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>**<span class="number">5</span>)]</span><br><span class="line">interval1 = <span class="number">0</span></span><br><span class="line">interval2 = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">    time1 = get_millisecond()</span><br><span class="line">    torch._foreach_mul_(grads, <span class="number">3</span>)</span><br><span class="line">    time2 = get_millisecond()</span><br><span class="line">    <span class="keyword">for</span> g <span class="keyword">in</span> grads:</span><br><span class="line">        g.detach().mul_(<span class="number">3</span>)</span><br><span class="line">    time3 = get_millisecond()</span><br><span class="line">    interval1 += time2-time1</span><br><span class="line">    interval2 += time3-time2</span><br><span class="line"><span class="built_in">print</span>(interval1/<span class="number">100</span>)</span><br><span class="line"><span class="built_in">print</span>(interval2/<span class="number">100</span>)</span><br></pre></td></tr></table></figure><p><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240109150822.png" alt=""><br>可以发现for循环的运行时间几乎是<code>_foreach_mul_</code>函数的两倍</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 深度学习 </category>
+          
+          <category> 深度学习基础知识 </category>
+          
+          <category> pytorch </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> pytorch </tag>
+            
+            <tag> 深度学习基础知识 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>学习率变化策略之LambdaLR</title>
       <link href="/2024/01/08/deep_learning/common_knowledge/LambdaLR/"/>
       <url>/2024/01/08/deep_learning/common_knowledge/LambdaLR/</url>
