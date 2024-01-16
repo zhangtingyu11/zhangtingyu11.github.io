@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)</title>
+      <link href="/2024/01/16/deep_learning/pytorch/cusolverDnCreate_error/"/>
+      <url>/2024/01/16/deep_learning/pytorch/cusolverDnCreate_error/</url>
+      
+        <content type="html"><![CDATA[<p>这种报错目前没有找到特别好的解决办法, 下面提出一些可能的解决方法, 仅供参考</p><h1 id="方法一">方法一</h1><p>参考<a href="https://github.com/facebookresearch/pytorch3d/issues/674">这个issue</a><br>里面说是显存不够, 但是这个方法对我没啥用</p><h1 id="方法二">方法二</h1><p>参考<a href="https://github.com/open-mmlab/mmdetection3d/issues/2542">我提的issue</a><br>只需要将张量转到cpu上然后计算reverse再移动到GPU上<br>这个方法会增加一部分时间, 因为涉及张量在设备之前的移动</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 深度学习 </category>
+          
+          <category> pytorch </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> pytorch </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>MonoCon实验环境搭建</title>
       <link href="/2024/01/16/lab_env_construction/monocon/"/>
       <url>/2024/01/16/lab_env_construction/monocon/</url>
