@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MMEngine中的load函数 | Grapymage的个人博客</title><meta name="author" content="Grapymage"><meta name="copyright" content="Grapymage"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="MMEngine版本: 0.10.2 load函数 load函数的主要目的是为了给定一个统一的接口来进行文件的读取, 例如下面的代码 12345import mmenginedata1 &#x3D; mmengine.load(&#x27;&#x2F;home&#x2F;public&#x2F;zty&#x2F;Project&#x2F;DeepLearningProject&#x2F;DID-M3D&#x2F;config&#x2F;kitti.yaml&#x27;)print(da">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MMEngine中的load函数">
+<meta property="og:url" content="https://zhangtingyu11.github.io/2024/01/22/openmmlab/mmengine/load_function/index.html">
+<meta property="og:site_name" content="Grapymage的个人博客">
+<meta property="og:description" content="MMEngine版本: 0.10.2 load函数 load函数的主要目的是为了给定一个统一的接口来进行文件的读取, 例如下面的代码 12345import mmenginedata1 &#x3D; mmengine.load(&#x27;&#x2F;home&#x2F;public&#x2F;zty&#x2F;Project&#x2F;DeepLearningProject&#x2F;DID-M3D&#x2F;config&#x2F;kitti.yaml&#x27;)print(da">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg">
+<meta property="article:published_time" content="2024-01-22T12:15:02.000Z">
+<meta property="article:modified_time" content="2024-01-22T12:15:49.683Z">
+<meta property="article:author" content="Grapymage">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="MMEngine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg"><link rel="shortcut icon" href="/img/avatar.jpeg"><link rel="canonical" href="https://zhangtingyu11.github.io/2024/01/22/openmmlab/mmengine/load_function/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MMEngine中的load函数',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-22 20:15:49'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.0.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">80</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">49</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">45</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/top_img.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Grapymage的个人博客"><span class="site-name">Grapymage的个人博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">MMEngine中的load函数</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-01-22T12:15:02.000Z" title="发表于 2024-01-22 20:15:02">2024-01-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-01-22T12:15:49.683Z" title="更新于 2024-01-22 20:15:49">2024-01-22</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/OpenMMLab/">OpenMMLab</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/OpenMMLab/MMEngine/">MMEngine</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">515</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span id="" data-flag-title="MMEngine中的load函数"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="twikoo_visitors"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>MMEngine版本: 0.10.2</p>
+<h1 id="load函数">load函数</h1>
+<p><code>load</code>函数的主要目的是为了给定一个统一的接口来进行文件的读取, 例如下面的代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> mmengine</span><br><span class="line">data1 = mmengine.load(<span class="string">&#x27;/home/public/zty/Project/DeepLearningProject/DID-M3D/config/kitti.yaml&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(data1)</span><br><span class="line">data2 = mmengine.load(<span class="string">&#x27;/home/public/zty/Project/DeepLearningProject/mmengine/mmengine/hub/deprecated.json&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(data2)</span><br></pre></td></tr></table></figure>
+<p>输出如下<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240122194838.png" alt=""><br>
+可以发现对于不同的文件后缀, 都可以使用<code>load</code>函数来读取</p>
+<h1 id="load函数流程">load函数流程</h1>
+<p>首先会通过以下的<code>file_handler</code>通过文件后缀来确定要处理的句柄, 然后根据文件的前缀来确定<code>backend</code> (常见的前缀有<code>https</code>, <code>http</code>, 空前缀)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">file_handlers = &#123;</span><br><span class="line">    <span class="string">&#x27;json&#x27;</span>: JsonHandler(),</span><br><span class="line">    <span class="string">&#x27;yaml&#x27;</span>: YamlHandler(),</span><br><span class="line">    <span class="string">&#x27;yml&#x27;</span>: YamlHandler(),</span><br><span class="line">    <span class="string">&#x27;pickle&#x27;</span>: PickleHandler(),</span><br><span class="line">    <span class="string">&#x27;pkl&#x27;</span>: PickleHandler(),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后使用确定的<code>handler</code>和<code>backend</code>来处理文件</p>
+<h1 id="新增文件句柄">新增文件句柄</h1>
+<p>可以发现如果文件的后缀不在<code>file_handler</code>中就会出现找不到句柄的情况, 需要自定义<br>
+下面的代码自定义了以<code>.bin</code>为后缀的句柄</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> mmengine</span><br><span class="line"><span class="keyword">from</span> mmengine <span class="keyword">import</span> register_handler, BaseFileHandler</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="meta">@register_handler(<span class="params"><span class="string">&#x27;bin&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BinFileHandler</span>(<span class="title class_ inherited__">BaseFileHandler</span>):</span><br><span class="line">    str_like = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">load_from_fileobj</span>(<span class="params">self, file, **kwargs</span>):</span><br><span class="line">        <span class="keyword">return</span> np.frombuffer(file.getvalue(), **kwargs, dtype=np.float32)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">dump_to_fileobj</span>(<span class="params">self, obj, file, **kwargs</span>):</span><br><span class="line">        file.write(obj)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">dump_to_str</span>(<span class="params">self, obj, **kwargs</span>):</span><br><span class="line">        <span class="comment"># 实际没有意义</span></span><br><span class="line">        <span class="keyword">return</span> obj.tobytes()</span><br></pre></td></tr></table></figure>
+<p>需要重载三个函数: <code>load_from_fileobj</code>, <code>dump_to_fileobj</code>, <code>dump_to_str</code><br>
+因为<code>str_like</code>是判断读取文件是读取字符串函数字节流, 这里是读取字节流, 所以需要显式写下<code>str_like = False</code><br>
+同时使用<code>@register_handler('bin')</code>进行注册</p>
+<h1 id="register-handler的工作原理">register_handler的工作原理</h1>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">register_handler</span>(<span class="params">file_formats, **kwargs</span>):</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">wrap</span>(<span class="params">cls</span>):</span><br><span class="line">        _register_handler(cls(**kwargs), file_formats)</span><br><span class="line">        <span class="keyword">return</span> cls</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> wrap</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">_register_handler</span>(<span class="params">handler, file_formats</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;Register a handler for some file extensions.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        handler (:obj:`BaseFileHandler`): Handler to be registered.</span></span><br><span class="line"><span class="string">        file_formats (str or list[str]): File formats to be handled by this</span></span><br><span class="line"><span class="string">            handler.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> <span class="built_in">isinstance</span>(handler, BaseFileHandler):</span><br><span class="line">        <span class="keyword">raise</span> TypeError(</span><br><span class="line">            <span class="string">f&#x27;handler must be a child of BaseFileHandler, not <span class="subst">&#123;<span class="built_in">type</span>(handler)&#125;</span>&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(file_formats, <span class="built_in">str</span>):</span><br><span class="line">        file_formats = [file_formats]</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> is_list_of(file_formats, <span class="built_in">str</span>):</span><br><span class="line">        <span class="keyword">raise</span> TypeError(<span class="string">&#x27;file_formats must be a str or a list of str&#x27;</span>)</span><br><span class="line">    <span class="keyword">for</span> ext <span class="keyword">in</span> file_formats:</span><br><span class="line">        file_handlers[ext] = handler</span><br></pre></td></tr></table></figure>
+<p>上面装饰器的作用是构造一个句柄示例, 然后在<code>file_handler</code>中创建后缀名和句柄实例的键值对</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io">Grapymage</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io/2024/01/22/openmmlab/mmengine/load_function/">https://zhangtingyu11.github.io/2024/01/22/openmmlab/mmengine/load_function/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhangtingyu11.github.io" target="_blank">Grapymage的个人博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><a class="post-meta__tags" href="/tags/MMEngine/">MMEngine</a></div><div class="post_share"><div class="social-share" data-image="/img/avatar.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i>赞助</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/03/08/algorithms/lanqiao/find_integer/" title="蓝桥杯2022省赛python研究生组B.寻找整数"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">蓝桥杯2022省赛python研究生组B.寻找整数</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/22/python/python_decorator/" title="python装饰器"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">python装饰器</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/12/07/openmmlab/mmdeploy/mmdeploy-install/" title="安装MMDeploy(pth模型转onnx)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-07</div><div class="title">安装MMDeploy(pth模型转onnx)</div></div></a></div><div><a href="/2023/12/19/deep_learning/pytorch/cudnn_determine/" title="确定随机种子导致的训练变慢问题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">确定随机种子导致的训练变慢问题</div></div></a></div><div><a href="/2023/12/25/deep_learning/math_in_deeplearning/ep1/" title="EP1. 深度学习中的矩阵求导基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-25</div><div class="title">EP1. 深度学习中的矩阵求导基础</div></div></a></div><div><a href="/2024/01/10/deep_learning/common_knowledge/download_waymo/" title="下载waymo数据集V1.4.2"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-10</div><div class="title">下载waymo数据集V1.4.2</div></div></a></div><div><a href="/2024/01/16/deep_learning/pytorch/cusolverDnCreate_error/" title="Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-16</div><div class="title">Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Grapymage</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">80</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">49</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">45</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangtingyu11"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">无</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#load%E5%87%BD%E6%95%B0"><span class="toc-number">1.</span> <span class="toc-text">load函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#load%E5%87%BD%E6%95%B0%E6%B5%81%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">load函数流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B0%E5%A2%9E%E6%96%87%E4%BB%B6%E5%8F%A5%E6%9F%84"><span class="toc-number">3.</span> <span class="toc-text">新增文件句柄</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#register-handler%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">4.</span> <span class="toc-text">register_handler的工作原理</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/03/08/algorithms/lanqiao/find_integer/" title="蓝桥杯2022省赛python研究生组B.寻找整数">蓝桥杯2022省赛python研究生组B.寻找整数</a><time datetime="2024-03-08T02:09:26.000Z" title="发表于 2024-03-08 10:09:26">2024-03-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/22/openmmlab/mmengine/load_function/" title="MMEngine中的load函数">MMEngine中的load函数</a><time datetime="2024-01-22T12:15:02.000Z" title="发表于 2024-01-22 20:15:02">2024-01-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/22/python/python_decorator/" title="python装饰器">python装饰器</a><time datetime="2024-01-22T09:21:27.000Z" title="发表于 2024-01-22 17:21:27">2024-01-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/16/deep_learning/pytorch/cusolverDnCreate_error/" title="Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)">Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)</a><time datetime="2024-01-16T13:19:33.000Z" title="发表于 2024-01-16 21:19:33">2024-01-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/16/lab_env_construction/monocon/" title="MonoCon实验环境搭建">MonoCon实验环境搭建</a><time datetime="2024-01-16T13:10:34.000Z" title="发表于 2024-01-16 21:10:34">2024-01-16</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/top_img.png')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Grapymage</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      onCommentLoaded: () => {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      }
+    }, null))
+  }
+
+  const loadTwikoo = () => {
+    if (typeof twikoo === 'object') setTimeout(init,0)
+    else getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(init)
+  }
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(res => {
+      countELement.textContent = res[0].count
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else {
+      loadTwikoo()
+      
+    }
+  } else {
+    window.loadOtherComment = loadTwikoo
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
