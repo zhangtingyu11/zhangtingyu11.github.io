@@ -1,0 +1,288 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>斯坦福2021秋季·实用机器学习(第二章) | Grapymage的个人博客</title><meta name="author" content="Grapymage"><meta name="copyright" content="Grapymage"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="[toc] 数据清理 数据错误  数据经常有错误,  也就是和ground truth有偏差, 比如数据确实, 错误, 或者有极端值 一个好的机器学习模型对错误数据的容忍度是很高的, 但是可能精度比干净的数据要低 部署使用不干净数据训练的模型可能会影响新收集的数据的质量  数据错误的类型  离群点: 数据的值不在正常分布里面 规则冲突: 违反了一些限制, 比如Not Null和必须唯一的限制 违反">
+<meta property="og:type" content="article">
+<meta property="og:title" content="斯坦福2021秋季·实用机器学习(第二章)">
+<meta property="og:url" content="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter2/index.html">
+<meta property="og:site_name" content="Grapymage的个人博客">
+<meta property="og:description" content="[toc] 数据清理 数据错误  数据经常有错误,  也就是和ground truth有偏差, 比如数据确实, 错误, 或者有极端值 一个好的机器学习模型对错误数据的容忍度是很高的, 但是可能精度比干净的数据要低 部署使用不干净数据训练的模型可能会影响新收集的数据的质量  数据错误的类型  离群点: 数据的值不在正常分布里面 规则冲突: 违反了一些限制, 比如Not Null和必须唯一的限制 违反">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg">
+<meta property="article:published_time" content="2024-06-26T06:50:53.000Z">
+<meta property="article:modified_time" content="2024-06-26T06:51:23.802Z">
+<meta property="article:author" content="Grapymage">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg"><link rel="shortcut icon" href="/img/avatar.jpeg"><link rel="canonical" href="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '斯坦福2021秋季·实用机器学习(第二章)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-06-26 14:51:23'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.0.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/top_img.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Grapymage的个人博客"><span class="site-name">Grapymage的个人博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">斯坦福2021秋季·实用机器学习(第二章)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-26T06:50:53.000Z" title="发表于 2024-06-26 14:50:53">2024-06-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-06-26T06:51:23.802Z" title="更新于 2024-06-26 14:51:23">2024-06-26</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span id="" data-flag-title="斯坦福2021秋季·实用机器学习(第二章)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="twikoo_visitors"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>[toc]</p>
+<h1 id="数据清理">数据清理</h1>
+<h2 id="数据错误">数据错误</h2>
+<ul>
+<li>数据经常有错误,  也就是和ground truth有偏差, 比如数据确实, 错误, 或者有极端值</li>
+<li>一个好的机器学习模型对错误数据的容忍度是很高的, 但是可能精度比干净的数据要低</li>
+<li>部署使用不干净数据训练的模型可能会影响新收集的数据的质量</li>
+</ul>
+<h2 id="数据错误的类型">数据错误的类型</h2>
+<ul>
+<li>离群点: 数据的值不在正常分布里面</li>
+<li>规则冲突: 违反了一些限制, 比如Not Null和必须唯一的限制</li>
+<li>违反语义语法: 比如数值的类型要按照美元来算, 但是使用了其他的币种, 或者单词写错了</li>
+</ul>
+<h2 id="离群点检测">离群点检测</h2>
+<p>对于离散类别的类, 可以将样本特别少的删除掉, 或者手动将其合并到别的类<br>
+对于数值类别的类, 如下图所示, box的上界是75%的数据是低于他的, 下界是25%的数据是低于它的, 上下都取1.5倍的box高度, 对于这个区间之外的数据都认为是离群点(1.5是个超参数)<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617094558.png" alt=""></p>
+<h2 id="基于规则的检测">基于规则的检测</h2>
+<ul>
+<li>功能性依赖(Functional dependencies): x -&gt; y表示值x唯一决定一个值y, 比如邮编可以决定所在的州. 如果不满足要么自动改正, 要么就删除</li>
+<li>Denial constraints: 灵活的一阶表达式. 例如, 如果这个公司有一个EIN的话, 那么手机号码必须是非空</li>
+</ul>
+<h2 id="基于模式的检测">基于模式的检测</h2>
+<ul>
+<li>基于语法的检测: 比如将eng全部改成English</li>
+<li>基于语义的检测: 在Country这个列的值必须含有首都, 因此Stanford不能作为国家</li>
+</ul>
+<h1 id="data-transformation">Data Transformation</h1>
+<h2 id="实数型特征的归一化">实数型特征的归一化</h2>
+<ul>
+<li>使用min-max进行归一化(归一化到最小值为a, 最大值为b): <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>x</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo>=</mo><mfrac><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msub><mo><mi>min</mi><mo>⁡</mo></mo><mi mathvariant="bold">x</mi></msub></mrow><mrow><msub><mo><mi>max</mi><mo>⁡</mo></mo><mi mathvariant="bold">x</mi></msub><mo>−</mo><msub><mo><mi>min</mi><mo>⁡</mo></mo><mi mathvariant="bold">x</mi></msub></mrow></mfrac><mo stretchy="false">(</mo><mi>b</mi><mo>−</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>a</mi></mrow><annotation encoding="application/x-tex">x_i&#x27;=\frac{x_i-\min_\mathbf{x}}{\max_\mathbf{x}-\min_\mathbf{x}}(b-a)+a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.010556em;vertical-align:-0.258664em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-2.441336em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.3227019999999998em;vertical-align:-0.44509999999999994em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8776019999999999em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">a</span><span class="mtight">x</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1744571428571429em;"><span style="top:-2.357em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathbf mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mspace mtight" style="margin-right:0.19516666666666668em;"></span><span class="mord mtight">−</span><span class="mspace mtight" style="margin-right:0.19516666666666668em;"></span><span class="mop mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">i</span><span class="mtight">n</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1744571428571429em;"><span style="top:-2.357em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathbf mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.4101em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mop mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">i</span><span class="mtight">n</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1744571428571429em;"><span style="top:-2.357em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathbf mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.44509999999999994em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mopen">(</span><span class="mord mathdefault">b</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">a</span></span></span></span></li>
+<li>使用Z-score进行归一化(归一化成均值为0方差为1): <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>x</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo>=</mo><mfrac><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><mtext>mean</mtext><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo></mrow><mrow><mtext>std</mtext><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">x_i&#x27;=\frac{x_i-\text{mean}(\mathbf{x})}{\text{std}(\mathbf{x})}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.010556em;vertical-align:-0.258664em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-2.441336em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">std</span></span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathbf mtight">x</span></span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord text mtight"><span class="mord mtight">mean</span></span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathbf mtight">x</span></span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></li>
+<li>使得绝对值的最大值小于1: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>x</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo>=</mo><msub><mi>x</mi><mi>i</mi></msub><mi mathvariant="normal">/</mi><mn>1</mn><msup><mn>0</mn><mi>j</mi></msup><mspace width="1em"/><mtext>smallest</mtext><mi>j</mi><mtext>s.t.</mtext><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi mathvariant="normal">∣</mi><msubsup><mi>x</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mi mathvariant="normal">∣</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x_i&#x27;=x_i/10^j\quad\text{smallest}j\text{s.t.}\max(|x_i&#x27;|)&lt;1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.010556em;vertical-align:-0.258664em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-2.441336em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.0833279999999998em;vertical-align:-0.258664em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord">smallest</span></span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord text"><span class="mord">s.t.</span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop">max</span><span class="mopen">(</span><span class="mord">∣</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-2.441336em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></li>
+<li>对数缩放: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>x</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">x_i&#x27; = log(x_i)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.010556em;vertical-align:-0.258664em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-2.441336em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></li>
+</ul>
+<h2 id="图像变换">图像变换</h2>
+<ul>
+<li>下采样和裁剪
+<ul>
+<li>减少图像的尺寸用于节省内存, 快速加载</li>
+<li>机器学习对低分辨率的数据集的效果还不错</li>
+<li>注意存储的图片的质量, 80%~90%质量的图片会导致1%的精度的下降</li>
+</ul>
+</li>
+<li>图像whitening(图像中有些像素没什么用, 做一些降维的操作)
+<ul>
+<li>让输入不那么冗 余</li>
+<li>让模型收敛更快</li>
+</ul>
+</li>
+</ul>
+<h2 id="视频变换">视频变换</h2>
+<p>一般一个电影的长度是2h, YouTube视频大概11min, Tiktok短视频大概15s<br>
+需要去平衡数据存储的大小, 视频的质量以及视频加载的速度<br>
+在机器学习领域往往使用短视频片段, 大概10s以内, 每个切片只包含一个事件<br>
+视频存储采用了比较好的一些压缩算法, 需要对视频进行解码, 解码的操作会比存储他们便宜不少</p>
+<h2 id="文本变换">文本变换</h2>
+<ul>
+<li>词根化/语法化: 例如将am, are, is变成be, 将car, cars, car’s, cars’变成car</li>
+<li>tokenization: 例如用单词划分就是<code>text.split(' ')</code>, 用字母划分就是<code>text.split('')</code>, 使用子词划分, 比如&quot;a new gpu!&quot;, 划分为&quot;a&quot;, “new”, “gp”, “##u”, “!”, 因为gpu在字典里没有, 但是gp有, 所以需要这么划分</li>
+</ul>
+<h1 id="特征工程">特征工程</h1>
+<h2 id="特征工程">特征工程</h2>
+<p>机器学习算法喜欢定义好的固定长度的输入和输出<br>
+在深度学习之前, 特征工程是机器学习模型的关键<br>
+深度学习通过训练神经网络来提取特征</p>
+<h2 id="表数据特征">表数据特征</h2>
+<ul>
+<li>Int/float数据: 直接使用它, 或者将值域区间切成n个bin, 给每个数分配一个子区间的索引</li>
+<li>离散数据: 使用one-hot编码, 不常见的类别变成Unknown</li>
+<li>时间数据: 使用一个特征列表: [year, month, day, day_of_year, week_of_year, day_of_week]</li>
+<li>特征结合: 两个特征做笛卡尔积, 比如[cat, dog] * [male, female]变成[(cat, male), (cat, female), (dog, male), (dog, female)]</li>
+</ul>
+<h2 id="文本特征">文本特征</h2>
+<p>将文本表示为token特征:</p>
+<ul>
+<li>Bag of words(BoW) 模型: 将每个单词都设置成一个one-hot编码, 然后将出现的词的one-hot编码加起来(下图就是一个例子).限制是需要仔细的单词设计(字典不能太大也不能太小, 句子是有顺序信息的, 这个信息丢失了)<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617114827.png" alt=""></li>
+<li>词嵌入(Word2vec): 向量化单词, 相似的单词会摆放的比较靠近. 通过上下文来预测这个词来进行训练</li>
+</ul>
+<p>使用预训练好的语言模型(BERT, GPT-3):</p>
+<ul>
+<li>是一个比较大的Transformer模型</li>
+<li>用大量的未标注数据进行训练</li>
+<li>在下游任务上进行微调</li>
+</ul>
+<h2 id="图片-视频特征">图片/视频特征</h2>
+<p>传统的方式是使用手工的特征比如SIFT来抽取图像特征<br>
+最近使用的方法是使用预训练的深度神经网络, 例如ResNet, 用ImageNet进行的图像分类预训练, I3D用Kinetics进行动作分类的训练</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io">Grapymage</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter2/">https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhangtingyu11.github.io" target="_blank">Grapymage的个人博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><a class="post-meta__tags" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></div><div class="post_share"><div class="social-share" data-image="/img/avatar.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i>赞助</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/26/deep_learning/stanford_ml/chapter3/" title="斯坦福2021秋季·实用机器学习(第三章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">斯坦福2021秋季·实用机器学习(第三章)</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/26/deep_learning/stanford_ml/chapter1/" title="斯坦福2021秋季·实用机器学习(第一章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">斯坦福2021秋季·实用机器学习(第一章)</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第十章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第十一章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter1/" title="斯坦福2021秋季·实用机器学习(第一章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第一章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter3/" title="斯坦福2021秋季·实用机器学习(第三章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第三章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter4/" title="斯坦福2021秋季·实用机器学习(第四章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第四章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第五章)</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Grapymage</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangtingyu11"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">无</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%B8%85%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">数据清理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%94%99%E8%AF%AF"><span class="toc-number">1.1.</span> <span class="toc-text">数据错误</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%94%99%E8%AF%AF%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.2.</span> <span class="toc-text">数据错误的类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A6%BB%E7%BE%A4%E7%82%B9%E6%A3%80%E6%B5%8B"><span class="toc-number">1.3.</span> <span class="toc-text">离群点检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E8%A7%84%E5%88%99%E7%9A%84%E6%A3%80%E6%B5%8B"><span class="toc-number">1.4.</span> <span class="toc-text">基于规则的检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%A8%A1%E5%BC%8F%E7%9A%84%E6%A3%80%E6%B5%8B"><span class="toc-number">1.5.</span> <span class="toc-text">基于模式的检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#data-transformation"><span class="toc-number">2.</span> <span class="toc-text">Data Transformation</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%95%B0%E5%9E%8B%E7%89%B9%E5%BE%81%E7%9A%84%E5%BD%92%E4%B8%80%E5%8C%96"><span class="toc-number">2.1.</span> <span class="toc-text">实数型特征的归一化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%8F%98%E6%8D%A2"><span class="toc-number">2.2.</span> <span class="toc-text">图像变换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%86%E9%A2%91%E5%8F%98%E6%8D%A2"><span class="toc-number">2.3.</span> <span class="toc-text">视频变换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E6%9C%AC%E5%8F%98%E6%8D%A2"><span class="toc-number">2.4.</span> <span class="toc-text">文本变换</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%89%B9%E5%BE%81%E5%B7%A5%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">特征工程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E5%BE%81%E5%B7%A5%E7%A8%8B"><span class="toc-number">3.1.</span> <span class="toc-text">特征工程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A8%E6%95%B0%E6%8D%AE%E7%89%B9%E5%BE%81"><span class="toc-number">3.2.</span> <span class="toc-text">表数据特征</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E6%9C%AC%E7%89%B9%E5%BE%81"><span class="toc-number">3.3.</span> <span class="toc-text">文本特征</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%89%87-%E8%A7%86%E9%A2%91%E7%89%B9%E5%BE%81"><span class="toc-number">3.4.</span> <span class="toc-text">图片&#x2F;视频特征</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)">斯坦福2021秋季·实用机器学习(第十一章)</a><time datetime="2024-06-26T07:04:34.000Z" title="发表于 2024-06-26 15:04:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)">斯坦福2021秋季·实用机器学习(第十章)</a><time datetime="2024-06-26T07:04:11.000Z" title="发表于 2024-06-26 15:04:11">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter9/" title="斯坦福2021秋季·实用机器学习(第九章)">斯坦福2021秋季·实用机器学习(第九章)</a><time datetime="2024-06-26T07:03:24.000Z" title="发表于 2024-06-26 15:03:24">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)">斯坦福2021秋季·实用机器学习(第五章)</a><time datetime="2024-06-26T07:02:34.000Z" title="发表于 2024-06-26 15:02:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter4/" title="斯坦福2021秋季·实用机器学习(第四章)">斯坦福2021秋季·实用机器学习(第四章)</a><time datetime="2024-06-26T06:56:43.000Z" title="发表于 2024-06-26 14:56:43">2024-06-26</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/top_img.png')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Grapymage</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      onCommentLoaded: () => {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      }
+    }, null))
+  }
+
+  const loadTwikoo = () => {
+    if (typeof twikoo === 'object') setTimeout(init,0)
+    else getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(init)
+  }
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(res => {
+      countELement.textContent = res[0].count
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else {
+      loadTwikoo()
+      
+    }
+  } else {
+    window.loadOtherComment = loadTwikoo
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

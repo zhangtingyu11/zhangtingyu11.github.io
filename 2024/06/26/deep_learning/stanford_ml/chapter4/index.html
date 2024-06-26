@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>斯坦福2021秋季·实用机器学习(第四章) | Grapymage的个人博客</title><meta name="author" content="Grapymage"><meta name="copyright" content="Grapymage"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="[toc] 模型评估 模型指标  在有监督训练时, 通过最小化训练的损失来训练模型. 损失值是衡量模型质量的一个广泛使用的指标 有许多其他的指标, 比如对于分类问题使用accuracy, 对于目标检测使用mAP. 还有一些商业上的考虑, 比如预测的延迟 不会选择一个单一的指标来选择模型  案例分析: 广告 首先获取相关的广告, 然后对每个广告进行预测, 预测Click Through Rate(C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="斯坦福2021秋季·实用机器学习(第四章)">
+<meta property="og:url" content="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter4/index.html">
+<meta property="og:site_name" content="Grapymage的个人博客">
+<meta property="og:description" content="[toc] 模型评估 模型指标  在有监督训练时, 通过最小化训练的损失来训练模型. 损失值是衡量模型质量的一个广泛使用的指标 有许多其他的指标, 比如对于分类问题使用accuracy, 对于目标检测使用mAP. 还有一些商业上的考虑, 比如预测的延迟 不会选择一个单一的指标来选择模型  案例分析: 广告 首先获取相关的广告, 然后对每个广告进行预测, 预测Click Through Rate(C">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg">
+<meta property="article:published_time" content="2024-06-26T06:56:43.000Z">
+<meta property="article:modified_time" content="2024-06-26T07:06:02.344Z">
+<meta property="article:author" content="Grapymage">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg"><link rel="shortcut icon" href="/img/avatar.jpeg"><link rel="canonical" href="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter4/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '斯坦福2021秋季·实用机器学习(第四章)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-06-26 15:06:02'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.0.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/top_img.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Grapymage的个人博客"><span class="site-name">Grapymage的个人博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">斯坦福2021秋季·实用机器学习(第四章)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-26T06:56:43.000Z" title="发表于 2024-06-26 14:56:43">2024-06-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-06-26T07:06:02.344Z" title="更新于 2024-06-26 15:06:02">2024-06-26</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span id="" data-flag-title="斯坦福2021秋季·实用机器学习(第四章)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="twikoo_visitors"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>[toc]</p>
+<h1 id="模型评估">模型评估</h1>
+<h2 id="模型指标">模型指标</h2>
+<ul>
+<li>在有监督训练时, 通过最小化训练的损失来训练模型. 损失值是衡量模型质量的一个广泛使用的指标</li>
+<li>有许多其他的指标, 比如对于分类问题使用accuracy, 对于目标检测使用mAP. 还有一些商业上的考虑, 比如预测的延迟</li>
+<li>不会选择一个单一的指标来选择模型</li>
+</ul>
+<h2 id="案例分析-广告">案例分析: 广告</h2>
+<p>首先获取相关的广告, 然后对每个广告进行预测, 预测Click Through Rate(CTR), 然后展示CTR * 价格最高的广告</p>
+<h2 id="分类的指标">分类的指标</h2>
+<p><strong>Accuracy</strong>: 预测正确的样本数 / 样本总数<br>
+<strong>Precision</strong>: 预测类<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>正确的样本数/预测类<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>的样本数<br>
+<strong>Recall</strong>: 预测类<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>正确的样本数/类<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>的样本数<br>
+<strong>F1</strong>: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mn>2</mn><mo>×</mo><mi>P</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>i</mi><mi>s</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>×</mo><mi>R</mi><mi>e</mi><mi>c</mi><mi>a</mi><mi>l</mi><mi>l</mi></mrow><mrow><mo stretchy="false">(</mo><mi>P</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>i</mi><mi>s</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>+</mo><mi>R</mi><mi>e</mi><mi>c</mi><mi>a</mi><mi>l</mi><mi>l</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{2 \times Precision \times Recall}{(Precision + Recall)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.400108em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801079999999999em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathdefault mtight" style="margin-right:0.13889em;">P</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">c</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">s</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">n</span><span class="mbin mtight">+</span><span class="mord mathdefault mtight" style="margin-right:0.00773em;">R</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">c</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mbin mtight">×</span><span class="mord mathdefault mtight" style="margin-right:0.13889em;">P</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">c</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">s</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">n</span><span class="mbin mtight">×</span><span class="mord mathdefault mtight" style="margin-right:0.00773em;">R</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">c</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></p>
+<p><strong>ROC</strong>:<br>
+横坐标是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mtext>是负例但是预测成正例的样本数</mtext><mtext>负例的样本数</mtext></mfrac></mrow><annotation encoding="application/x-tex">\frac{\text{是负例但是预测成正例的样本数}}{\text{负例的样本数}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.217331em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.872331em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">负例的样本数</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">是负例但是预测成正例的样本数</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><br>
+纵坐标是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mtext>是正例且预测成正例的样本数</mtext><mtext>正例的样本数</mtext></mfrac></mrow><annotation encoding="application/x-tex">\frac{\text{是正例且预测成正例的样本数}}{\text{正例的样本数}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.217331em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.872331em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">正例的样本数</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">是正例且预测成正例的样本数</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><br>
+划分正负样本, 需要依赖阈值<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span></span></span></span>, 当预测的值大于等于<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span></span></span></span>时, 就是预测成正例, 否则预测成负例<br>
+对于不同的<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span></span></span></span>都会有对应的横纵坐标, 就可以画出ROC曲线</p>
+<p><strong>AUC</strong><br>
+ROC曲线下面的面积<br>
+可以根据下面不同的AUC下的数据分布来进行理解<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617220822.png" alt=""></p>
+<h2 id="展示广告的商业指标">展示广告的商业指标</h2>
+<ul>
+<li>延迟: 广告需要满足实时性, 也就是和其他内容一起加载出来</li>
+<li>ASN: 页面上的平均广告数量</li>
+<li>CTR: 用户的点击概率</li>
+<li>ACP: 用户每一次点击广告, 广告商平均支付多少钱</li>
+</ul>
+<p>最后的收入就是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">#</mi><mi>p</mi><mi>a</mi><mi>g</mi><mi>e</mi><mi>v</mi><mi>i</mi><mi>e</mi><mi>w</mi><mi>s</mi><mo>×</mo><mi>A</mi><mi>S</mi><mi>N</mi><mo>×</mo><mi>C</mi><mi>T</mi><mi>R</mi><mo>×</mo><mi>A</mi><mi>C</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">\#pageviews \times ASN \times CTR \times ACP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord">#</span><span class="mord mathdefault">p</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mord mathdefault">i</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span>, 其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">#</mi><mi>p</mi><mi>a</mi><mi>g</mi><mi>e</mi><mi>v</mi><mi>i</mi><mi>e</mi><mi>w</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">\#pageviews</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord">#</span><span class="mord mathdefault">p</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mord mathdefault">i</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">s</span></span></span></span>就是页面的流量有多大</p>
+<h2 id="从模型到商业指标">从模型到商业指标</h2>
+<p>模型的关键指标是AUC<br>
+但是AUC的增长可能会损害商业指标</p>
+<ul>
+<li>假设预测出来CTR变低了, 就会导致更少的广告被展示</li>
+<li>模型都是使用的过去的数据, 但是样本每天都在变化, 可能会推广的广告用户并不买账</li>
+<li>如果挑的广告都是价格比较低的就会导致收入变低</li>
+</ul>
+<p>解决办法就是部署到线上观察商业指标</p>
+<h1 id="过拟合和欠拟合">过拟合和欠拟合</h1>
+<h2 id="训练和泛化误差">训练和泛化误差</h2>
+<ul>
+<li>训练误差: 模型在训练集上的误差</li>
+<li>泛化误差: 模型在新数据上的误差</li>
+</ul>
+<h2 id="过拟合和欠拟合">过拟合和欠拟合</h2>
+<p>训练误差, 泛化误差和过拟合, 欠拟合的关系<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617223231.png" alt=""></p>
+<p>数据和模型的复杂度与过拟合, 欠拟合的关系<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617223327.png" alt=""></p>
+<h2 id="模型的复杂度">模型的复杂度</h2>
+<p>模型的复杂度表示模型去拟合各种函数的能力</p>
+<ul>
+<li>低复杂度的模型难以拟合训练集</li>
+<li>高复杂度的模型可以记下训练集</li>
+</ul>
+<p>难以比较不同算法之间的复杂度<br>
+在算法中, 有两个关键因素:</p>
+<ul>
+<li>参数的数量</li>
+<li>可以学习的参数可以取到多少值(值域范围)</li>
+</ul>
+<h2 id="模型复杂度样例-决策树">模型复杂度样例: 决策树</h2>
+<p>当树的深度越大的时候, 训练的误差不断降低, 验证误差升高了<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617223923.png" alt=""></p>
+<h2 id="数据复杂度">数据复杂度</h2>
+<p>数据的复杂度包含很多因素</p>
+<ul>
+<li>有多少个样本</li>
+<li>每个样本中有多少个元素</li>
+<li>时间/空间结构</li>
+<li>多样性</li>
+</ul>
+<p>难以去比较不同数据之间的复杂性: 比如字母和像素的复杂度难以比较</p>
+<h2 id="模型复杂度和数据复杂度之间的关系">模型复杂度和数据复杂度之间的关系</h2>
+<p><img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617224303.png" alt=""></p>
+<h2 id="模型选择">模型选择</h2>
+<p>选择适合数据复杂度的模型</p>
+<ul>
+<li>降低泛化误差</li>
+<li>考虑商业指标</li>
+</ul>
+<p>定下模型之后选择合适的超参数</p>
+<ul>
+<li>决策树要设置maximal depths</li>
+<li>神经网络要设置架构, 深度, 宽度, 正则化</li>
+</ul>
+<h1 id="模型验证">模型验证</h1>
+<h2 id="评估泛化误差">评估泛化误差</h2>
+<p>使用测试集来评估误差, 但是测试集只能使用一次, 测试集可以指以下:</p>
+<ul>
+<li>期中考试测验分数</li>
+<li>预测出来的房屋价格和真实出售价格的区别</li>
+<li>Kaggle的私榜</li>
+</ul>
+<p>验证集: 可以被使用多次</p>
+<ul>
+<li>经常是训练集的一部分</li>
+<li>大部分情况&quot;test&quot;指的是验证误差</li>
+</ul>
+<h2 id="生成验证集">生成验证集</h2>
+<ul>
+<li>将数据划分成训练集和验证集, 然后在训练集上训练模型, 在验证集上评估泛化误差</li>
+<li>一般选择n%的样本作为验证集</li>
+</ul>
+<h2 id="分割非独立同分布数据">分割非独立同分布数据</h2>
+<p>在非独立同分布数据上, 随机划分可能无效<br>
+例如序列数据(房屋的价格, 股票的价格), 验证集的时候应该在训练集之后</p>
+<p>样本属于组(例如同一个人的照片): 那么应该在组中进行划分, 而不是对样本进行划分</p>
+<p>不均匀的数据: 应该在少类别上采样更多</p>
+<h2 id="房价预测的分割数据集策略">房价预测的分割数据集策略</h2>
+<p>如果是序列分割(前50%作为训练集, 后50%作为验证集)<br>
+序列分割, 过拟合发生地要早一点<br>
+同时序列分割的情况下, 验证集的误差可能会更大一点, 一般前3个月和后3个月的分布可能完全不一样<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/20240617225940.png" alt=""></p>
+<h2 id="k折交叉验证">K折交叉验证</h2>
+<p>往往是针对<strong>数据不够用</strong>的情况<br>
+将训练数据分成K份<br>
+将第<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>份数据作为验证集, 剩下的作为训练集<br>
+报告K个验证集的平均误差<br>
+一般K = 5或者10</p>
+<h2 id="常见的错误">常见的错误</h2>
+<p>90%特别好的数据是由于bug导致的, 比如验证集被污染了(验证集和训练集有重叠)</p>
+<p>比如验证集中有些样本和训练集是重复的<br>
+整合数据的时候数据可能存在冗余</p>
+<p>还有可能存在信息泄漏, 比如使用未来的数据来预测过去</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io">Grapymage</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter4/">https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter4/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhangtingyu11.github.io" target="_blank">Grapymage的个人博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><a class="post-meta__tags" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></div><div class="post_share"><div class="social-share" data-image="/img/avatar.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i>赞助</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">斯坦福2021秋季·实用机器学习(第五章)</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/26/deep_learning/stanford_ml/chapter3/" title="斯坦福2021秋季·实用机器学习(第三章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">斯坦福2021秋季·实用机器学习(第三章)</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第十章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第十一章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter1/" title="斯坦福2021秋季·实用机器学习(第一章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第一章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter2/" title="斯坦福2021秋季·实用机器学习(第二章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第二章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter3/" title="斯坦福2021秋季·实用机器学习(第三章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第三章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第五章)</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Grapymage</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangtingyu11"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">无</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0"><span class="toc-number">1.</span> <span class="toc-text">模型评估</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E6%8C%87%E6%A0%87"><span class="toc-number">1.1.</span> <span class="toc-text">模型指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90-%E5%B9%BF%E5%91%8A"><span class="toc-number">1.2.</span> <span class="toc-text">案例分析: 广告</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E7%B1%BB%E7%9A%84%E6%8C%87%E6%A0%87"><span class="toc-number">1.3.</span> <span class="toc-text">分类的指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B1%95%E7%A4%BA%E5%B9%BF%E5%91%8A%E7%9A%84%E5%95%86%E4%B8%9A%E6%8C%87%E6%A0%87"><span class="toc-number">1.4.</span> <span class="toc-text">展示广告的商业指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8E%E6%A8%A1%E5%9E%8B%E5%88%B0%E5%95%86%E4%B8%9A%E6%8C%87%E6%A0%87"><span class="toc-number">1.5.</span> <span class="toc-text">从模型到商业指标</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%87%E6%8B%9F%E5%90%88%E5%92%8C%E6%AC%A0%E6%8B%9F%E5%90%88"><span class="toc-number">2.</span> <span class="toc-text">过拟合和欠拟合</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E5%92%8C%E6%B3%9B%E5%8C%96%E8%AF%AF%E5%B7%AE"><span class="toc-number">2.1.</span> <span class="toc-text">训练和泛化误差</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%87%E6%8B%9F%E5%90%88%E5%92%8C%E6%AC%A0%E6%8B%9F%E5%90%88"><span class="toc-number">2.2.</span> <span class="toc-text">过拟合和欠拟合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="toc-number">2.3.</span> <span class="toc-text">模型的复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E5%A4%8D%E6%9D%82%E5%BA%A6%E6%A0%B7%E4%BE%8B-%E5%86%B3%E7%AD%96%E6%A0%91"><span class="toc-number">2.4.</span> <span class="toc-text">模型复杂度样例: 决策树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="toc-number">2.5.</span> <span class="toc-text">数据复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%92%8C%E6%95%B0%E6%8D%AE%E5%A4%8D%E6%9D%82%E5%BA%A6%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">2.6.</span> <span class="toc-text">模型复杂度和数据复杂度之间的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E9%80%89%E6%8B%A9"><span class="toc-number">2.7.</span> <span class="toc-text">模型选择</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E9%AA%8C%E8%AF%81"><span class="toc-number">3.</span> <span class="toc-text">模型验证</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%84%E4%BC%B0%E6%B3%9B%E5%8C%96%E8%AF%AF%E5%B7%AE"><span class="toc-number">3.1.</span> <span class="toc-text">评估泛化误差</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%9F%E6%88%90%E9%AA%8C%E8%AF%81%E9%9B%86"><span class="toc-number">3.2.</span> <span class="toc-text">生成验证集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E5%89%B2%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E6%95%B0%E6%8D%AE"><span class="toc-number">3.3.</span> <span class="toc-text">分割非独立同分布数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%BF%E4%BB%B7%E9%A2%84%E6%B5%8B%E7%9A%84%E5%88%86%E5%89%B2%E6%95%B0%E6%8D%AE%E9%9B%86%E7%AD%96%E7%95%A5"><span class="toc-number">3.4.</span> <span class="toc-text">房价预测的分割数据集策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#k%E6%8A%98%E4%BA%A4%E5%8F%89%E9%AA%8C%E8%AF%81"><span class="toc-number">3.5.</span> <span class="toc-text">K折交叉验证</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E9%94%99%E8%AF%AF"><span class="toc-number">3.6.</span> <span class="toc-text">常见的错误</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)">斯坦福2021秋季·实用机器学习(第十一章)</a><time datetime="2024-06-26T07:04:34.000Z" title="发表于 2024-06-26 15:04:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)">斯坦福2021秋季·实用机器学习(第十章)</a><time datetime="2024-06-26T07:04:11.000Z" title="发表于 2024-06-26 15:04:11">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter9/" title="斯坦福2021秋季·实用机器学习(第九章)">斯坦福2021秋季·实用机器学习(第九章)</a><time datetime="2024-06-26T07:03:24.000Z" title="发表于 2024-06-26 15:03:24">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)">斯坦福2021秋季·实用机器学习(第五章)</a><time datetime="2024-06-26T07:02:34.000Z" title="发表于 2024-06-26 15:02:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter4/" title="斯坦福2021秋季·实用机器学习(第四章)">斯坦福2021秋季·实用机器学习(第四章)</a><time datetime="2024-06-26T06:56:43.000Z" title="发表于 2024-06-26 14:56:43">2024-06-26</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/top_img.png')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Grapymage</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      onCommentLoaded: () => {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      }
+    }, null))
+  }
+
+  const loadTwikoo = () => {
+    if (typeof twikoo === 'object') setTimeout(init,0)
+    else getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(init)
+  }
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(res => {
+      countELement.textContent = res[0].count
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else {
+      loadTwikoo()
+      
+    }
+  } else {
+    window.loadOtherComment = loadTwikoo
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

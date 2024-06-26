@@ -51,7 +51,7 @@
   isHome: true,
   isHighlightShrink: false,
   isToc: false,
-  postUpdate: '2024-03-08 10:10:52'
+  postUpdate: '2024-06-26 15:06:09'
 }</script><script>(win=>{
       win.saveToLocal = {
         set: (key, value, ttl) => {
@@ -148,89 +148,236 @@
         }
       }
       detectApple()
-    })(window)</script><meta name="generator" content="Hexo 7.0.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">80</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">49</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">45</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url('/img/index.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Grapymage的个人博客"><span class="site-name">Grapymage的个人博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">Grapymage的个人博客</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/03/08/algorithms/lanqiao/find_integer/" title="蓝桥杯2022省赛python研究生组B.寻找整数">蓝桥杯2022省赛python研究生组B.寻找整数</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-03-08T02:09:26.000Z" title="发表于 2024-03-08 10:09:26">2024-03-08</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E7%AE%97%E6%B3%95/%E4%B8%AD%E5%9B%BD%E5%89%A9%E4%BD%99%E5%AE%9A%E7%90%86/">中国剩余定理</a></span></div><div class="content">思路
-如果知道一个数模很多数的值, 可以考虑中国剩余定理
-中国剩余定理
-考虑一元线性同余方程组:
-(S):{x≡a1(modm1)x≡a2(modm2)⋮x≡an(modmn)\left.(S):\quad\left\{\begin{array}{c}x\equiv a_1\pmod{m_1}\\x\equiv a_2\pmod{m_2}\\\vdots\\x\equiv a_n\pmod{m_n}\end{array}\right.\right.
-(S):⎩⎪⎪⎪⎪⎨⎪⎪⎪⎪⎧​x≡a1​(modm1​)x≡a2​(modm2​)⋮x≡an​(modmn​)​
-中国剩余定理说明: 如果整数m1,m2,⋯ ,mnm_1, m_2, \cdots, m_nm1​,m2​,⋯,mn​其中任意两个数互质, 那么对于任意的整数: a1,a2,⋯ ,ana_1, a_2, \cdots, a_na1​,a2​,⋯,an​, 方程组(S)(S)(S)有解, 并且通解可以通过如下方式构造得到:
+    })(window)</script><meta name="generator" content="Hexo 7.0.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url('/img/index.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Grapymage的个人博客"><span class="site-name">Grapymage的个人博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">Grapymage的个人博客</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)">斯坦福2021秋季·实用机器学习(第十一章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T07:04:34.000Z" title="发表于 2024-06-26 15:04:34">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">[toc]
+迁移学习
+迁移学习
 
-计算所有模数的乘积 MMM
-对于第iii个方程:
-a. 计算Mi=MmiM_i = \frac{M}{m ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/22/openmmlab/mmengine/load_function/" title="MMEngine中的load函数">MMEngine中的load函数</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-22T12:15:02.000Z" title="发表于 2024-01-22 20:15:02">2024-01-22</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/OpenMMLab/">OpenMMLab</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/OpenMMLab/MMEngine/">MMEngine</a></span></div><div class="content">MMEngine版本: 0.10.2
-load函数
-load函数的主要目的是为了给定一个统一的接口来进行文件的读取, 例如下面的代码
-12345import mmenginedata1 = mmengine.load(&#x27;/home/public/zty/Project/DeepLearningProject/DID-M3D/config/kitti.yaml&#x27;)print(data1)data2 = mmengine.load(&#x27;/home/public/zty/Project/DeepLearningProject/mmengine/mmengine/hub/deprecated.json&#x27;)print(data2)
-输出如下
+出发点
 
-可以发现对于不同的文件后缀, 都可以使用load函数来读取
-load函数流程
-首先会通过以下的file_handler通过文件后缀来确定要处理的句柄, 然后根据文件的前缀来确定backend (常见的前缀有https, http, 空前缀)
-1234567file_handlers = &#123;    &#x27; ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/22/python/python_decorator/" title="python装饰器">python装饰器</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-22T09:21:27.000Z" title="发表于 2024-01-22 17:21:27">2024-01-22</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/python3/">python3</a></span></div><div class="content">主要参考PythonCookbook中的内容, 使用的环境是python3.8.18
-给函数增加装饰器
-1234567891011121314151617181920import timedef timethis(func):    &#x27;&#x27;&#x27;    Decorator that reports the execution time.    &#x27;&#x27;&#x27;    def wrapper(*args, **kwargs):        start = time.time()        result = func(*args, **kwargs)        end = time.time()        print(func.__name__, end-start)        return result    return wrapper@timethisdef count(n):    for _ in range(n):        pass    res1 = count(10**7)res2 = count(10** ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/16/deep_learning/pytorch/cusolverDnCreate_error/" title="Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)">Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-16T13:19:33.000Z" title="发表于 2024-01-16 21:19:33">2024-01-16</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/pytorch/">pytorch</a></span></div><div class="content">这种报错目前没有找到特别好的解决办法, 下面提出一些可能的解决方法, 仅供参考
-方法一
-参考这个issue
-里面说是显存不够, 但是这个方法对我没啥用
-方法二
-参考我提的issue
-只需要将张量转到cpu上然后计算reverse再移动到GPU上
-这个方法会增加一部分时间, 因为涉及张量在设备之前的移动
-</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/16/lab_env_construction/monocon/" title="MonoCon实验环境搭建">MonoCon实验环境搭建</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-16T13:10:34.000Z" title="发表于 2024-01-16 21:10:34">2024-01-16</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">实验环境搭建</a></span></div><div class="content">仓库地址
-创建虚拟环境
-123456789101112131415161718192021222324conda create -n monocon python=3.8conda activate monocongit clone https://github.com/Xianpeng919/MonoConcd MonoConconda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=11.1 -c pytorch -c conda-forgepip install opencv-python==3.4.10.37pip install mmcv-full==1.3.1 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.8.0/index.htmlcd ./mmdetection-2.11.0pip install -r requirements/build.txtpip install -v -e .cd ..pip ins ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/11/paper_reading/3D_object_detection/camera_only/MonoCon/" title="Learning Auxiliary Monocular Contexts Helps Monocular 3D Object Detection">Learning Auxiliary Monocular Contexts Helps Monocular 3D Object Detection</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-11T12:45:58.000Z" title="发表于 2024-01-11 20:45:58">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/3D%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/">3D目标检测</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/3D%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/%E7%BA%AF%E7%9B%B8%E6%9C%BA3D%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/">纯相机3D目标检测</a></span></div><div class="content">主要思路
-在模型中添加一些辅助的检测头来提升模型的性能
-Introduction
-单目3D目标检测的主要挑战之一是精确的预测物体的3D中心位置
-目前SOTA的方法主要有两类, 可以根据是够需要额外的信息(LiDAR的深度, 单目相机的深度)来进行分类
-在实际应用中, 3D中心点的位置可以分解为3D中心点在图像上的投影点和物体的深度. 再结合相机的内参, 就可以得到3D中心点的位置
-本文主要是关注端到端的单目3D目标检测, 并且不利用任何的额外信息
-在实现上, MonoCon使用一个很简单的设计, 包含三部分: 一个DNN, 一系列的检测头用于3D目标检测, 一系列的检测头用于学习辅助的语义信息
-主要贡献
+将一个已经在一个任务上训练好的模型用于一个相关的任务
+深度学习中的模型需要非常多的数据, 并且训练很昂贵
 
-提出了一个简单但是有效的方法, MonoCon, 通过学习辅助的单目context来辅助进行单目3D目标检测
-SOTA
-激发了探索更多辅助的任务
 
-Approach
-Problem Definition
-给定图像网格ΛΛΛ (在KITTI上是384×1280384 \times 1280384×1280), IΛI_ΛIΛ​是图像网格上的图像. 3D包围框可以表示为物体的3D中心点位 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/10/misc/proxy_send_email/" title="通过代理发送163邮件">通过代理发送163邮件</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-10T11:44:28.000Z" title="发表于 2024-01-10 19:44:28">2024-01-10</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%9D%82%E7%B1%BB/">杂类</a></span></div><div class="content">背景
-想做一个自动训练的脚本, 然后观察训练得出来的结果, 如果结果比较好就通过邮件发送给我.
-但是实验室的服务器是在机房里面, 不能联网的. 之前使用FRP搭了内网穿透, 但是只设置了HTTP代理. 写了发送邮件的代码后发现发送不出去, 后来查阅资料发现需要设置socks代理. 因此记录一下
-FRP配置
-FRP的下载以及运行什么的不细说了, 后面可能会再写一篇博客专门说FRP
-下面贴一下服务器的配置, 绑定的端口号是52117, token这里就不贴了, 和客户端对应上就可以
-1234[common]bind_port = 52117kcp_bind_port = 52117token = xxxxxxxx
-客户端配置
-123456789101112131415161718[common]server_addr = 10.60.57.15server_port = 52117protocol = kcptoken = xxxxxxxx[v2ray]type = tcplocal_ip = 127.0.0.1local_port = 1081remote_port = 52118use ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/10/deep_learning/common_knowledge/download_waymo/" title="下载waymo数据集V1.4.2">下载waymo数据集V1.4.2</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-10T11:37:56.000Z" title="发表于 2024-01-10 19:37:56">2024-01-10</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">深度学习基础知识</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/%E6%95%B0%E6%8D%AE%E9%9B%86/">数据集</a></span></div><div class="content">写在前面
-下载waymo数据集的主要难点就是安装gsutil, 尽量按照官方文档来. 本篇博客的时间是2023.01.10, 随着时间的推移未必仍然有效.
-环境: Ubuntu20.04
-安装gsutil
-更新软件包并安装依赖
-12sudo apt-get updatesudo apt-get install apt-transport-https ca-certificates gnupg curl sudo
-导入Google Cloud公钥
-1curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-添加gcloud CLI发行版URI作为软件包源
-1echo &quot;deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main&quot; | sud ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/09/deep_learning/common_knowledge/grad_clip_norm/" title="梯度裁剪(clip_grad_norm_)">梯度裁剪(clip_grad_norm_)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-09T07:49:44.000Z" title="发表于 2024-01-09 15:49:44">2024-01-09</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">深度学习基础知识</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/pytorch/">pytorch</a></span></div><div class="content">今天看到OpenPCDet, 发现里面每个模型都会做梯度裁剪, 因此看了一下梯度裁剪的源码
-代码
-12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273def clip_grad_norm_(        parameters: _tensor_or_tensors, max_norm: float, norm_type: float = 2.0,        error_if_nonfinite: bool = False, foreach: Optional[bool] = None) -&gt; torch.Tensor:    r&quot;&quot;&quot;Clips gradient norm of an iterable of parameters.    The norm is computed over all gradients toget ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/01/09/deep_learning/common_knowledge/foreach_func/" title="pytorch中的foreach函数">pytorch中的foreach函数</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-01-09T07:09:26.000Z" title="发表于 2024-01-09 15:09:26">2024-01-09</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">深度学习基础知识</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/pytorch/">pytorch</a></span></div><div class="content">最近在看梯度裁剪的时候看到里面调用了_foreach_mul_函数, 说是效率会更高, 因此写了一个代码进行了对比
-函数介绍
-对于_foreach_mul_函数, 总共接收两个参数, 第一个参数是一个Tensor组成的序列, 第二个参数可以是一个标量, 也可以是一个标量序列, 也可以是一个Tensor序列
-如果第二个参数是一个标量, _foreach_mul_函数就将第一个序列中的每一个Tensor都乘上这个标量, 在序列中做原地修改
-如果第二个参数是一个标量序列, _foreach_mul_函数就将第一个序列中的每一个Tensor都乘上标量序列中对应的标量, 在序列中做原地修改
-如果第二个参数是一个Tensor序列, _foreach_mul_函数就将第一个序列中的每一个Tensor都乘上Tensor序列中对应的Tensor, 在序列中做原地修改
-效率对比
-根据一下代码对比了_foreach_mul_和for循环的时间对比
-123456789101112131415161718192021222324252627282930313233343536373839404142434445 ...</div></div></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span><a class="page-number" href="/page/2/#content-inner">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/#content-inner">8</a><a class="extend next" rel="next" href="/page/2/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Grapymage</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">80</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">49</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">45</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangtingyu11"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">无</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/03/08/algorithms/lanqiao/find_integer/" title="蓝桥杯2022省赛python研究生组B.寻找整数">蓝桥杯2022省赛python研究生组B.寻找整数</a><time datetime="2024-03-08T02:09:26.000Z" title="发表于 2024-03-08 10:09:26">2024-03-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/22/openmmlab/mmengine/load_function/" title="MMEngine中的load函数">MMEngine中的load函数</a><time datetime="2024-01-22T12:15:02.000Z" title="发表于 2024-01-22 20:15:02">2024-01-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/22/python/python_decorator/" title="python装饰器">python装饰器</a><time datetime="2024-01-22T09:21:27.000Z" title="发表于 2024-01-22 17:21:27">2024-01-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/16/deep_learning/pytorch/cusolverDnCreate_error/" title="Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)">Pytorch报错:cusolver error:7,when calling cusolverDnCreate(handle)</a><time datetime="2024-01-16T13:19:33.000Z" title="发表于 2024-01-16 21:19:33">2024-01-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/16/lab_env_construction/monocon/" title="MonoCon实验环境搭建">MonoCon实验环境搭建</a><time datetime="2024-01-16T13:10:34.000Z" title="发表于 2024-01-16 21:10:34">2024-01-16</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+方法
+
+特征提取(比如Word2Vec, ResNet50的特征, I3D的特征)
+在相关的任务上训练一个模型然后重复利用他
+在一个预训练模型上微调它
+
+
+相关方法
+
+半监督学习
+zero-shot/few-shot学习
+多任务学习, 希望从多个任务当中受益
+
+
+
+微调在计算机视觉中的应用
+存在大规模标注好的CV数据集, 尤其是在图像分类中
+将在这些大规模数据集上训练的知识迁移到自己的计算机视觉应用上
+预训练模型
+可以将神经网络分成
+
+编码器: 将原始的像素映射成特征
+解码器: 使用一个线性分类器来进行决策
+
+预训练模型
+在一个大规模的数据集上进行训练, 然后特征提取器可以泛化到别的数据集或者别的任务上
+微调技术
+首先初始化一个新的模型, 将特征提取器上的参数初始化为预训练模型的参数
+随机初始化输出层
+使用一个小的学习率并且使用较小的轮次来进行训练
+冻结底层
+神经网络学习的是分层的特征
+低层的特征是通用的, 可以泛化的很好, 比如曲线 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)">斯坦福2021秋季·实用机器学习(第十章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T07:04:11.000Z" title="发表于 2024-06-26 15:04:11">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">深度神经网络架构
+批量归一化和层归一化
+对数据进行归一化会使得损失更加的平滑
+
+∥∇f(x)−∇f(y)∥2≤β∥x−y∥2\|\nabla f(\mathbf{x})-\nabla f(\mathbf{y})\|^2\leq\beta\|\mathbf{x}-\mathbf{y}\|^2∥∇f(x)−∇f(y)∥2≤β∥x−y∥2, 当数据的差比较小的时候, 梯度的差就会比较小, 也就是说梯度的变化不会很大
+一个小的β\betaβ可以使用更大的学习率
+但是这个对于深度神经网络并不适用
+
+Batch Normalization对中间层的输入也做标准化
+
+数据更加平滑使得训练更简单
+但是这种解释目前也是存在争议的
+
+批量归一化
+第一步是变形
+X∈Rn×c×w×h→X′∈Rnwh×c\mathbf{X}\in\mathbb{R}^{n\times c\times w\times h}\to\mathbf{X}^{\prime}\in\mathbb{R}^{nwh\times c}
+X∈Rn×c×w×h→X′∈Rnwh×c
+第二步是做标准化
+x^j′←(xj′−max⁡(xj′))/std⁡ ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter9/" title="斯坦福2021秋季·实用机器学习(第九章)">斯坦福2021秋季·实用机器学习(第九章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T07:03:24.000Z" title="发表于 2024-06-26 15:03:24">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">模型调参
+手工调参
+
+可以使用一些高质量数据集中的默认超参数, 或者使用论文中提到的超参数
+更改超参数的值, 然后重新训练模型看看性能的变化
+重复多次去观察以下一些内容
+
+哪些超参数是重要的
+模型对超参数的敏感程度
+超参数的合理取值范围是多少
+
+
+
+在进行超参数的实验的时候需要仔细的实验管理, 比如记录训练的日志和超参数去进行比较. 最简单的方法就是保存成log文件见, 更好的方法是使用现成的工具, 比如tensorboard, weights &amp; bias
+自动调节超参数
+计算的成本是在下降的, 人的成本是在上升的
+计算的成本如下
+
+现在一个数据科学家的成本大概是500刀每天
+如果使用算法1000次调参的情况下比人要好, 就可以使用自动调节超参数
+AutoML
+AutoML是希望将机器学习中的每个步骤都实现自动化: 比如数据清理, 特征提取, 模型选择
+AutoML包含两大块:
+
+Hyperparameter optimization(HPO, 超参数优化): 通过算法找到一个好的超参数集合
+Neural architecture search(NAS): 构建一个好的神经网 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)">斯坦福2021秋季·实用机器学习(第五章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T07:02:34.000Z" title="发表于 2024-06-26 15:02:34">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">[toc]
+方差和偏差
+偏差和方差的图像说明图下
+
+偏差和方差的定义
+假设从y=f(x)+εy=f(x)+\varepsilony=f(x)+ε中采样了n个数据D={(x1,y1),...,(xn,yn)}D=\{(x_1,y_1),...,(x_n,y_n)\}D={(x1​,y1​),...,(xn​,yn​)}, 其中ε\varepsilonε表示数据的噪声
+目标是要最小化均方根误差
+E⁡D[(y−f^D(x))2]=E⁡D[((f−E⁡D[f^D])−(f^D−E⁡D[f^D])+ε)2]=(f−ED[f^D])2+ED[(f^D−ED[f^D]))2]+ε2=Bias[f^D]2+Var[f^D]+ε2\begin{aligned}
+\operatorname{E}_{D}\left[(y-\hat{f}_{D}(x))^{2}\right]&amp; =\operatorname{E}_{D}\left[\left((f-\operatorname{E}_{D}[\hat{f}_{D}])-(\hat{f}_{D}-\operatorname{E}_{D}[\hat{f}_ ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter4/" title="斯坦福2021秋季·实用机器学习(第四章)">斯坦福2021秋季·实用机器学习(第四章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T06:56:43.000Z" title="发表于 2024-06-26 14:56:43">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">[toc]
+模型评估
+模型指标
+
+在有监督训练时, 通过最小化训练的损失来训练模型. 损失值是衡量模型质量的一个广泛使用的指标
+有许多其他的指标, 比如对于分类问题使用accuracy, 对于目标检测使用mAP. 还有一些商业上的考虑, 比如预测的延迟
+不会选择一个单一的指标来选择模型
+
+案例分析: 广告
+首先获取相关的广告, 然后对每个广告进行预测, 预测Click Through Rate(CTR), 然后展示CTR * 价格最高的广告
+分类的指标
+Accuracy: 预测正确的样本数 / 样本总数
+Precision: 预测类iii正确的样本数/预测类iii的样本数
+Recall: 预测类iii正确的样本数/类iii的样本数
+F1: 2×Precision×Recall(Precision+Recall)\frac{2 \times Precision \times Recall}{(Precision + Recall)}(Precision+Recall)2×Precision×Recall​
+ROC:
+横坐标是是负例但是预测成正例的样本数负例的样本数\frac{\text{ ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter3/" title="斯坦福2021秋季·实用机器学习(第三章)">斯坦福2021秋季·实用机器学习(第三章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T06:52:34.000Z" title="发表于 2024-06-26 14:52:34">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">机器学习介绍
+机器学习算法的类型
+
+有监督模型: 在有标注的数据上进行训练来生成标签(自监督模型就是标签是来自于数据本身, 比如BERT)
+半监督学习: 在有标签和无标签数据上来学习模型, 预测标签或者预测无标签数据的标签(自训练)
+无监督学习: 在无标签的数据上进行训练(例如聚类, 深度估计)
+强化学习: 通过观测结果来进行行动来最大化收益
+
+有监督训练的主要成分
+
+模型: 根据输入输出预测结果
+损失: 衡量预测和ground truth之间的差异
+目标: 在训练中需要最优化的任意函数
+优化: 通过求解目标函数来学习模型的参数
+
+有监督模型的类别:
+
+决策树: 使用树去进行决策
+线性方法: 通过输入的线性组合来进行决策
+核方法: 使用核函数来计算特征的相似度
+神经网络: 使用神经网络来学习特征表示
+
+决策树
+决策树
+决策树包含分类树和回归树
+
+决策树的好处和坏处
+
+好处
+
+是可解释的
+可以处理数值和类别特征
+
+
+坏处
+
+不具有鲁棒性(可以通过集成学习来帮助)
+复杂的树往往会导致过拟合(需要剪枝)
+不能并行计算
+
+
+
+随机森林
+使用多个决策树来提升鲁棒性, 每个树都是独立训练的, 对于 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter2/" title="斯坦福2021秋季·实用机器学习(第二章)">斯坦福2021秋季·实用机器学习(第二章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T06:50:53.000Z" title="发表于 2024-06-26 14:50:53">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">[toc]
+数据清理
+数据错误
+
+数据经常有错误,  也就是和ground truth有偏差, 比如数据确实, 错误, 或者有极端值
+一个好的机器学习模型对错误数据的容忍度是很高的, 但是可能精度比干净的数据要低
+部署使用不干净数据训练的模型可能会影响新收集的数据的质量
+
+数据错误的类型
+
+离群点: 数据的值不在正常分布里面
+规则冲突: 违反了一些限制, 比如Not Null和必须唯一的限制
+违反语义语法: 比如数值的类型要按照美元来算, 但是使用了其他的币种, 或者单词写错了
+
+离群点检测
+对于离散类别的类, 可以将样本特别少的删除掉, 或者手动将其合并到别的类
+对于数值类别的类, 如下图所示, box的上界是75%的数据是低于他的, 下界是25%的数据是低于它的, 上下都取1.5倍的box高度, 对于这个区间之外的数据都认为是离群点(1.5是个超参数)
+
+基于规则的检测
+
+功能性依赖(Functional dependencies): x -&gt; y表示值x唯一决定一个值y, 比如邮编可以决定所在的州. 如果不满足要么自动改正, 要么就删除
+Denial constraints ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/26/deep_learning/stanford_ml/chapter1/" title="斯坦福2021秋季·实用机器学习(第一章)">斯坦福2021秋季·实用机器学习(第一章)</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-26T06:47:39.000Z" title="发表于 2024-06-26 14:47:39">2024-06-26</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="content">[toc]
+课程介绍
+常见的机器学习应用
+
+制造业: 维修预测, 质量控制
+零售业: 商品推荐, 聊天机器人, 需求预测
+医疗: 通过病人信息进行预警, 疾病诊断
+金融: 欺诈识别, 贷款申请的处理
+汽车: 故障检测, 自动驾驶
+
+机器学习的一般流程
+
+
+Step1: 将问题定义成一个机器学习问题
+Step2: 收集和处理数据
+Step3: 训练并且微调模型
+Step4: 部署模型
+Step5: 监控模型, 根据模型的表现, 可能需要手机更多的数据, 训练新的模型等等, 跳到Step2
+
+在机器学习各个阶段的一些挑战
+定义问题: 一般是聚焦最有影响力的工业问题
+数据获取: 高质量的数据是稀少的, 并且涉及隐私问题
+训练模型: 机器学习模型越来越复杂, 很吃数据, 并且很昂贵
+部署模型: 巨大的计算两不适合实时预测
+监控模型: 可能会发现模型存在数据偏移(训练数据和实际数据存在分布偏移)以及公平性的问题(可能数据中就带有种族歧视)
+机器学习中的不同的角色
+
+领域专家: 有商业眼光, 知道什么数据是重要的, 以及在哪找到这些数据, 能够识别一个机器学习模型的影响力
+数据科学家: 能够进行数 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/06/deep_learning/interview/evaluation_metrics/waymo_metrics/" title="Waymo数据集评价指标">Waymo数据集评价指标</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-06T14:45:37.000Z" title="发表于 2024-06-06 22:45:37">2024-06-06</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">评价指标</a></span></div><div class="content">难度分类
+难度分为Level1 和Level2
+如果被标注员标注为Hard或者包围框点的数量&lt;5, 那么就是Level2,否则就是Level1
+并且将距离远近也分为了3个档位: 0-30m, 30-50m, 50m以上
+mAP
+和普通的mAP一样, 可以参考我的目标检测任务评价指标这篇博客
+还是使用IoU作为分类的指标
+汽车的IoU是0.7, 其他类别的IoU是0.5
+mAPH
+在计算TP的时候乘上了一个权重, 也就是原来每个TP都占1, 但是现在的每个TP都占1−min⁡(∣θ~−θ∣,2π−∣θ~−θ∣)/π1-\operatorname*{min}(|\tilde{\theta}-\theta|,2\pi-|\tilde{\theta}-\theta|)/\pi1−min(∣θ~−θ∣,2π−∣θ~−θ∣)/π, 也就是角度偏差越大, 这个TP就会越小
+公式如下
+APH=100∫01max⁡{h(r′)∣r′&gt;=r}dr\mathrm{APH}=100\int_0^1\max\{h(r^{\prime})|r^{\prime}&gt;=r\}dr
+APH=100∫01 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/06/06/deep_learning/interview/evaluation_metrics/nuscenes_metrics/" title="nuScenes数据集评价指标">nuScenes数据集评价指标</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-06-06T14:30:33.000Z" title="发表于 2024-06-06 22:30:33">2024-06-06</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">评价指标</a></span></div><div class="content">mAP
+下面是mAP的计算公式
+mAP=1∣C∣∣D∣∑c∈C∑d∈DAPc,d\mathrm{mAP}=\frac1{|\mathbb{C}||\mathbb{D}|}\sum_{c\in\mathbb{C}}\sum_{d\in\mathbb{D}}\mathrm{AP}_{c,d}
+mAP=∣C∣∣D∣1​c∈C∑​d∈D∑​APc,d​
+nuScenes数据集的匹配并不像KITTI数据集使用IoU来做正负样本匹配, 而是使用地平面上的2D中心距离来做匹配, D={0.5,1,2,4}D = \{0.5, 1, 2, 4\}D={0.5,1,2,4}, C\mathbb{C}C表示不同的类别
+TP\mathbb{TP}TP
+总共包含几个值, mATE\mathrm{mATE}mATE, mASE\mathrm{mASE}mASE, mAOE\mathrm{mAOE}mAOE, mAVE\mathrm{mAVE}mAVE,mAAE\mathrm{mAAE}mAAE
+这里的指标都使用2m作为阈值来进行正负样本的匹配, 并且只针对TP进行计算
+计算的时候会分别计算每个类别的每个Reca ...</div></div></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span><a class="page-number" href="/page/2/#content-inner">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/#content-inner">12</a><a class="extend next" rel="next" href="/page/2/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Grapymage</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangtingyu11"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">无</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)">斯坦福2021秋季·实用机器学习(第十一章)</a><time datetime="2024-06-26T07:04:34.000Z" title="发表于 2024-06-26 15:04:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)">斯坦福2021秋季·实用机器学习(第十章)</a><time datetime="2024-06-26T07:04:11.000Z" title="发表于 2024-06-26 15:04:11">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter9/" title="斯坦福2021秋季·实用机器学习(第九章)">斯坦福2021秋季·实用机器学习(第九章)</a><time datetime="2024-06-26T07:03:24.000Z" title="发表于 2024-06-26 15:03:24">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)">斯坦福2021秋季·实用机器学习(第五章)</a><time datetime="2024-06-26T07:02:34.000Z" title="发表于 2024-06-26 15:02:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter4/" title="斯坦福2021秋季·实用机器学习(第四章)">斯坦福2021秋季·实用机器学习(第四章)</a><time datetime="2024-06-26T06:56:43.000Z" title="发表于 2024-06-26 14:56:43">2024-06-26</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
             <i class="fas fa-folder-open"></i>
             <span>分类</span>
             <a class="card-more-btn" href="/categories/" title="查看更多">
     <i class="fas fa-angle-right"></i></a>
             </div>
             <ul class="card-category-list" id="aside-cat-list">
-            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/CUDA%E7%BC%96%E7%A8%8B/"><span class="card-category-list-name">CUDA编程</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/cmake/"><span class="card-category-list-name">cmake</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/python3/"><span class="card-category-list-name">python3</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%9D%82%E7%B1%BB/"><span class="card-category-list-name">杂类</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"><span class="card-category-list-name">深度学习</span><span class="card-category-list-count">18</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/OpenMMLab/"><span class="card-category-list-name">OpenMMLab</span><span class="card-category-list-count">2</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/OpenMMLab/MMDeploy/"><span class="card-category-list-name">MMDeploy</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/OpenMMLab/MMEngine/"><span class="card-category-list-name">MMEngine</span><span class="card-category-list-count">1</span></a></li></ul></li></ul></li>
-            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/%E5%8D%95%E8%B0%83%E6%A0%88/" style="font-size: 1.18em; color: #999ca1">单调栈</a> <a href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/" style="font-size: 1.18em; color: #999ca1">快速幂</a> <a href="/tags/python3/" style="font-size: 1.5em; color: #99a9bf">python3</a> <a href="/tags/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/" style="font-size: 1.34em; color: #99a3b0">二分查找</a> <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" style="font-size: 1.3em; color: #99a1ac">动态规划</a> <a href="/tags/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/" style="font-size: 1.26em; color: #999fa8">滑动窗口</a> <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%8E%87%E7%AD%96%E7%95%A5/" style="font-size: 1.14em; color: #999b9d">学习率策略</a> <a href="/tags/%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6/" style="font-size: 1.14em; color: #999b9d">组合数学</a> <a href="/tags/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91/" style="font-size: 1.14em; color: #999b9d">二叉搜索树</a> <a href="/tags/Leetcode/" style="font-size: 1.46em; color: #99a7bb">Leetcode</a> <a href="/tags/%E5%BE%85%E5%A1%AB%E5%9D%91/" style="font-size: 1.22em; color: #999ea4">待填坑</a> <a href="/tags/%E6%95%B0%E5%AD%A6/" style="font-size: 1.18em; color: #999ca1">数学</a> <a href="/tags/%E5%89%8D%E7%BC%80%E5%92%8C/" style="font-size: 1.18em; color: #999ca1">前缀和</a> <a href="/tags/MMEngine/" style="font-size: 1.14em; color: #999b9d">MMEngine</a> <a href="/tags/Leetcode-python3/" style="font-size: 1.1em; color: #999">Leetcode. python3</a> <a href="/tags/%E5%A0%86/" style="font-size: 1.18em; color: #999ca1">堆</a> <a href="/tags/Ubuntu/" style="font-size: 1.14em; color: #999b9d">Ubuntu</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" style="font-size: 1.42em; color: #99a6b7">深度学习基础知识</a> <a href="/tags/%E7%BA%AF%E7%9B%B8%E6%9C%BA3D%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" style="font-size: 1.38em; color: #99a4b4">纯相机3D目标检测</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E9%87%8C%E7%9A%84%E6%95%B0%E5%AD%A6/" style="font-size: 1.14em; color: #999b9d">深度学习里的数学</a> <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" style="font-size: 1.14em; color: #999b9d">博客搭建</a> <a href="/tags/%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" style="font-size: 1.14em; color: #999b9d">广度优先搜索</a> <a href="/tags/CUDA%E7%BC%96%E7%A8%8B/" style="font-size: 1.14em; color: #999b9d">CUDA编程</a> <a href="/tags/%E8%B4%AA%E5%BF%83/" style="font-size: 1.3em; color: #99a1ac">贪心</a> <a href="/tags/%E8%A3%85%E9%A5%B0%E5%99%A8/" style="font-size: 1.14em; color: #999b9d">装饰器</a> <a href="/tags/%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85/" style="font-size: 1.14em; color: #999b9d">软件安装</a> <a href="/tags/%E6%9C%80%E7%9F%AD%E8%B7%AF/" style="font-size: 1.14em; color: #999b9d">最短路</a> <a href="/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/" style="font-size: 1.14em; color: #999b9d">哈希表</a> <a href="/tags/%E6%9D%82%E7%B1%BB/" style="font-size: 1.14em; color: #999b9d">杂类</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" style="font-size: 1.3em; color: #99a1ac">深度学习</a> <a href="/tags/%E9%80%92%E5%BD%92/" style="font-size: 1.18em; color: #999ca1">递归</a> <a href="/tags/%E5%B7%AE%E5%88%86%E6%95%B0%E7%BB%84/" style="font-size: 1.18em; color: #999ca1">差分数组</a> <a href="/tags/%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88/" style="font-size: 1.18em; color: #999ca1">有序集合</a> <a href="/tags/%E7%8A%B6%E6%80%81%E5%8E%8B%E7%BC%A9%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" style="font-size: 1.14em; color: #999b9d">状态压缩动态规划</a> <a href="/tags/3D%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" style="font-size: 1.14em; color: #999b9d">3D目标检测</a> <a href="/tags/cmake/" style="font-size: 1.14em; color: #999b9d">cmake</a> <a href="/tags/pytorch/" style="font-size: 1.26em; color: #999fa8">pytorch</a> <a href="/tags/%E6%95%B0%E7%BB%84/" style="font-size: 1.14em; color: #999b9d">数组</a> <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size: 1.14em; color: #999b9d">位运算</a> <a href="/tags/%E6%A8%A1%E6%8B%9F/" style="font-size: 1.3em; color: #99a1ac">模拟</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/03/"><span class="card-archive-list-date">三月 2024</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/01/"><span class="card-archive-list-date">一月 2024</span><span class="card-archive-list-count">17</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/12/"><span class="card-archive-list-date">十二月 2023</span><span class="card-archive-list-count">55</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/11/"><span class="card-archive-list-date">十一月 2023</span><span class="card-archive-list-count">7</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">80</div></div><div class="webinfo-item"><div class="item-name">本站总字数 :</div><div class="item-count">56.5k</div></div><div class="webinfo-item"><div class="item-name">本站访客数 :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">本站总访问量 :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-03-08T02:10:51.795Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/index.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Grapymage</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>window.typedJSFn = {
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/CUDA%E7%BC%96%E7%A8%8B/"><span class="card-category-list-name">CUDA编程</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/TensorRT/"><span class="card-category-list-name">TensorRT</span><span class="card-category-list-count">1</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/TensorRT/CenterPoint/"><span class="card-category-list-name">CenterPoint</span><span class="card-category-list-count">1</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/cmake/"><span class="card-category-list-name">cmake</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/cpp/"><span class="card-category-list-name">cpp</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/python3/"><span class="card-category-list-name">python3</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%9D%82%E7%B1%BB/"><span class="card-category-list-name">杂类</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"><span class="card-category-list-name">深度学习</span><span class="card-category-list-count">51</span></a></li>
+            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/%E6%9E%9A%E4%B8%BE/" style="font-size: 1.23em; color: #999ea6">枚举</a> <a href="/tags/python3/" style="font-size: 1.5em; color: #99a9bf">python3</a> <a href="/tags/%E5%9B%9E%E6%BA%AF/" style="font-size: 1.14em; color: #999b9d">回溯</a> <a href="/tags/MMEngine/" style="font-size: 1.14em; color: #999b9d">MMEngine</a> <a href="/tags/%E6%A8%A1%E5%9E%8B%E6%9E%B6%E6%9E%84/" style="font-size: 1.14em; color: #999b9d">模型架构</a> <a href="/tags/pytorch/" style="font-size: 1.28em; color: #99a0aa">pytorch</a> <a href="/tags/%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85/" style="font-size: 1.14em; color: #999b9d">软件安装</a> <a href="/tags/%E7%BA%AF%E7%9B%B8%E6%9C%BA3D%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" style="font-size: 1.41em; color: #99a5b7">纯相机3D目标检测</a> <a href="/tags/%E6%95%B0%E5%AD%A6/" style="font-size: 1.19em; color: #999da1">数学</a> <a href="/tags/%E9%80%92%E5%BD%92/" style="font-size: 1.19em; color: #999da1">递归</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 1.41em; color: #99a5b7">机器学习</a> <a href="/tags/KITTI/" style="font-size: 1.14em; color: #999b9d">KITTI</a> <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" style="font-size: 1.14em; color: #999b9d">博客搭建</a> <a href="/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/" style="font-size: 1.14em; color: #999b9d">多模态</a> <a href="/tags/%E5%B7%AE%E5%88%86%E6%95%B0%E7%BB%84/" style="font-size: 1.19em; color: #999da1">差分数组</a> <a href="/tags/CUDA%E7%BC%96%E7%A8%8B/" style="font-size: 1.14em; color: #999b9d">CUDA编程</a> <a href="/tags/3D%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" style="font-size: 1.14em; color: #999b9d">3D目标检测</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" style="font-size: 1.46em; color: #99a7bb">深度学习</a> <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%8E%87%E7%AD%96%E7%95%A5/" style="font-size: 1.14em; color: #999b9d">学习率策略</a> <a href="/tags/%E7%AE%97%E6%B3%95%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" style="font-size: 1.19em; color: #999da1">算法常用技巧</a> <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6%E5%99%A8/" style="font-size: 1.14em; color: #999b9d">学习率调度器</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/" style="font-size: 1.32em; color: #99a2ae">代码解析</a> <a href="/tags/%E6%95%B0%E7%BB%84/" style="font-size: 1.14em; color: #999b9d">数组</a> <a href="/tags/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/" style="font-size: 1.28em; color: #99a0aa">滑动窗口</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/" style="font-size: 1.23em; color: #999ea6">数据增强</a> <a href="/tags/%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6/" style="font-size: 1.14em; color: #999b9d">组合数学</a> <a href="/tags/yolo/" style="font-size: 1.14em; color: #999b9d">yolo</a> <a href="/tags/%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 1.28em; color: #99a0aa">实验环境搭建</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" style="font-size: 1.28em; color: #99a0aa">深度优先搜索</a> <a href="/tags/%E6%9C%80%E7%9F%AD%E8%B7%AF/" style="font-size: 1.14em; color: #999b9d">最短路</a> <a href="/tags/Leetcode-python3/" style="font-size: 1.1em; color: #999">Leetcode. python3</a> <a href="/tags/Leetcode/" style="font-size: 1.5em; color: #99a9bf">Leetcode</a> <a href="/tags/TensorRT/" style="font-size: 1.14em; color: #999b9d">TensorRT</a> <a href="/tags/vscode/" style="font-size: 1.14em; color: #999b9d">vscode</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E9%87%8C%E7%9A%84%E6%95%B0%E5%AD%A6/" style="font-size: 1.14em; color: #999b9d">深度学习里的数学</a> <a href="/tags/%E6%A8%A1%E6%8B%9F/" style="font-size: 1.37em; color: #99a4b2">模拟</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" style="font-size: 1.14em; color: #999b9d">计算机视觉</a> <a href="/tags/%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" style="font-size: 1.14em; color: #999b9d">广度优先搜索</a> <a href="/tags/%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/" style="font-size: 1.37em; color: #99a4b2">评价指标</a> <a href="/tags/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91/" style="font-size: 1.14em; color: #999b9d">二叉搜索树</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/06/"><span class="card-archive-list-date">六月 2024</span><span class="card-archive-list-count">30</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/05/"><span class="card-archive-list-date">五月 2024</span><span class="card-archive-list-count">10</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/01/"><span class="card-archive-list-date">一月 2024</span><span class="card-archive-list-count">17</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/12/"><span class="card-archive-list-date">十二月 2023</span><span class="card-archive-list-count">55</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/11/"><span class="card-archive-list-date">十一月 2023</span><span class="card-archive-list-count">7</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">119</div></div><div class="webinfo-item"><div class="item-name">本站总字数 :</div><div class="item-count">124.1k</div></div><div class="webinfo-item"><div class="item-name">本站访客数 :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">本站总访问量 :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-06-26T07:06:08.498Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/index.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Grapymage</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>window.typedJSFn = {
   init: (str) => {
     window.typed = new Typed('#subtitle', Object.assign({
       strings: str,

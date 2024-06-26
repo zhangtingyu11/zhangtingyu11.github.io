@@ -1,0 +1,315 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>斯坦福2021秋季·实用机器学习(第九章) | Grapymage的个人博客</title><meta name="author" content="Grapymage"><meta name="copyright" content="Grapymage"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="模型调参 手工调参  可以使用一些高质量数据集中的默认超参数, 或者使用论文中提到的超参数 更改超参数的值, 然后重新训练模型看看性能的变化 重复多次去观察以下一些内容  哪些超参数是重要的 模型对超参数的敏感程度 超参数的合理取值范围是多少    在进行超参数的实验的时候需要仔细的实验管理, 比如记录训练的日志和超参数去进行比较. 最简单的方法就是保存成log文件见, 更好的方法是使用现成的工具">
+<meta property="og:type" content="article">
+<meta property="og:title" content="斯坦福2021秋季·实用机器学习(第九章)">
+<meta property="og:url" content="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter9/index.html">
+<meta property="og:site_name" content="Grapymage的个人博客">
+<meta property="og:description" content="模型调参 手工调参  可以使用一些高质量数据集中的默认超参数, 或者使用论文中提到的超参数 更改超参数的值, 然后重新训练模型看看性能的变化 重复多次去观察以下一些内容  哪些超参数是重要的 模型对超参数的敏感程度 超参数的合理取值范围是多少    在进行超参数的实验的时候需要仔细的实验管理, 比如记录训练的日志和超参数去进行比较. 最简单的方法就是保存成log文件见, 更好的方法是使用现成的工具">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg">
+<meta property="article:published_time" content="2024-06-26T07:03:24.000Z">
+<meta property="article:modified_time" content="2024-06-26T07:03:43.917Z">
+<meta property="article:author" content="Grapymage">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhangtingyu11.github.io/img/avatar.jpeg"><link rel="shortcut icon" href="/img/avatar.jpeg"><link rel="canonical" href="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter9/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '斯坦福2021秋季·实用机器学习(第九章)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-06-26 15:03:43'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.0.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/top_img.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Grapymage的个人博客"><span class="site-name">Grapymage的个人博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-file-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">斯坦福2021秋季·实用机器学习(第九章)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-26T07:03:24.000Z" title="发表于 2024-06-26 15:03:24">2024-06-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-06-26T07:03:43.917Z" title="更新于 2024-06-26 15:03:43">2024-06-26</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span id="" data-flag-title="斯坦福2021秋季·实用机器学习(第九章)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="twikoo_visitors"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="模型调参">模型调参</h1>
+<h2 id="手工调参">手工调参</h2>
+<ul>
+<li>可以使用一些高质量数据集中的默认超参数, 或者使用论文中提到的超参数</li>
+<li>更改超参数的值, 然后重新训练模型看看性能的变化</li>
+<li>重复多次去观察以下一些内容
+<ul>
+<li>哪些超参数是重要的</li>
+<li>模型对超参数的敏感程度</li>
+<li>超参数的合理取值范围是多少</li>
+</ul>
+</li>
+</ul>
+<p>在进行超参数的实验的时候需要仔细的实验管理, 比如记录训练的日志和超参数去进行比较. 最简单的方法就是保存成log文件见, 更好的方法是使用现成的工具, 比如tensorboard, weights &amp; bias</p>
+<h2 id="自动调节超参数">自动调节超参数</h2>
+<p>计算的成本是在下降的, 人的成本是在上升的<br>
+计算的成本如下<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/202406182022782.png" alt=""><br>
+现在一个数据科学家的成本大概是500刀每天<br>
+如果使用算法1000次调参的情况下比人要好, 就可以使用自动调节超参数</p>
+<h2 id="automl">AutoML</h2>
+<p>AutoML是希望将机器学习中的每个步骤都实现自动化: 比如数据清理, 特征提取, 模型选择</p>
+<p>AutoML包含两大块:</p>
+<ul>
+<li>Hyperparameter optimization(HPO, 超参数优化): 通过算法找到一个好的超参数集合</li>
+<li>Neural architecture search(NAS): 构建一个好的神经网络模型</li>
+</ul>
+<h1 id="超参数优化算法">超参数优化算法</h1>
+<h2 id="所有空间">所有空间</h2>
+<p>首先需要确定每个超参数的范围<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/202406182027530.png" alt=""><br>
+比如backbone是离散的, momentum这些就是均匀分布的, learning rate就是log-uniform的</p>
+<h2 id="black-box和multi-fidelity">Black-box和Multi-fidelity</h2>
+<p><strong>Black-box</strong>: 就是完成每个训练过程来观察性能变化<br>
+<strong>Multi-fidelity</strong>: 使用一些方法来进行加速. 比如在子集数据集中进行训练, 减少模型的大小(使用更少的层, 更少的通道数), 如果遇到不太好的配置, 就提前停止</p>
+<h2 id="常见的hpo策略">常见的HPO策略</h2>
+<p>第一个就是网格搜索, 就是遍历所有可能的组合, 这样一定可以获得最优的结果, 但是时间复杂度太高了<br>
+第二个就是随机搜索, 可以画一个曲线, 表示到当前配置为止, 最优的性能是多少, 当性能很长一段时间不提高了就可以停止了</p>
+<h2 id="贝叶斯优化-bsyesian-optimization-bo">贝叶斯优化(Bsyesian Optimization, BO)</h2>
+<p><strong>BO</strong>: 迭代的学习一个映射, 从超参数到目标函数的预测. 基于当前的估计来决定下一次应该尝试什么超参数<br>
+<strong>Surrogate model</strong>: 拟合超参数到目标函数, 可以使用随机森林一些概率型回归模型. 如下图, 已经采样了两个点, 横轴可以理解为是搜索空化简, 纵轴可以理解为是目标函数. 黑色的实线表示真实的目标函数值, 黑色的虚线表示预测的目标函数值, 蓝色区间表示置信区间. 采样的点是acquisition max的点<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/202406182036672.png" alt=""></p>
+<p><strong>Acquisition function</strong></p>
+<ul>
+<li>Acquisition max表示不确定性和预测的目标函数都很高</li>
+<li>根据获取函数来决定下一次选取的超参数</li>
+<li>需要在exploration(不确定性高, 就需要采样)和exploitation(目标函数的值高也需要采样)进行权衡</li>
+</ul>
+<p><strong>BO的缺陷</strong></p>
+<ul>
+<li>在初始阶段, 类似于随机搜索</li>
+<li>优化的过程是序列化的, 不能并行</li>
+</ul>
+<h2 id="successive-halving-连续折半">Successive Halving(连续折半)</h2>
+<ol>
+<li>随机选择n个超参数配置训练m个epoch</li>
+<li>重复下面的操作直到只剩下一个超参数配置: 保留最好的n/2个超参数配置, 然后再训练m个epoch</li>
+<li>根据训练的时间来决定n和m的大小</li>
+</ol>
+<h2 id="hyperband">Hyperband</h2>
+<p>在Successive Halving的过程中,<br>
+n是个exploration的过程<br>
+m是个exploitation的过程<br>
+总的来说就是执行多次SH算法, 也就是每一轮都会有模型跑满所有的epoch. 每一轮的SH算法, 都是n减少, m增大, 这样每一轮都会找到当前轮的最优解, 然后把多轮的最优解整合起来</p>
+<p><strong>还有一些超参数选取的办法, 比如有50个数据集, 这50个数据集, 找出TOP5个平均效果最好的超参数, 当有新数据集时, 直接测试这五组超参数即可</strong></p>
+<h1 id="神经网络架构搜索">神经网络架构搜索</h1>
+<h2 id="nas">NAS</h2>
+<p>一个神经网络有不同类别的超参数</p>
+<ul>
+<li>比如模型的拓扑结构, resnet和mobilenet的拓扑结构就不一样</li>
+<li>单个层也有不同的超参数, 比如卷积核大小, 卷积核的特征</li>
+</ul>
+<p>NAS可以自动化神经网络的设计, 需要确定以下三点</p>
+<ul>
+<li>怎么确定一个神经网络的搜索空间</li>
+<li>怎么搜索这个搜索空间</li>
+<li>怎么评估性能</li>
+</ul>
+<h2 id="使用强化学习来进行nas">使用强化学习来进行NAS</h2>
+<p>使用RNN生成一系列token来表示模型的架构<br>
+根据模型的结果来计算强化学习的Reward<br>
+NAS超级贵, 这个方法要使用2000个GPU天<br>
+为了加速NAS, 有一些方法: 比如对网络进行删减, 然后训练, 如果参数差不多, 尝试重用一些网络参数</p>
+<h2 id="one-shot方法">One-shot方法</h2>
+<p>训练一个特别大的模型, 包含所有的超参数组合<br>
+然后根据训练的结果决定选择哪个模型最好<br>
+但是这个模型可能特别大, 并且不容易收敛<br>
+常见的方法是训练少量的epoch, 然后根据训练的结果从头开始进行训练</p>
+<h2 id="可微的架构搜索">可微的架构搜索</h2>
+<p>每层里面有三个备选的层<br>
+<img src="https://raw.githubusercontent.com/zhangtingyu11/PictureBed/main/202406182112109.png" alt=""><br>
+假设第<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi></mrow><annotation encoding="application/x-tex">l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span></span></span></span>层的第<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>个候选的输出是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>o</mi><mi>i</mi><mi>l</mi></msubsup></mrow><annotation encoding="application/x-tex">o_i^l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.107772em;vertical-align:-0.258664em;"></span><span class="mord"><span class="mord mathdefault">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.441336em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span></span></span></span><br>
+学习一个权重<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>a</mi><mi>l</mi></msup></mrow><annotation encoding="application/x-tex">a^l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.849108em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span></span></span></span></span></span></span></span>, 那么第<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.74285em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>层的是输入就是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>i</mi></msub><msubsup><mi>α</mi><mi>i</mi><mi>l</mi></msubsup><msubsup><mi>o</mi><mi>i</mi><mi>l</mi></msubsup></mrow><annotation encoding="application/x-tex">\sum_i \alpha_i^l o_i^l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.148818em;vertical-align:-0.29971000000000003em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16195399999999993em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.441336em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.441336em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.258664em;"><span></span></span></span></span></span></span></span></span></span>, 其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>α</mi><mi>l</mi></msup><mo>=</mo><mi>s</mi><mi>o</mi><mi>f</mi><mi>t</mi><mi>m</mi><mi>a</mi><mi>x</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mi>l</mi></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\alpha^l = softmax(a^l)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.849108em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.099108em;vertical-align:-0.25em;"></span><span class="mord mathdefault">s</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">t</span><span class="mord mathdefault">m</span><span class="mord mathdefault">a</span><span class="mord mathdefault">x</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><br>
+后面只需要选择每层权重最大的</p>
+<h2 id="scaling-cnn">Scaling CNN</h2>
+<p>只能用在卷积神经网络<br>
+一个CNN有三种更改方式:</p>
+<ul>
+<li>使用更多的层(深度)</li>
+<li>输出更多的通道数(宽度)</li>
+<li>使用更大的输入(分辨率)</li>
+</ul>
+<p>EfficientNet认为要动就三个一起动<br>
+比如将深度乘上<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>α</mi><mi>ϕ</mi></msup></mrow><annotation encoding="application/x-tex">\alpha^{\phi}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8491079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">ϕ</span></span></span></span></span></span></span></span></span></span></span></span>, 将宽度乘上<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>β</mi><mi>ϕ</mi></msup></mrow><annotation encoding="application/x-tex">\beta^{\phi}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.043548em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">ϕ</span></span></span></span></span></span></span></span></span></span></span></span>, 将分辨率乘上<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>γ</mi><mi>ϕ</mi></msup></mrow><annotation encoding="application/x-tex">\gamma^{\phi}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.043548em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05556em;">γ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">ϕ</span></span></span></span></span></span></span></span></span></span></span></span><br>
+其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><msup><mi>β</mi><mn>2</mn></msup><msup><mi>γ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\alpha \beta^2 \gamma^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.008548em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05556em;">γ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>大约为2</p>
+<h2 id="研究方向">研究方向</h2>
+<ul>
+<li>NAS结果的可解释性</li>
+<li>搜索的架构怎么应用到边缘设备中
+<ul>
+<li>边缘设备涉及到隐私保护</li>
+<li>边缘设备使用的计算单元不一样, 会有计算性能的限制</li>
+<li>需要最小化模型的损失以及硬件的时延, 比如最小化 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>s</mi><mi>s</mi><mo>×</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo stretchy="false">(</mo><mi>l</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>c</mi><mi>y</mi><msup><mo stretchy="false">)</mo><mi>β</mi></msup></mrow><annotation encoding="application/x-tex">loss \times log(latency)^\beta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.0991079999999998em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">c</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05278em;">β</span></span></span></span></span></span></span></span></span></span></span></li>
+</ul>
+</li>
+<li>如何拓展到整个ML工作流中</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io">Grapymage</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter9/">https://zhangtingyu11.github.io/2024/06/26/deep_learning/stanford_ml/chapter9/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhangtingyu11.github.io" target="_blank">Grapymage的个人博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><a class="post-meta__tags" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></div><div class="post_share"><div class="social-share" data-image="/img/avatar.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i>赞助</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">斯坦福2021秋季·实用机器学习(第十章)</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">斯坦福2021秋季·实用机器学习(第五章)</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第十章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第十一章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter1/" title="斯坦福2021秋季·实用机器学习(第一章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第一章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter2/" title="斯坦福2021秋季·实用机器学习(第二章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第二章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter3/" title="斯坦福2021秋季·实用机器学习(第三章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第三章)</div></div></a></div><div><a href="/2024/06/26/deep_learning/stanford_ml/chapter4/" title="斯坦福2021秋季·实用机器学习(第四章)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-26</div><div class="title">斯坦福2021秋季·实用机器学习(第四章)</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Grapymage</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">119</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">66</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">56</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangtingyu11"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">无</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E8%B0%83%E5%8F%82"><span class="toc-number">1.</span> <span class="toc-text">模型调参</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%8B%E5%B7%A5%E8%B0%83%E5%8F%82"><span class="toc-number">1.1.</span> <span class="toc-text">手工调参</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E8%B0%83%E8%8A%82%E8%B6%85%E5%8F%82%E6%95%B0"><span class="toc-number">1.2.</span> <span class="toc-text">自动调节超参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#automl"><span class="toc-number">1.3.</span> <span class="toc-text">AutoML</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B6%85%E5%8F%82%E6%95%B0%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">超参数优化算法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%80%E6%9C%89%E7%A9%BA%E9%97%B4"><span class="toc-number">2.1.</span> <span class="toc-text">所有空间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#black-box%E5%92%8Cmulti-fidelity"><span class="toc-number">2.2.</span> <span class="toc-text">Black-box和Multi-fidelity</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84hpo%E7%AD%96%E7%95%A5"><span class="toc-number">2.3.</span> <span class="toc-text">常见的HPO策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%98%E5%8C%96-bsyesian-optimization-bo"><span class="toc-number">2.4.</span> <span class="toc-text">贝叶斯优化(Bsyesian Optimization, BO)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#successive-halving-%E8%BF%9E%E7%BB%AD%E6%8A%98%E5%8D%8A"><span class="toc-number">2.5.</span> <span class="toc-text">Successive Halving(连续折半)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hyperband"><span class="toc-number">2.6.</span> <span class="toc-text">Hyperband</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84%E6%90%9C%E7%B4%A2"><span class="toc-number">3.</span> <span class="toc-text">神经网络架构搜索</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#nas"><span class="toc-number">3.1.</span> <span class="toc-text">NAS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E6%9D%A5%E8%BF%9B%E8%A1%8Cnas"><span class="toc-number">3.2.</span> <span class="toc-text">使用强化学习来进行NAS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#one-shot%E6%96%B9%E6%B3%95"><span class="toc-number">3.3.</span> <span class="toc-text">One-shot方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E5%BE%AE%E7%9A%84%E6%9E%B6%E6%9E%84%E6%90%9C%E7%B4%A2"><span class="toc-number">3.4.</span> <span class="toc-text">可微的架构搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#scaling-cnn"><span class="toc-number">3.5.</span> <span class="toc-text">Scaling CNN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E6%96%B9%E5%90%91"><span class="toc-number">3.6.</span> <span class="toc-text">研究方向</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter11/" title="斯坦福2021秋季·实用机器学习(第十一章)">斯坦福2021秋季·实用机器学习(第十一章)</a><time datetime="2024-06-26T07:04:34.000Z" title="发表于 2024-06-26 15:04:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter10/" title="斯坦福2021秋季·实用机器学习(第十章)">斯坦福2021秋季·实用机器学习(第十章)</a><time datetime="2024-06-26T07:04:11.000Z" title="发表于 2024-06-26 15:04:11">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter9/" title="斯坦福2021秋季·实用机器学习(第九章)">斯坦福2021秋季·实用机器学习(第九章)</a><time datetime="2024-06-26T07:03:24.000Z" title="发表于 2024-06-26 15:03:24">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter5/" title="斯坦福2021秋季·实用机器学习(第五章)">斯坦福2021秋季·实用机器学习(第五章)</a><time datetime="2024-06-26T07:02:34.000Z" title="发表于 2024-06-26 15:02:34">2024-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/26/deep_learning/stanford_ml/chapter4/" title="斯坦福2021秋季·实用机器学习(第四章)">斯坦福2021秋季·实用机器学习(第四章)</a><time datetime="2024-06-26T06:56:43.000Z" title="发表于 2024-06-26 14:56:43">2024-06-26</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/top_img.png')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Grapymage</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      onCommentLoaded: () => {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      }
+    }, null))
+  }
+
+  const loadTwikoo = () => {
+    if (typeof twikoo === 'object') setTimeout(init,0)
+    else getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(init)
+  }
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'https://vercel-six-xi-75.vercel.app/',
+      region: 'ap-shanghai',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(res => {
+      countELement.textContent = res[0].count
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else {
+      loadTwikoo()
+      
+    }
+  } else {
+    window.loadOtherComment = loadTwikoo
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
