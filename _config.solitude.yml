@@ -46,7 +46,7 @@ nav:
     #   朋友圈: /moments/ || fas fa-wifi
     #   友情链接: /links/ || fas fa-user-group
     #   宝藏博主: javascript:travelling() || fas fa-gift
-    关于: /about/ || fas fa-user
+    关于: /about/
     #   装备: /kit/ || fas fa-laptop
     #   音乐馆: /music/ || fas fa-music
 
@@ -66,7 +66,7 @@ nav:
 # Home Top Banner
 # 首页顶部
 hometop:
-  enable: true
+  enable: false
   banner:
     title: 把复杂技术<br>讲清楚 # 大字
     desc:
@@ -117,14 +117,14 @@ aside:
   # Sticky: Fixed position / noSticky: Not fixed position
   # Sticky: 固定位置 / noSticky: 不固定位置
   home: # on the homepage
-    noSticky: "about"
-    Sticky: "allInfo"
+    noSticky:
+    Sticky:
   post: # on the article page
-    noSticky: "about"
+    noSticky:
     Sticky: "newestPost"
   page: # on the page
-    noSticky: "about"
-    Sticky: "newestPost,allInfo"
+    noSticky:
+    Sticky:
   # 菜单栏位置(0: 左 1: 右)
   position: 1 # Sidebar positioning(0: left 1: right)
 
@@ -348,7 +348,7 @@ theme_color:
 display_mode:
   # auto: automatic switching(Recognize the current theme mode of the device) / dark: dark mode / light: light mode
   # auto: 自动切换（识别设备当前主题模式） / dark: 深色模式 / light: 浅色模式
-  type: auto
+  type: dark
   # After opening, the dark mode will display the starry sky background
   # 开启后深色模式会显示星空背景
   universe: false
@@ -393,9 +393,9 @@ expire:
 # Home page article configuration information
 # 首页文章配置信息
 index_post_list:
-  direction: column # row / column
+  direction: row # row / column
   column: 2 # 2: 2 columns 3: 3 columns
-  cover: both
+  cover: left
 # --------------------------- end ---------------------------
 
 # --------------------------- start ---------------------------
