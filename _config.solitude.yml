@@ -335,8 +335,8 @@ post:
 # --------------------------- start ---------------------------
 # Custom Theme Color
 theme_color:
-  dark: "#22d3ee" # dark
-  light: "#2563eb" # light
+  dark: "#dc8fa9" # dark
+  light: "#dc8fa9" # light
   nav_hover_text:
     dark: "#03111e" # Navigation hover text in dark mode
     light: "#ffffff" # Navigation hover text in light mode
@@ -348,7 +348,7 @@ theme_color:
 display_mode:
   # auto: automatic switching(Recognize the current theme mode of the device) / dark: dark mode / light: light mode
   # auto: 自动切换（识别设备当前主题模式） / dark: 深色模式 / light: 浅色模式
-  type: dark
+  type: light
   # After opening, the dark mode will display the starry sky background
   # 开启后深色模式会显示星空背景
   universe: false
