@@ -163,6 +163,77 @@
   font-size: 13px;
 }
 
+.projection-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr) 112px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0;
+  padding: 22px;
+  border: 1px solid #deebe8;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f7fbfa 0%, #fff9fb 100%);
+}
+.projection-flow__node {
+  display: grid;
+  align-content: center;
+  min-height: 150px;
+  padding: 18px 16px;
+  border: 1px solid rgba(83, 151, 140, .18);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, .88);
+  text-align: center;
+  box-shadow: 0 10px 28px rgba(65, 112, 105, .07);
+}
+.projection-flow__node--normalized { background: #f0faf7; }
+.projection-flow__node--pixel { background: #fff5f8; }
+.projection-flow__step {
+  margin-bottom: 9px;
+  color: #6c908b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.projection-flow__node strong {
+  color: #294d4d !important;
+  font-size: 17px;
+}
+.projection-flow__node code {
+  margin: 8px auto 6px;
+  padding: 3px 7px;
+  color: #c45f80;
+  background: rgba(224, 143, 169, .09);
+  font-size: 15px;
+}
+.projection-flow__node small { color: #7a9592; font-size: 12px; }
+.projection-flow__arrow {
+  display: grid;
+  gap: 10px;
+  color: #567874;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 650;
+}
+.projection-flow__arrow i {
+  position: relative;
+  display: block;
+  height: 2px;
+  margin: 0 8px;
+  border-radius: 2px;
+  background: #71c9b8;
+}
+.projection-flow__arrow i::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid #71c9b8;
+  border-right: 2px solid #71c9b8;
+  transform: translateY(-50%) rotate(45deg);
+}
+
 @media (max-width: 700px) {
   .parameter-cards, .intrinsic-lab__comparison { grid-template-columns: 1fr; }
   .intrinsic-lab__body { padding: 15px; }
@@ -171,4 +242,22 @@
   .depth-projection__header { align-items: flex-start; }
   .depth-projection__header span { display: block; }
   .depth-projection canvas { aspect-ratio: 1.4; }
+  .projection-flow {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 16px;
+  }
+  .projection-flow__node { min-height: 126px; }
+  .projection-flow__arrow { gap: 6px; }
+  .projection-flow__arrow i {
+    width: 2px;
+    height: 34px;
+    margin: 0 auto;
+  }
+  .projection-flow__arrow i::after {
+    top: auto;
+    right: 50%;
+    bottom: -1px;
+    transform: translateX(50%) rotate(135deg);
+  }
 }

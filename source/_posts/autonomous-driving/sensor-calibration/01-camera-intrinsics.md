@@ -87,10 +87,34 @@ y = Yc / Zc
 
 现在，归一化坐标 `(x, y)` 与像素坐标 `(u, v)` 之间还缺一次换算。内参矩阵 `K` 要做的，就是根据相机的焦距、主点和倾斜参数，完成这最后一步。到这里，整个过程可以压缩成一行：
 
-```text
-空间点 (Xc, Yc, Zc)  →  归一化坐标 (x, y)  →  像素坐标 (u, v)
-          除以 Zc                     乘以内参 K
-```
+<div class="projection-flow" role="img" aria-label="空间点依次经过除以深度 Zc 和乘以内参 K，最终得到像素坐标">
+  <div class="projection-flow__node projection-flow__node--camera">
+    <span class="projection-flow__step">01 · 相机坐标系</span>
+    <strong>空间点 P</strong>
+    <code>(Xc, Yc, Zc)</code>
+    <small>单位通常是米</small>
+  </div>
+  <div class="projection-flow__arrow">
+    <span>除以深度 Zc</span>
+    <i aria-hidden="true"></i>
+  </div>
+  <div class="projection-flow__node projection-flow__node--normalized">
+    <span class="projection-flow__step">02 · 归一化平面</span>
+    <strong>归一化坐标</strong>
+    <code>(x, y)</code>
+    <small>没有像素单位</small>
+  </div>
+  <div class="projection-flow__arrow">
+    <span>乘以内参 K</span>
+    <i aria-hidden="true"></i>
+  </div>
+  <div class="projection-flow__node projection-flow__node--pixel">
+    <span class="projection-flow__step">03 · 数字图像</span>
+    <strong>像素坐标</strong>
+    <code>(u, v)</code>
+    <small>单位是像素 px</small>
+  </div>
+</div>
 
 这样一来，`K` 就不再是突然出现的 3×3 数字表了。它正好位于上面流程的第二个箭头，接下来我们把这个“换算盒子”打开。
 
