@@ -113,9 +113,62 @@
 .intrinsic-lab__explain { min-height: 1.6em; margin: 14px 0 0 !important; color: #b7cbe1 !important; text-align: center; font-size: 13px; }
 .intrinsic-lab__tip { margin: 9px 0 0 !important; color: #7895b6 !important; text-align: center; font-size: 11px; }
 
+.depth-projection {
+  margin: 26px 0 20px;
+  overflow: hidden;
+  border: 1px solid #d9ebe7;
+  border-radius: 18px;
+  background: #f7fbfa;
+  box-shadow: 0 16px 45px rgba(62, 109, 102, .09);
+}
+.depth-projection__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px 12px;
+}
+.depth-projection__header > div { display: grid; gap: 3px; }
+.depth-projection__header strong { color: #294d4d !important; font-size: 16px; }
+.depth-projection__header span { color: #71918e; font-size: 13px; }
+.depth-projection__header button {
+  flex: none;
+  min-width: 64px;
+  padding: 7px 14px;
+  border: 1px solid #9edbd0;
+  border-radius: 999px;
+  color: #295b56;
+  background: #e8f7f3;
+  font: 650 13px system-ui, sans-serif;
+  cursor: pointer;
+}
+.depth-projection__header button:hover { border-color: #69bfae; background: #dcf3ed; }
+.depth-projection canvas { display: block; width: 100%; aspect-ratio: 25 / 12; background: #f7fbfa; }
+.depth-projection__control { padding: 12px 18px 0; }
+.depth-projection__control label {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 6px 12px;
+  align-items: center;
+  color: #527572;
+  font-size: 13px;
+}
+.depth-projection__control output { justify-self: end; color: #c36182; font: 750 14px ui-monospace, monospace; }
+.depth-projection__control input { grid-column: 1 / -1; width: 100%; accent-color: #69bfae; cursor: pointer; }
+.depth-projection__explain {
+  min-height: 1.5em;
+  margin: 8px 18px 16px !important;
+  color: #587a77 !important;
+  text-align: center;
+  font-size: 13px;
+}
+
 @media (max-width: 700px) {
   .parameter-cards, .intrinsic-lab__comparison { grid-template-columns: 1fr; }
   .intrinsic-lab__body { padding: 15px; }
   .intrinsic-lab__matrix-row { flex-direction: column; }
   .intrinsic-lab__header { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .depth-projection__header { align-items: flex-start; }
+  .depth-projection__header span { display: block; }
+  .depth-projection canvas { aspect-ratio: 1.4; }
 }

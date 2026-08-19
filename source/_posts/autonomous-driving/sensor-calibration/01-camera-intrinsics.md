@@ -51,6 +51,27 @@ y = Yc / Zc
 
 这样得到的 `(x, y)` 叫作**归一化图像坐标**。它位于假想的 `Zc = 1` 平面上，还没有像素单位。同样大小的物体离相机越远，`Zc` 越大，投影通常就越靠近光轴——这就是“近大远小”的数学来源。
 
+<div class="depth-projection" data-depth-projection>
+  <div class="depth-projection__header">
+    <div>
+      <strong>把点 P 沿着 Zc 方向推远</strong>
+      <span>保持 Xc = 1.4 不变，只改变点到相机的深度</span>
+    </div>
+    <button type="button" data-depth-toggle aria-pressed="true">暂停</button>
+  </div>
+  <canvas data-depth-canvas role="img" aria-label="空间点远离相机时，归一化投影点逐渐靠近光轴的动画"></canvas>
+  <div class="depth-projection__control">
+    <label>
+      <span>深度 Zc</span>
+      <output data-depth-output>2.4</output>
+      <input data-depth-range type="range" min="2.4" max="8.4" step="0.1" value="2.4" aria-label="调整空间点的深度 Zc">
+    </label>
+  </div>
+  <p class="depth-projection__explain" data-depth-explain aria-live="polite"></p>
+</div>
+
+动画画的是 `Xc-Zc` 截面：点 `P` 的横向位置 `Xc` 始终不变。把它沿光轴推远时，光线与 `Zc = 1` 平面的交点会逐渐靠近光轴；如果把物体看成许多这样的点，整件物体的投影也就会变小。
+
 > 坐标轴方向不是全世界只有一种画法。有些图形学教材会让 `Y` 轴向上，或者让相机朝 `-Z` 方向观察。关键不是死记方向，而是先说明约定，并让后续公式始终与它一致。本文采用计算机视觉中常见的上述约定。
 
 ### 像素坐标系：图片上的最终位置

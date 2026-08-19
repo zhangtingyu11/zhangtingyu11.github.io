@@ -748,12 +748,12 @@ extends:
   # Insert in head
   # 插入到 head
   head:
-    - <link rel="stylesheet" href="/assets/site.css?v=20260819-7">
+    - <link rel="stylesheet" href="/assets/site.css?v=20260819-8">
 
   # Insert in body
   # 插入到 body
   body:
-    - <script type="module" src="/assets/site.js?v=20260819-7"></script>
+    - <script type="module" src="/assets/site.js?v=20260819-8"></script>
 # --------------------------- end ---------------------------
 
 # --------------------------- start ---------------------------

@@ -138,6 +138,198 @@ function mountLab(root) {
   render();
 }
 
+const DEPTH_X = 1.4;
+
+function drawDepthProjection(canvas, depth) {
+  const rect = canvas.getBoundingClientRect();
+  const cssWidth = Math.max(300, rect.width || 760);
+  const cssHeight = cssWidth < 560 ? cssWidth * .72 : cssWidth * .48;
+  const ratio = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.round(cssWidth * ratio);
+  canvas.height = Math.round(cssHeight * ratio);
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+  const scale = cssWidth / 900;
+  const sx = value => value * scale;
+  const axisY = cssHeight * .6;
+  const origin = { x: sx(72), y: axisY };
+  const unit = sx(88);
+  const planeX = origin.x + unit;
+  const point = { x: origin.x + unit * depth, y: axisY - unit * DEPTH_X };
+  const normalizedX = DEPTH_X / depth;
+  const projected = { x: planeX, y: axisY - unit * normalizedX };
+  const compact = cssWidth < 560;
+
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+  ctx.fillStyle = "#f7fbfa";
+  ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+  // A soft depth strip makes motion direction readable without adding a grid.
+  const depthGradient = ctx.createLinearGradient(planeX, 0, cssWidth, 0);
+  depthGradient.addColorStop(0, "rgba(104, 198, 181, .09)");
+  depthGradient.addColorStop(1, "rgba(151, 187, 226, .09)");
+  ctx.fillStyle = depthGradient;
+  ctx.fillRect(planeX, 0, cssWidth - planeX, cssHeight);
+
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#bddbd6";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(origin.x, axisY);
+  ctx.lineTo(cssWidth - sx(35), axisY);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#71c9b8";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(planeX, sx(58));
+  ctx.lineTo(planeX, cssHeight - sx(48));
+  ctx.stroke();
+
+  ctx.fillStyle = "#54817d";
+  ctx.font = `${Math.max(12, sx(15))}px system-ui, sans-serif`;
+  ctx.fillText("归一化平面  Zc = 1", planeX + sx(12), sx(48));
+  ctx.fillText("光轴", cssWidth - sx(78), axisY - sx(10));
+
+  // The current camera ray and its intersection with the normalized plane.
+  ctx.strokeStyle = "#df8fa9";
+  ctx.lineWidth = Math.max(2, sx(3));
+  ctx.setLineDash([sx(9), sx(8)]);
+  ctx.beginPath();
+  ctx.moveTo(origin.x, origin.y);
+  ctx.lineTo(point.x, point.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Show the fixed Xc offset at P.
+  ctx.strokeStyle = "rgba(85, 133, 128, .42)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(point.x, axisY);
+  ctx.lineTo(point.x, point.y);
+  ctx.stroke();
+
+  ctx.fillStyle = "#284f4d";
+  ctx.beginPath();
+  ctx.arc(origin.x, origin.y, Math.max(6, sx(8)), 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#ea8b73";
+  ctx.beginPath();
+  ctx.arc(point.x, point.y, Math.max(7, sx(10)), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  ctx.fillStyle = "#cf7190";
+  ctx.beginPath();
+  ctx.arc(projected.x, projected.y, Math.max(6, sx(8)), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  ctx.fillStyle = "#294d4d";
+  ctx.font = `700 ${Math.max(13, sx(17))}px system-ui, sans-serif`;
+  ctx.fillText("光心 O", origin.x - sx(26), axisY + sx(34));
+  const pointLabelX = compact ? Math.min(point.x - sx(42), cssWidth - 92) : point.x - sx(42);
+  ctx.fillText("空间点 P", pointLabelX, point.y - sx(20));
+  ctx.fillStyle = "#c36182";
+  ctx.fillText("投影点", projected.x + sx(12), projected.y - sx(10));
+
+  if (!compact) {
+    ctx.fillStyle = "#6a8b88";
+    ctx.font = `${sx(14)}px system-ui, sans-serif`;
+    ctx.fillText("Xc = 1.4（保持不变）", point.x - sx(70), axisY + sx(27));
+  }
+
+  const formulaX = compact ? cssWidth * .14 : sx(300);
+  const formulaY = cssHeight - sx(42);
+  const formulaWidth = compact ? cssWidth * .72 : sx(300);
+  ctx.fillStyle = "rgba(255, 255, 255, .92)";
+  ctx.strokeStyle = "#d9ebe7";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(formulaX, formulaY - sx(42), formulaWidth, sx(56), sx(12));
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = "#315856";
+  ctx.font = `700 ${Math.max(12, sx(16))}px ui-monospace, monospace`;
+  ctx.fillText(`x = 1.4 / ${depth.toFixed(1)} = ${normalizedX.toFixed(2)}`, formulaX + sx(18), formulaY - sx(7));
+}
+
+function mountDepthProjection(root) {
+  if (root.dataset.mounted === "true") return;
+  root.dataset.mounted = "true";
+  const canvas = root.querySelector("[data-depth-canvas]");
+  const range = root.querySelector("[data-depth-range]");
+  const output = root.querySelector("[data-depth-output]");
+  const explain = root.querySelector("[data-depth-explain]");
+  const toggle = root.querySelector("[data-depth-toggle]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let playing = !reducedMotion;
+  let direction = 1;
+  let lastTime = 0;
+  let frameId = 0;
+
+  const render = () => {
+    const depth = Number(range.value);
+    const x = DEPTH_X / depth;
+    output.value = depth.toFixed(1);
+    explain.textContent = `Zc = ${depth.toFixed(1)} 时，x = 1.4 ÷ ${depth.toFixed(1)} = ${x.toFixed(2)}。Zc 越大，投影点越靠近光轴。`;
+    drawDepthProjection(canvas, depth);
+  };
+
+  const updateToggle = () => {
+    toggle.textContent = playing ? "暂停" : "播放";
+    toggle.setAttribute("aria-pressed", String(playing));
+  };
+
+  const tick = time => {
+    if (!root.isConnected) return;
+    if (!lastTime) lastTime = time;
+    const elapsed = Math.min(40, time - lastTime);
+    lastTime = time;
+    let next = Number(range.value) + direction * elapsed * .00105;
+    if (next >= Number(range.max)) { next = Number(range.max); direction = -1; }
+    if (next <= Number(range.min)) { next = Number(range.min); direction = 1; }
+    range.value = next.toFixed(2);
+    render();
+    if (playing) frameId = requestAnimationFrame(tick);
+  };
+
+  const start = () => {
+    if (!playing) return;
+    lastTime = 0;
+    cancelAnimationFrame(frameId);
+    frameId = requestAnimationFrame(tick);
+  };
+
+  toggle.addEventListener("click", () => {
+    playing = !playing;
+    updateToggle();
+    if (playing) start();
+    else cancelAnimationFrame(frameId);
+  });
+  range.addEventListener("input", () => {
+    playing = false;
+    cancelAnimationFrame(frameId);
+    updateToggle();
+    render();
+  });
+
+  const observer = new ResizeObserver(render);
+  observer.observe(canvas);
+  updateToggle();
+  render();
+  start();
+}
+
 export function mountIntrinsicLabs(scope = document) {
   scope.querySelectorAll("[data-intrinsic-lab]").forEach(mountLab);
+  scope.querySelectorAll("[data-depth-projection]").forEach(mountDepthProjection);
 }
