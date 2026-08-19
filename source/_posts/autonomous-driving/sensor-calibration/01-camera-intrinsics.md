@@ -30,7 +30,7 @@ toc: true
 把相机的光心当作原点 `O`。在计算机视觉中，经常约定 `Xc` 向右、`Yc` 向下、`Zc` 朝镜头前方。于是一个空间点可以写成 `P(Xc, Yc, Zc)`：
 
 <figure class="coordinate-figure">
-  <img src="/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/camera-coordinate-system.svg" alt="相机坐标系、空间点和归一化成像平面的关系">
+  <img src="/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/camera-coordinate-system.svg?v=2" alt="相机坐标系、空间点和归一化成像平面的关系">
   <figcaption>空间点 P 发出的光线经过光心 O，与归一化成像平面相交。</figcaption>
 </figure>
 

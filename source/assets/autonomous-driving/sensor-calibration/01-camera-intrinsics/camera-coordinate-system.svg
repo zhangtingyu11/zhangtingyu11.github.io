@@ -47,13 +47,14 @@
     </g>
   </g>
 
-  <g transform="translate(784 462)" filter="url(#shadow)">
-    <rect width="350" height="148" rx="22" fill="#ffffff" stroke="#d9ebe7" stroke-width="2"/>
-    <text x="24" y="38" fill="#6a8b85" font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17">除以深度 Zc，得到归一化坐标</text>
-    <g fill="#294d4d" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="24" font-weight="700">
-      <text x="35" y="88">x = Xc / Zc</text>
-      <text x="190" y="88">y = Yc / Zc</text>
+  <g transform="translate(784 448)" filter="url(#shadow)">
+    <rect width="350" height="174" rx="22" fill="#ffffff" stroke="#d9ebe7" stroke-width="2"/>
+    <text x="24" y="34" fill="#6a8b85" font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17">除以深度 Zc，得到归一化坐标</text>
+    <g fill="#294d4d" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="23" font-weight="700">
+      <text x="28" y="76">x = Xc / Zc</text>
+      <text x="28" y="112">y = Yc / Zc</text>
     </g>
-    <text x="24" y="123" fill="#9a7f88" font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="16">点越远，投影通常越靠近光轴</text>
+    <line x1="24" y1="131" x2="326" y2="131" stroke="#e5efed" stroke-width="2"/>
+    <text x="24" y="157" fill="#9a7f88" font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="16">点越远，投影通常越靠近光轴</text>
   </g>
 </svg>
