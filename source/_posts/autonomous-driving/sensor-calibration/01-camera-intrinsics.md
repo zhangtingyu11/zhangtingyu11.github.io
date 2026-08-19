@@ -27,7 +27,15 @@ toc: true
 
 ### 相机坐标系：相机眼中的三维世界
 
-把相机的光心当作原点 `O`。在计算机视觉中，经常约定 `Xc` 向右、`Yc` 向下、`Zc` 朝镜头前方。于是一个空间点可以写成 `P(Xc, Yc, Zc)`：
+把相机的光心当作原点 `O`。在计算机视觉中，经常约定 `Xc` 向右、`Yc` 向下、`Zc` 朝镜头前方。
+
+我们先随便选一个空间点，并给它取名为 `P`（Point，点）。如果点 `P` 在三个方向上的坐标分别是 `Xc`、`Yc`、`Zc`，就可以记作：
+
+```text
+点 P 的相机坐标 = (Xc, Yc, Zc)
+```
+
+这里的 `P` 只是点的名字，不参与计算，也不是新的相机参数。图中展示的就是这个点与相机坐标系的关系：
 
 <figure class="coordinate-figure">
   <img src="/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/camera-coordinate-system.svg?v=2" alt="相机坐标系、空间点和归一化成像平面的关系">
