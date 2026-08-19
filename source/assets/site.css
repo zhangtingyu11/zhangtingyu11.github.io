@@ -1,36 +1,36 @@
-@import url("/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/demo.css?v=20260819-10");
+@import url("/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/demo.css?v=20260819-11");
 
 :root,
 html[data-theme="light"],
 html[data-theme="dark"] {
-  --fresh-rose: #dc8fa9;
-  --fresh-rose-deep: #bd718d;
-  --fresh-lilac: #9b91b3;
-  --fresh-ink: #453d49;
-  --fresh-muted: #867a89;
-  --fresh-bg: #faf8fb;
+  --fresh-rose: #67aa9e;
+  --fresh-rose-deep: #3f756d;
+  --fresh-lilac: #849d99;
+  --fresh-ink: #344441;
+  --fresh-muted: #74847f;
+  --fresh-bg: #f5f9f8;
   --fresh-panel: #ffffff;
-  --fresh-line: #eee5eb;
-  --efu-theme: #dc8fa9;
-  --efu-main: #dc8fa9;
-  --efu-background: #faf8fb;
+  --fresh-line: #dfe9e6;
+  --efu-theme: #67aa9e;
+  --efu-main: #67aa9e;
+  --efu-background: #f5f9f8;
   --efu-card-bg: #ffffff;
   --efu-card-bg-op: rgba(255, 255, 255, .88);
-  --efu-fontcolor: #453d49;
-  --efu-secondtext: #867a89;
+  --efu-fontcolor: #344441;
+  --efu-secondtext: #74847f;
   --efu-lighttext: #ffffff;
-  --efu-border-color: #eee5eb;
-  --style-border: 1px solid #eee5eb;
-  --style-border-always: 1px solid #eee5eb;
-  --style-border-hover: 1px solid #dfafbf;
-  --efu-shadow-border: 0 12px 36px rgba(126, 93, 113, .08);
-  --efu-shadow-main: 0 18px 48px rgba(183, 116, 145, .15);
+  --efu-border-color: #dfe9e6;
+  --style-border: 1px solid #dfe9e6;
+  --style-border-always: 1px solid #dfe9e6;
+  --style-border-hover: 1px solid #9bc9c0;
+  --efu-shadow-border: 0 12px 36px rgba(67, 105, 98, .08);
+  --efu-shadow-main: 0 18px 48px rgba(76, 139, 127, .13);
 }
 
 body {
   background:
-    radial-gradient(circle at 8% 8%, rgba(246, 212, 225, .38), transparent 26%),
-    radial-gradient(circle at 92% 18%, rgba(224, 220, 242, .4), transparent 24%),
+    radial-gradient(circle at 8% 8%, rgba(201, 235, 226, .42), transparent 26%),
+    radial-gradient(circle at 92% 18%, rgba(214, 230, 237, .42), transparent 24%),
     var(--fresh-bg) !important;
   color: var(--fresh-ink);
 }
@@ -42,14 +42,14 @@ body::before {
   z-index: -1;
   pointer-events: none;
   opacity: .36;
-  background-image: radial-gradient(rgba(202, 151, 174, .28) .7px, transparent .7px);
+  background-image: radial-gradient(rgba(102, 162, 151, .22) .7px, transparent .7px);
   background-size: 24px 24px;
   mask-image: linear-gradient(to bottom, #000, transparent 72%);
 }
 
 #page-header.not-top-img {
   background: rgba(255, 253, 254, .82) !important;
-  border-bottom: 1px solid rgba(227, 211, 220, .72);
+  border-bottom: 1px solid rgba(206, 224, 219, .78);
   backdrop-filter: blur(18px);
 }
 
@@ -90,10 +90,10 @@ body::before {
   height: clamp(440px, 42vw, 520px);
   margin: 0 0 30px;
   overflow: hidden;
-  border: 1px solid rgba(235, 218, 227, .9);
+  border: 1px solid rgba(210, 228, 223, .92);
   border-radius: 28px;
-  background: #f4e8ef;
-  box-shadow: 0 24px 70px rgba(124, 93, 111, .1);
+  background: #e8f2ef;
+  box-shadow: 0 24px 70px rgba(67, 105, 98, .1);
 }
 
 .gp-home-intro__image,
@@ -171,8 +171,8 @@ body::before {
 }
 
 .layout--home .category-bar-item.select a {
-  border-color: #ecd5de;
-  background: #fbedf2 !important;
+  border-color: #b9d9d2;
+  background: #eaf5f2 !important;
   color: var(--fresh-rose-deep) !important;
 }
 
@@ -182,7 +182,7 @@ body::before {
 #page {
   border: 1px solid var(--fresh-line);
   background: rgba(255, 255, 255, .96);
-  box-shadow: 0 16px 48px rgba(126, 93, 113, .08);
+  box-shadow: 0 16px 48px rgba(67, 105, 98, .08);
 }
 
 .layout--home .recent-posts .recent-post-item {
@@ -194,9 +194,9 @@ body::before {
 }
 
 .layout--home .recent-posts .recent-post-item:hover {
-  border-color: #e3bdcb;
+  border-color: #a9d0c7;
   transform: translateY(-3px);
-  box-shadow: 0 22px 58px rgba(176, 119, 145, .14);
+  box-shadow: 0 22px 58px rgba(76, 139, 127, .13);
 }
 
 .layout--home .recent-post-item > .post_cover {
@@ -266,6 +266,21 @@ body::before {
   color: var(--fresh-rose);
 }
 
+#card-toc .toc-content .toc-link {
+  color: #687b77 !important;
+}
+
+#card-toc .toc-content .toc-link.active {
+  background: #e7f2ef !important;
+  color: #315c55 !important;
+  font-size: 15px !important;
+  font-weight: 700;
+}
+
+#card-toc .toc-content .toc-link.active span {
+  color: inherit !important;
+}
+
 #article-container code {
   font-variant-ligatures: none;
 }
@@ -277,15 +292,15 @@ body::before {
 .coordinate-figure img {
   display: block;
   width: 100%;
-  border: 1px solid #eadfe5;
+  border: 1px solid #dce9e5;
   border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 14px 38px rgba(126, 93, 113, .08);
+  box-shadow: 0 14px 38px rgba(67, 105, 98, .08);
 }
 
 .coordinate-figure figcaption {
   margin-top: .65rem;
-  color: #887b89;
+  color: #70827e;
   font-size: .8rem;
   line-height: 1.65;
   text-align: center;

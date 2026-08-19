@@ -1,4 +1,4 @@
-import { mountIntrinsicLabs } from "/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/demo.js?v=20260819-8";
+import { mountIntrinsicLabs } from "/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/demo.js?v=20260819-11";
 
 const mountHomeIntro = (root = document) => {
   const home = root.querySelector?.(".layout--home");

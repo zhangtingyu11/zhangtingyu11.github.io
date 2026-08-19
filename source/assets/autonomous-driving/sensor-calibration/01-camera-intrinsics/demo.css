@@ -49,7 +49,7 @@
   color: #456c68;
   font: 26px Georgia, serif;
 }
-.homogeneous-equation__k { color: #c45f80; font-style: italic; }
+.homogeneous-equation__k { color: #437b72; font-style: italic; }
 .vector-grid {
   position: relative;
   display: grid;
@@ -192,7 +192,7 @@
   color: #527572;
   font-size: 13px;
 }
-.depth-projection__control output { justify-self: end; color: #c36182; font: 750 14px ui-monospace, monospace; }
+.depth-projection__control output { justify-self: end; color: #437b72; font: 750 14px ui-monospace, monospace; }
 .depth-projection__control input { grid-column: 1 / -1; width: 100%; accent-color: #69bfae; cursor: pointer; }
 .depth-projection__explain {
   min-height: 1.5em;
@@ -211,7 +211,7 @@
   padding: 22px;
   border: 1px solid #deebe8;
   border-radius: 18px;
-  background: linear-gradient(135deg, #f7fbfa 0%, #fff9fb 100%);
+  background: linear-gradient(135deg, #f7fbfa 0%, #f4f8fa 100%);
 }
 .projection-flow__node {
   display: grid;
@@ -225,7 +225,7 @@
   box-shadow: 0 10px 28px rgba(65, 112, 105, .07);
 }
 .projection-flow__node--normalized { background: #f0faf7; }
-.projection-flow__node--pixel { background: #fff5f8; }
+.projection-flow__node--pixel { background: #f1f6f8; }
 .projection-flow__step {
   margin-bottom: 9px;
   color: #6c908b;
@@ -240,8 +240,8 @@
 .projection-flow__node code {
   margin: 8px auto 6px;
   padding: 3px 7px;
-  color: #c45f80;
-  background: rgba(224, 143, 169, .09);
+  color: #567f8f;
+  background: rgba(96, 134, 150, .08);
   font-size: 15px;
 }
 .projection-flow__node small { color: #7a9592; font-size: 12px; }

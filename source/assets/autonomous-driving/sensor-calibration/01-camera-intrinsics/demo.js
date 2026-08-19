@@ -195,7 +195,7 @@ function drawDepthProjection(canvas, depth) {
   ctx.fillText("光轴", cssWidth - sx(78), axisY - sx(10));
 
   // The current camera ray and its intersection with the normalized plane.
-  ctx.strokeStyle = "#df8fa9";
+  ctx.strokeStyle = "#79a7b8";
   ctx.lineWidth = Math.max(2, sx(3));
   ctx.setLineDash([sx(9), sx(8)]);
   ctx.beginPath();
@@ -225,7 +225,7 @@ function drawDepthProjection(canvas, depth) {
   ctx.lineWidth = 4;
   ctx.stroke();
 
-  ctx.fillStyle = "#cf7190";
+  ctx.fillStyle = "#5f8e9f";
   ctx.beginPath();
   ctx.arc(projected.x, projected.y, Math.max(6, sx(8)), 0, Math.PI * 2);
   ctx.fill();
@@ -238,7 +238,7 @@ function drawDepthProjection(canvas, depth) {
   ctx.fillText("光心 O", origin.x - sx(26), axisY + sx(34));
   const pointLabelX = compact ? Math.min(point.x - sx(42), cssWidth - 92) : point.x - sx(42);
   ctx.fillText("空间点 P", pointLabelX, point.y - sx(20));
-  ctx.fillStyle = "#c36182";
+  ctx.fillStyle = "#4d7887";
   ctx.fillText("投影点", projected.x + sx(12), projected.y - sx(10));
 
   if (!compact) {
