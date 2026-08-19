@@ -270,6 +270,27 @@ body::before {
   font-variant-ligatures: none;
 }
 
+.coordinate-figure {
+  margin: 1.4rem 0 1.7rem;
+}
+
+.coordinate-figure img {
+  display: block;
+  width: 100%;
+  border: 1px solid #eadfe5;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 14px 38px rgba(126, 93, 113, .08);
+}
+
+.coordinate-figure figcaption {
+  margin-top: .65rem;
+  color: #887b89;
+  font-size: .8rem;
+  line-height: 1.65;
+  text-align: center;
+}
+
 #article-container strong,
 #article-container b,
 .article-container strong,

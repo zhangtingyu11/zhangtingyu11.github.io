@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">相机坐标系与归一化成像平面</title>
+  <desc id="desc">相机光心为原点，Xc向右、Yc向下、Zc向前，空间点P沿光线投影到Zc等于1的归一化成像平面</desc>
+  <defs>
+    <marker id="arrow-mint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#56b9a7"/></marker>
+    <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#df8fa9"/></marker>
+    <marker id="arrow-lilac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#9a8ab5"/></marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#6f948d" flood-opacity=".12"/></filter>
+  </defs>
+  <rect width="1200" height="680" rx="30" fill="#f7fbfa"/>
+  <circle cx="1080" cy="60" r="170" fill="#e7f1ff" opacity=".72"/>
+  <circle cx="80" cy="650" r="190" fill="#e2f5ef" opacity=".9"/>
+
+  <g font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+    <text x="58" y="72" fill="#294d4d" font-size="30" font-weight="700">相机坐标系：空间点在相机眼中的位置</text>
+    <text x="59" y="108" fill="#718a86" font-size="18">原点在光心 O，三个数 (Xc, Yc, Zc) 描述点 P 的三维位置</text>
+  </g>
+
+  <g opacity=".94">
+    <path d="M453 196 770 240 770 500 453 456Z" fill="#ffffff" stroke="#b5ddd4" stroke-width="3" filter="url(#shadow)"/>
+    <path d="M505 203v260M558 211v259M611 218v260M664 225v260M717 233v259M453 248l317 44M453 300l317 44M453 352l317 44M453 404l317 44" fill="none" stroke="#dceeea" stroke-width="2"/>
+    <text x="474" y="185" fill="#6a978f" font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="18">归一化成像平面 Zc = 1</text>
+  </g>
+
+  <g fill="none" stroke-linecap="round">
+    <path d="M250 500 1050 195" stroke="#56b9a7" stroke-width="5" marker-end="url(#arrow-mint)"/>
+    <path d="M250 500 525 544" stroke="#df8fa9" stroke-width="5" marker-end="url(#arrow-rose)"/>
+    <path d="M250 500 250 642" stroke="#9a8ab5" stroke-width="5" marker-end="url(#arrow-lilac)"/>
+    <path d="M250 500 974 150" stroke="#e68c76" stroke-width="4" stroke-dasharray="12 12"/>
+  </g>
+
+  <g font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="23" font-weight="700">
+    <text x="1060" y="192" fill="#438f83">Zc</text>
+    <text x="535" y="554" fill="#c76f8c">Xc</text>
+    <text x="266" y="640" fill="#81719c">Yc</text>
+  </g>
+
+  <g>
+    <circle cx="250" cy="500" r="11" fill="#294d4d"/>
+    <circle cx="612" cy="325" r="10" fill="#df8fa9" stroke="#ffffff" stroke-width="5"/>
+    <circle cx="974" cy="150" r="12" fill="#e68c76" stroke="#ffffff" stroke-width="5"/>
+    <g font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+      <text x="211" y="484" fill="#294d4d" font-size="20" font-weight="700">光心 O</text>
+      <text x="629" y="315" fill="#b96c85" font-size="19" font-weight="700">投影点 (x, y)</text>
+      <text x="992" y="143" fill="#b86958" font-size="20" font-weight="700">空间点 P</text>
+      <text x="992" y="171" fill="#7b706f" font-size="17">(Xc, Yc, Zc)</text>
+    </g>
+  </g>
+
+  <g transform="translate(784 462)" filter="url(#shadow)">
+    <rect width="350" height="148" rx="22" fill="#ffffff" stroke="#d9ebe7" stroke-width="2"/>
+    <text x="24" y="38" fill="#6a8b85" font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17">除以深度 Zc，得到归一化坐标</text>
+    <g fill="#294d4d" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="24" font-weight="700">
+      <text x="35" y="88">x = Xc / Zc</text>
+      <text x="190" y="88">y = Yc / Zc</text>
+    </g>
+    <text x="24" y="123" fill="#9a7f88" font-family="'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="16">点越远，投影通常越靠近光轴</text>
+  </g>
+</svg>
