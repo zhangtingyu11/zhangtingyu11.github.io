@@ -140,6 +140,18 @@ y = Yc / Zc
   </span>
 </div>
 
+### 矩阵里的五个参数
+
+先不用计算，逐个看清矩阵里的五个参数：
+
+<div class="parameter-cards">
+  <div class="parameter-card"><strong>f<sub>x</sub></strong><p>横向焦距参数，单位通常是像素。它控制投影相对主点在水平方向放大多少。</p></div>
+  <div class="parameter-card"><strong>f<sub>y</sub></strong><p>纵向焦距参数，单位通常是像素。它控制投影相对主点在垂直方向放大多少。</p></div>
+  <div class="parameter-card"><strong>c<sub>x</sub></strong><p>主点的横坐标，单位是像素。改变它会让整幅投影向左或向右平移。</p></div>
+  <div class="parameter-card"><strong>c<sub>y</sub></strong><p>主点的纵坐标，单位是像素。改变它会让整幅投影向上或向下平移。</p></div>
+  <div class="parameter-card"><strong>s</strong><p>倾斜参数（skew），单位通常是像素。它描述两条像素轴不完全垂直时产生的横向剪切；现代相机中通常接近 0。</p></div>
+</div>
+
 把 `K` 和 `[x, y, 1]ᵀ` 真正乘开，三行结果分别是：
 
 ```text
@@ -157,16 +169,7 @@ u = fx · Xc/Zc + s · Yc/Zc + cx
 v = fy · Yc/Zc             + cy
 ```
 
-先别急着记公式。现在只需要抓住结构：`fx`、`fy` 负责缩放，`cx`、`cy` 负责把原点移到主点，`s` 负责横纵方向之间的倾斜耦合。下面逐个认识它们。
-
-## 五个参数分别是什么意思？
-
-<div class="parameter-cards">
-  <div class="parameter-card"><strong>f<sub>x</sub></strong><p>横向焦距参数。数值越大，投影点相对主点的横向距离越大。</p></div>
-  <div class="parameter-card"><strong>f<sub>y</sub></strong><p>纵向焦距参数。数值越大，投影点相对主点的纵向距离越大。</p></div>
-  <div class="parameter-card"><strong>c<sub>x</sub>, c<sub>y</sub></strong><p>主点坐标，也就是相机光轴与成像平面的交点落在哪个像素附近。</p></div>
-  <div class="parameter-card"><strong>s</strong><p>倾斜参数（skew）。描述图像的两条像素轴不完全垂直时产生的剪切。</p></div>
-</div>
+这两行也把五个参数的分工串了起来：`fx`、`fy` 负责缩放，`cx`、`cy` 负责平移，`s` 负责倾斜耦合。下面再回答几个初学时最容易混淆的问题。
 
 ### `fx` 和 `fy` 是镜头上写的焦距吗？
 
