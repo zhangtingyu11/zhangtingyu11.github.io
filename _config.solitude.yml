@@ -448,7 +448,7 @@ right_menu:
 #  information
 # 复制信息
 copy:
-  enable: false
+  enable: true
   # Turn on Link copyright information after copying.
   # 复制后链接版权信息
   copyright:
@@ -748,12 +748,12 @@ extends:
   # Insert in head
   # 插入到 head
   head:
-    - <link rel="stylesheet" href="/assets/site.css?v=20260819-4">
+    - <link rel="stylesheet" href="/assets/site.css?v=20260819-5">
 
   # Insert in body
   # 插入到 body
   body:
-    - <script type="module" src="/assets/site.js?v=20260819-4"></script>
+    - <script type="module" src="/assets/site.js?v=20260819-5"></script>
 # --------------------------- end ---------------------------
 
 # --------------------------- start ---------------------------
