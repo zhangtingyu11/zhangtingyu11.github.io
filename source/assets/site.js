@@ -20,7 +20,7 @@ const mountHomeIntro = (root = document) => {
       </div>
     </div>
     <figure class="gp-home-intro__visual">
-      <img src="/img/megumi-kato.jpg" alt="樱花街道上的加藤惠" loading="eager">
+      <img src="/img/megumi-kato.jpg?v=20260819-2" alt="樱花街道上的加藤惠" loading="eager">
       <figcaption><span></span> 春日、记录与分享</figcaption>
     </figure>`;
 
