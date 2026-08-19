@@ -270,6 +270,14 @@ body::before {
   font-variant-ligatures: none;
 }
 
+#article-container strong,
+#article-container b,
+.article-container strong,
+.article-container b {
+  color: #332d36 !important;
+  font-weight: 700;
+}
+
 #article-container,
 .article-container,
 #post .post-content {
