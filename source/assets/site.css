@@ -205,9 +205,17 @@ body::before {
   background: #f3faf7;
 }
 
+.layout--home .recent-post-item > .post_cover a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7fbfa;
+}
+
 .layout--home .recent-post-item > .post_cover img {
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   transition: transform .5s ease;
 }
 
@@ -218,13 +226,23 @@ body::before {
 .layout--home .recent-post-item > .recent-post-info {
   width: 57%;
   padding: 36px 42px;
+  overflow: visible;
+}
+
+.layout--home .recent-post-info-top {
+  overflow: visible;
 }
 
 .layout--home .recent-post-info .article-title {
+  display: block !important;
+  overflow: visible !important;
+  padding: 5px 0 9px;
   color: var(--fresh-ink);
   font-size: clamp(22px, 2.5vw, 31px) !important;
-  line-height: 1.4;
+  line-height: 1.5 !important;
   letter-spacing: -.035em;
+  -webkit-box-orient: initial;
+  -webkit-line-clamp: unset;
 }
 
 .layout--home .recent-post-info-top-tips .original {
