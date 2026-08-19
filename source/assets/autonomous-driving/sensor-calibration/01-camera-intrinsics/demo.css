@@ -33,6 +33,45 @@
 .matrix-grid::before { left: 0; border-left: 2px solid currentColor; }
 .matrix-grid::after { right: 0; border-right: 2px solid currentColor; }
 
+.homogeneous-equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 24px 0;
+  padding: 24px 18px;
+  border: 1px solid #deebe8;
+  border-radius: 16px;
+  color: #294d4d;
+  background: linear-gradient(135deg, #f3faf8, #fff7fa);
+}
+.homogeneous-equation__symbol {
+  color: #456c68;
+  font: 26px Georgia, serif;
+}
+.homogeneous-equation__k { color: #c45f80; font-style: italic; }
+.vector-grid {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  min-width: 62px;
+  padding: 7px 16px;
+  color: #294d4d;
+  text-align: center;
+  font: 18px "JetBrains Mono", "SFMono-Regular", monospace;
+}
+.vector-grid::before, .vector-grid::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 9px;
+  border-top: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+}
+.vector-grid::before { left: 0; border-left: 2px solid currentColor; }
+.vector-grid::after { right: 0; border-right: 2px solid currentColor; }
+
 .intrinsic-note {
   margin: 24px 0;
   padding: 18px 20px;
@@ -260,4 +299,7 @@
     bottom: -1px;
     transform: translateX(50%) rotate(135deg);
   }
+  .homogeneous-equation { gap: 12px; padding: 20px 12px; }
+  .homogeneous-equation__symbol { font-size: 22px; }
+  .vector-grid { min-width: 54px; padding-inline: 13px; font-size: 16px; }
 }

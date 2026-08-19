@@ -105,7 +105,7 @@ y = Yc / Zc
     <small>没有像素单位</small>
   </div>
   <div class="projection-flow__arrow">
-    <span>乘以内参 K</span>
+    <span>补 1 后乘以内参 K</span>
     <i aria-hidden="true"></i>
   </div>
   <div class="projection-flow__node projection-flow__node--pixel">
@@ -116,11 +116,20 @@ y = Yc / Zc
   </div>
 </div>
 
-这样一来，`K` 就不再是突然出现的 3×3 数字表了。它正好位于上面流程的第二个箭头，接下来我们把这个“换算盒子”打开。
+这里还要补上一个容易被省略的步骤：`(x, y)` 只有两个分量，不能直接与 3×3 的内参矩阵相乘。计算前要在末尾补一个 `1`，把它写成齐次坐标 `[x, y, 1]ᵀ`。这个 `1` 不表示多出了一条空间坐标轴，只是为了把缩放和平移统一写成一次矩阵乘法。
 
 ## 内参矩阵长什么样？
 
-在标准针孔相机模型中，负责把 `(x, y)` 变成 `(u, v)` 的内参矩阵通常写成：
+在标准针孔相机模型中，归一化坐标到像素坐标的完整写法是：
+
+<div class="homogeneous-equation" role="img" aria-label="像素齐次坐标 u v 1 等于内参矩阵 K 乘以归一化齐次坐标 x y 1">
+  <span class="vector-grid"><span>u</span><span>v</span><span>1</span></span>
+  <span class="homogeneous-equation__symbol">=</span>
+  <span class="homogeneous-equation__symbol homogeneous-equation__k">K</span>
+  <span class="vector-grid"><span>x</span><span>y</span><span>1</span></span>
+</div>
+
+其中，内参矩阵 `K` 通常写成：
 
 <div class="intrinsic-matrix" aria-label="相机内参矩阵 K">
   <span class="intrinsic-matrix__symbol">K =</span>
@@ -131,12 +140,15 @@ y = Yc / Zc
   </span>
 </div>
 
-把矩阵乘法拆成真正决定像素位置的两行，就是：
+把 `K` 和 `[x, y, 1]ᵀ` 真正乘开，三行结果分别是：
 
 ```text
 u = fx · x + s · y + cx
 v = fy · y          + cy
+1 = 1
 ```
+
+最后一行只是说明齐次坐标的第三个分量仍然是 `1`；真正决定图片上位置的是前两行。
 
 把上一节的 `x = Xc/Zc`、`y = Yc/Zc` 代入，就能得到从三维相机坐标直接计算像素坐标的形式：
 
