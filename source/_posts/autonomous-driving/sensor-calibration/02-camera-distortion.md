@@ -229,20 +229,22 @@ r = √(x² + y²)
 
 `θ` 用弧度，`f` 负责把角度换成传感器长度或像素距离。归一化时再除以 `f`，才会得到 `ρ/f = θ`。所以这里不是“长度等于角度”，而是**归一化半径的数值等于弧度值**。
 
-真实镜头还要乘一个修正倍率。下面固定 `θ = 1 rad`、归一化焦距 `f = 1`，只看这个倍率怎样移动点：
+但 `ρ = f·θ` 仍然只是一条理想曲线。真实镜头的成像位置会与它有偏差：灰点是理想公式的预测，橙圈是棋盘格角点的实际观测。加入 `k1～k4`，就是为了让绿色预测点对准橙圈。
+
+下面固定 `θ = 1 rad`、归一化焦距 `f = 1`。拖动倍率，试着让绿点与橙圈重合：
 
 <div class="kb-radius-lab" data-kb-radius-lab>
   <label class="kb-radius-lab__control">
-    <span>修正倍率（拖动看看）<output data-kb-radius-factor-output>0.75</output></span>
-    <input data-kb-radius-factor-range type="range" min="60" max="140" step="1" value="75" aria-label="调整 KB 半径修正倍率">
+    <span>模型修正倍率<output data-kb-radius-factor-output>0.65</output></span>
+    <input data-kb-radius-factor-range type="range" min="60" max="140" step="1" value="65" aria-label="调整 KB 半径修正倍率，使绿色预测点对准橙色观测点">
   </label>
-  <canvas role="img" aria-label="修正倍率改变时，鱼眼点沿着穿过归一化坐标原点 O 的直线向内或向外移动"></canvas>
+  <canvas role="img" aria-label="调整修正倍率，使加入 k 后的绿色预测点对准棋盘格角点的橙色实际观测位置"></canvas>
   <div class="kb-radius-lab__values">
-    <span>入射角 θ = 1.00 rad</span>
-    <span>灰点半径 f·θ = 1.00</span>
-    <span>绿点半径 f·θd = <output data-kb-radius-result-output>0.75</output></span>
+    <span data-kind="base">灰点：不加 k 的预测 1.00</span>
+    <span data-kind="observed">橙圈：实际观测 0.82</span>
+    <span data-kind="corrected">绿点：加 k 的预测 <output data-kb-radius-result-output>0.65</output></span>
   </div>
-  <p data-kb-radius-explain aria-live="polite">倍率小于 1：绿点被拉向原点 O。</p>
+  <p data-kb-radius-explain aria-live="polite">绿色预测点太靠近 O，继续增大倍率。</p>
 </div>
 
 动画里的修正倍率，就是 `k1～k4` 共同算出的结果。`θd` 是由角度算出的无量纲数，在归一化平面上直接用作新半径；它不是毫米或像素长度：
@@ -252,7 +254,7 @@ r = √(x² + y²)
 修正倍率 = 1 + k1·θ² + k2·θ⁴ + k3·θ⁶ + k4·θ⁸
 ```
 
-这些 `k` 由标定程序根据棋盘格角点拟合出来。越靠后的 `k`，主要微调画面最外圈。
+动画只对齐了一个点。实际标定会同时观察许多棋盘格角点，求出一组 `k`，让所有绿色预测尽量靠近各自的橙色观测。这里修正的是投影公式，使它贴合真实镜头；还不是在执行图像去畸变。
 
 动画中点始终在同一条线上，因为 `(x/r, y/r)` 只保留方向。最后把这支方向箭头乘上归一化半径 `θd`；再由内参中的 `fx、fy` 换算成像素坐标：
 

@@ -395,6 +395,9 @@ function drawKbRadiusMapping(canvas, factor) {
   const baseY = originY + dy * baseLength;
   const correctedX = originX + dx * baseLength * factor;
   const correctedY = originY + dy * baseLength * factor;
+  const observedFactor = .82;
+  const observedX = originX + dx * baseLength * observedFactor;
+  const observedY = originY + dy * baseLength * observedFactor;
 
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, width, height);
@@ -493,8 +496,8 @@ function drawKbRadiusMapping(canvas, factor) {
     const endX = correctedX + normalX;
     const endY = correctedY + normalY;
     const arrowAngle = Math.atan2(endY - startY, endX - startX);
-    ctx.strokeStyle = "#d08a6e";
-    ctx.fillStyle = "#d08a6e";
+    ctx.strokeStyle = "#7898a2";
+    ctx.fillStyle = "#7898a2";
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(startX, startY);
@@ -511,14 +514,6 @@ function drawKbRadiusMapping(canvas, factor) {
     ctx.textBaseline = "bottom";
     ctx.fillText(factor < 1 ? "向 O" : "远离 O", (startX + endX) / 2, (startY + endY) / 2 - 4);
   }
-
-  const radiusLabelX = originX + dx * baseLength * .48 + dy * 19;
-  const radiusLabelY = originY + dy * baseLength * .48 - dx * 19;
-  ctx.fillStyle = "#607772";
-  ctx.font = "12px system-ui, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("这条线段的长度就是平面距离", radiusLabelX, radiusLabelY);
 
   ctx.beginPath();
   ctx.arc(originX, originY, 8, 0, Math.PI * 2);
@@ -546,20 +541,32 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.lineWidth = 3;
   ctx.stroke();
 
+  ctx.beginPath();
+  ctx.arc(observedX, observedY, 13, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(220, 132, 96, .12)";
+  ctx.strokeStyle = "#d77f61";
+  ctx.lineWidth = 3;
+  ctx.fill();
+  ctx.stroke();
+
   ctx.font = "700 13px system-ui, sans-serif";
   ctx.textBaseline = "middle";
-  if (Math.abs(factor - 1) < .035) {
-    ctx.fillStyle = "#315c55";
-    ctx.textAlign = width < 420 ? "right" : "left";
-    ctx.fillText("f·θ 与 f·θd 重合", width < 420 ? baseX - 12 : baseX + 14, baseY - 12);
-  } else {
-    ctx.fillStyle = "#6c7f7b";
-    ctx.textAlign = "left";
-    ctx.fillText("f·θ 基础位置", baseX + 13, baseY - 13);
+  ctx.fillStyle = "#6c7f7b";
+  ctx.textAlign = "left";
+  ctx.fillText(Math.abs(factor - 1) < .035 ? "无 k = 有 k" : "无 k 预测", baseX + 12, baseY - 14);
+  if (Math.abs(factor - observedFactor) <= .012) {
     ctx.fillStyle = "#3f756d";
-    const correctedLabelX = factor < 1 ? correctedX - 10 : correctedX + 13;
-    ctx.textAlign = factor < 1 ? "right" : "left";
-    ctx.fillText("f·θd 修正后", correctedLabelX, correctedY + 16);
+    ctx.textAlign = "left";
+    ctx.fillText("有 k 预测 = 实测", observedX + 17, observedY + 15);
+  } else {
+    ctx.fillStyle = "#b7654d";
+    ctx.textAlign = "left";
+    ctx.fillText("棋盘格实测", observedX + 15, observedY + 15);
+    ctx.fillStyle = "#3f756d";
+    const labelOnLeft = factor < 1 || width < 420;
+    const correctedLabelX = labelOnLeft ? correctedX - 10 : correctedX + 13;
+    ctx.textAlign = labelOnLeft ? "right" : "left";
+    ctx.fillText("有 k 预测", correctedLabelX, correctedY + (factor > 1 ? 17 : -16));
   }
 }
 
@@ -719,9 +726,10 @@ function mountKbRadiusLab(root) {
     const factor = Number(range.value) / 100;
     factorOutput.value = factor.toFixed(2);
     resultOutput.value = factor.toFixed(2);
-    if (factor < .99) explain.textContent = "倍率小于 1：绿点被拉向原点 O。";
-    else if (factor > 1.01) explain.textContent = "倍率大于 1：绿点远离原点 O。";
-    else explain.textContent = "倍率等于 1：修正前后的位置重合。";
+    const difference = factor - .82;
+    if (Math.abs(difference) <= .01) explain.textContent = "对齐了：当前模型预测与这个棋盘格角点的实际位置一致。";
+    else if (difference < 0) explain.textContent = "绿色预测点太靠近 O，继续增大倍率。";
+    else explain.textContent = "绿色预测点离 O 太远，减小倍率。";
     drawKbRadiusMapping(canvas, factor);
   };
 
