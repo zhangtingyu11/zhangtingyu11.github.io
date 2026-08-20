@@ -151,6 +151,35 @@
   border-radius: 18px;
   background: #f7fbfa;
 }
+
+.radtan-power-map {
+  display: grid;
+  gap: 9px;
+  margin: 18px 0;
+  padding: 15px 17px;
+  border: 1px solid #dbe9e5;
+  border-radius: 15px;
+  background: #f8fbfa;
+}
+.radtan-power-map__axis,
+.radtan-power-map > div:not(.radtan-power-map__axis) {
+  display: grid;
+  grid-template-columns: 74px minmax(150px, 1fr) 92px;
+  align-items: center;
+  gap: 12px;
+}
+.radtan-power-map__axis span:first-child { grid-column: 2; justify-self: start; }
+.radtan-power-map__axis span:last-child { grid-column: 2; justify-self: end; }
+.radtan-power-map b { color: #315c55 !important; font: 700 12px ui-monospace, monospace; }
+.radtan-power-map small,
+.radtan-power-map__axis { color: #70837f; font-size: 11px; }
+.radtan-power-map > div > span { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.radtan-power-map i {
+  display: block;
+  height: 13px;
+  border-radius: 4px;
+  background: rgba(82, 157, 144, calc(.08 + var(--level) * .92));
+}
 .radtan-parameter-lab__tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
 .radtan-parameter-lab button {
   appearance: none;
@@ -238,6 +267,9 @@
   .radtan-flow,
   .radtan-parameter-lab__comparison,
   .distortion-lab__comparison { grid-template-columns: 1fr; }
+  .radtan-power-map__axis,
+  .radtan-power-map > div:not(.radtan-power-map__axis) { grid-template-columns: 62px minmax(120px, 1fr); }
+  .radtan-power-map small { grid-column: 2; }
   .radtan-flow i { width: 2px; height: 24px; }
   .radtan-flow i::after {
     top: auto;

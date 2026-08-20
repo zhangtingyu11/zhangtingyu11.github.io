@@ -18,9 +18,9 @@ const MODES = {
 };
 
 const RADTAN_PARAMETERS = {
-  k1: { scale: .32, initial: -65, describe: "r² 项：从画面中部开始明显。负值偏桶形，正值偏枕形。" },
-  k2: { scale: .18, initial: -70, describe: "r⁴ 项：中心变化较小，主要修正画面边缘。" },
-  k3: { scale: .1, initial: -80, describe: "r⁶ 项：变化集中在最外圈，对边缘标定数据很敏感。" },
+  k1: { scale: .14, initial: -75, describe: "r² 项：从画面中部开始明显。负值偏桶形，正值偏枕形。" },
+  k2: { scale: .14, initial: -75, describe: "r⁴ 项：中心变化很小，主要影响画面边缘。" },
+  k3: { scale: .14, initial: -75, describe: "r⁶ 项：基本只动最外圈，对边缘数据最敏感。" },
   p1: { scale: .08, initial: 65, describe: "切向项：主要表现为上下方向的不对称偏移。" },
   p2: { scale: .08, initial: 65, describe: "切向项：主要表现为左右方向的不对称偏移。" }
 };

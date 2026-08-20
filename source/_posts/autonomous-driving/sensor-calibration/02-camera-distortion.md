@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 14:18:00
+updated: 2026-08-20 14:29:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -119,6 +119,15 @@ yd = y·L(r) + Δyt
   <div><strong>p1、p2</strong><p>控制 Δxt、Δyt，对应上面的切向畸变。</p></div>
 </div>
 
+三个 `k` 的变形方向相同，区别在影响范围：
+
+<div class="radtan-power-map" role="img" aria-label="k1 从中部开始产生影响，k2 主要影响边缘，k3 主要影响最外圈">
+  <div class="radtan-power-map__axis"><span>中心</span><span>边缘</span></div>
+  <div><b>k1 · r²</b><span><i style="--level:.04"></i><i style="--level:.16"></i><i style="--level:.36"></i><i style="--level:.64"></i><i style="--level:1"></i></span><small>中部开始</small></div>
+  <div><b>k2 · r⁴</b><span><i style="--level:.002"></i><i style="--level:.026"></i><i style="--level:.13"></i><i style="--level:.41"></i><i style="--level:1"></i></span><small>主要在边缘</small></div>
+  <div><b>k3 · r⁶</b><span><i style="--level:.001"></i><i style="--level:.004"></i><i style="--level:.047"></i><i style="--level:.26"></i><i style="--level:1"></i></span><small>集中在最外圈</small></div>
+</div>
+
 <div class="radtan-parameter-lab" data-radtan-parameter-lab>
   <div class="radtan-parameter-lab__tabs" data-radtan-parameter-tabs role="group" aria-label="选择一个 RadTan 参数">
     <button class="is-active" type="button" data-radtan-parameter="k1">k1</button>
@@ -128,8 +137,8 @@ yd = y·L(r) + Δyt
     <button type="button" data-radtan-parameter="p2">p2</button>
   </div>
   <label class="radtan-parameter-lab__control">
-    <span><b data-radtan-parameter-name>k1</b><output data-radtan-parameter-output>-0.208</output></span>
-    <input data-radtan-parameter-range type="range" min="-100" max="100" step="1" value="-65" aria-label="调整当前 RadTan 参数">
+    <span><b data-radtan-parameter-name>k1</b><output data-radtan-parameter-output>-0.105</output></span>
+    <input data-radtan-parameter-range type="range" min="-100" max="100" step="1" value="-75" aria-label="调整当前 RadTan 参数">
   </label>
   <div class="radtan-parameter-lab__comparison">
     <div><strong>参数为 0</strong><canvas role="img" aria-label="无畸变的道路场景"></canvas></div>
