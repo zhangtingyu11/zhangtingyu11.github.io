@@ -366,6 +366,132 @@ function drawKbAngleGeometry(canvas, angleDegrees) {
   drawPanel(panels[1], "fisheye");
 }
 
+function drawKbRadiusMapping(canvas, factor) {
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(280, rect.width || 600);
+  const height = width >= 520 ? 250 : 225;
+  const ratio = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const originX = Math.max(42, width * .12);
+  const originY = height - 38;
+  const angle = -.44;
+  const dx = Math.cos(angle);
+  const dy = Math.sin(angle);
+  const baseLength = Math.min(width * .46, (originY - 48) / Math.abs(dy));
+  const guideLength = baseLength * 1.43;
+  const baseX = originX + dx * baseLength;
+  const baseY = originY + dy * baseLength;
+  const correctedX = originX + dx * baseLength * factor;
+  const correctedY = originY + dy * baseLength * factor;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "rgba(220, 241, 235, .72)";
+  ctx.beginPath();
+  ctx.arc(originX - 18, originY + 18, 75, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#b3c4c0";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 7]);
+  ctx.beginPath();
+  ctx.moveTo(originX, originY);
+  ctx.lineTo(originX + dx * guideLength, originY + dy * guideLength);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = "#8b9f9a";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(originX, originY);
+  ctx.lineTo(baseX, baseY);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#58a99a";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(originX, originY);
+  ctx.lineTo(correctedX, correctedY);
+  ctx.stroke();
+
+  const distance = Math.hypot(correctedX - baseX, correctedY - baseY);
+  if (distance > 12) {
+    const normalX = -dy * 15;
+    const normalY = dx * 15;
+    const startX = baseX + normalX;
+    const startY = baseY + normalY;
+    const endX = correctedX + normalX;
+    const endY = correctedY + normalY;
+    const arrowAngle = Math.atan2(endY - startY, endX - startX);
+    ctx.strokeStyle = "#d08a6e";
+    ctx.fillStyle = "#d08a6e";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - Math.cos(arrowAngle - .55) * 9, endY - Math.sin(arrowAngle - .55) * 9);
+    ctx.lineTo(endX - Math.cos(arrowAngle + .55) * 9, endY - Math.sin(arrowAngle + .55) * 9);
+    ctx.closePath();
+    ctx.fill();
+    ctx.font = "700 12px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(factor < 1 ? "向中心" : "向外", (startX + endX) / 2, (startY + endY) / 2 - 5);
+  }
+
+  ctx.beginPath();
+  ctx.arc(originX, originY, 8, 0, Math.PI * 2);
+  ctx.fillStyle = "#315c55";
+  ctx.fill();
+  ctx.fillStyle = "#315c55";
+  ctx.font = "700 13px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillText("图像中心", originX, originY + 13);
+
+  ctx.beginPath();
+  ctx.arc(baseX, baseY, 8, 0, Math.PI * 2);
+  ctx.fillStyle = "#829691";
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(correctedX, correctedY, 9, 0, Math.PI * 2);
+  ctx.fillStyle = "#58a99a";
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  ctx.font = "700 13px system-ui, sans-serif";
+  ctx.textBaseline = "middle";
+  if (Math.abs(factor - 1) < .035) {
+    ctx.fillStyle = "#315c55";
+    ctx.textAlign = "left";
+    ctx.fillText("两个位置重合", baseX + 14, baseY - 12);
+  } else {
+    ctx.fillStyle = "#6c7f7b";
+    ctx.textAlign = "left";
+    ctx.fillText("基础位置", baseX + 13, baseY - 13);
+    ctx.fillStyle = "#3f756d";
+    const correctedLabelX = factor < 1 ? correctedX - 10 : correctedX + 13;
+    ctx.textAlign = factor < 1 ? "right" : "left";
+    ctx.fillText("修正后", correctedLabelX, correctedY + 16);
+  }
+}
+
 function mountDistortionLab(root) {
   if (root.dataset.mounted === "true") return;
   root.dataset.mounted = "true";
@@ -509,9 +635,35 @@ function mountKbAngleLab(root) {
   render();
 }
 
+function mountKbRadiusLab(root) {
+  if (root.dataset.mounted === "true") return;
+  root.dataset.mounted = "true";
+  const range = root.querySelector("[data-kb-radius-factor-range]");
+  const factorOutput = root.querySelector("[data-kb-radius-factor-output]");
+  const resultOutput = root.querySelector("[data-kb-radius-result-output]");
+  const explain = root.querySelector("[data-kb-radius-explain]");
+  const canvas = root.querySelector("canvas");
+
+  const render = () => {
+    const factor = Number(range.value) / 100;
+    factorOutput.value = factor.toFixed(2);
+    resultOutput.value = factor.toFixed(2);
+    if (factor < .99) explain.textContent = "倍率小于 1：点被拉向图像中心。";
+    else if (factor > 1.01) explain.textContent = "倍率大于 1：点被推向图像外侧。";
+    else explain.textContent = "倍率等于 1：修正前后的位置重合。";
+    drawKbRadiusMapping(canvas, factor);
+  };
+
+  range.addEventListener("input", render);
+  const observer = new ResizeObserver(render);
+  observer.observe(canvas);
+  render();
+}
+
 export function mountDistortionLabs(scope = document) {
   scope.querySelectorAll("[data-distortion-lab]").forEach(mountDistortionLab);
   scope.querySelectorAll("[data-radtan-parameter-lab]").forEach(mountRadTanParameterLab);
   scope.querySelectorAll("[data-rational-parameter-lab]").forEach(mountRationalParameterLab);
   scope.querySelectorAll("[data-kb-angle-lab]").forEach(mountKbAngleLab);
+  scope.querySelectorAll("[data-kb-radius-lab]").forEach(mountKbRadiusLab);
 }

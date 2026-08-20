@@ -217,20 +217,31 @@ r = √(x² + y²)
 
 到这里，我们只知道光线的角度 `θ`。接下来的问题很具体：**这条光线应该落在离图像中心多远的位置？**
 
-最简单的鱼眼模型直接令半径等于角度：`半径 = θ`。但真实镜头没这么理想，所以标定程序会根据棋盘格角点的实际位置，用 `k1～k4` 把这个半径微调成 `θd`：
+最简单的鱼眼模型直接令半径等于角度：`半径 = θ`。真实镜头没这么理想，还要乘一个修正倍率。先固定 `θ = 1`，只看这个倍率会怎样移动点：
+
+<div class="kb-radius-lab" data-kb-radius-lab>
+  <label class="kb-radius-lab__control">
+    <span>修正倍率（拖动看看）<output data-kb-radius-factor-output>0.75</output></span>
+    <input data-kb-radius-factor-range type="range" min="60" max="140" step="1" value="75" aria-label="调整 KB 半径修正倍率">
+  </label>
+  <canvas role="img" aria-label="修正倍率改变时，鱼眼点沿着穿过图像中心的直线向内或向外移动"></canvas>
+  <div class="kb-radius-lab__values">
+    <span>基础半径 θ = 1.00</span>
+    <span>修正后 θd = <output data-kb-radius-result-output>0.75</output></span>
+  </div>
+  <p data-kb-radius-explain aria-live="polite">倍率小于 1：点被拉向图像中心。</p>
+</div>
+
+动画里的修正倍率，就是 `k1～k4` 共同算出的结果：
 
 ```text
 θd = θ × 修正倍率
 修正倍率 = 1 + k1·θ² + k2·θ⁴ + k3·θ⁶ + k4·θ⁸
 ```
 
-这些 `k` 不是手动猜的，而是标定程序拟合出来的。它们全为 0 时，`θd = θ`；不为 0 时，点就会被向中心拉或向外推。越靠后的 `k`，主要微调画面最外圈。
+这些 `k` 由标定程序根据棋盘格角点拟合出来。越靠后的 `k`，主要微调画面最外圈。
 
-<figure class="coordinate-figure">
-  <img src="/assets/autonomous-driving/sensor-calibration/02-camera-distortion/kb-radius-mapping.svg?v=2" alt="KB 模型保持点相对图像中心的方向不变，只把针孔半径 r 替换成鱼眼半径 θd">
-</figure>
-
-最后还要确定点往哪个方向放。`r` 是 `(x, y)` 这支箭头的长度；除以 `r`，就得到一支长度为 1、方向不变的箭头：
+动画中点始终在同一条线上，因为 `(x/r, y/r)` 只保留方向。最后把这支方向箭头乘上新半径 `θd`：
 
 ```text
 方向箭头 = (x/r, y/r)
