@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 13:38:00
+updated: 2026-08-20 13:53:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -86,26 +86,40 @@ toc: true
 
 ### RadTan
 
-OpenCV 的普通相机标定最常用 RadTan（Brown–Conrady）。先计算归一化平面上的半径：
+`RadTan` 是两个单词的缩写：`Radial + Tangential`。它把前面提到的径向畸变和切向畸变放在同一个模型里。
+
+<div class="radtan-flow" role="img" aria-label="理想点先经过径向畸变，再叠加切向畸变，得到畸变点">
+  <div><small>理想点</small><strong>(x, y)</strong></div>
+  <span><b>径向 k</b><i aria-hidden="true"></i><small>桶形 / 枕形</small></span>
+  <span><b>切向 p</b><i aria-hidden="true"></i><small>不对称偏移</small></span>
+  <div><small>畸变点</small><strong>(x<sub>d</sub>, y<sub>d</sub>)</strong></div>
+</div>
+
+这里的 `(x, y)` 是理想归一化坐标，`r` 是它到图像中心的距离：
 
 ```text
 r² = x² + y²
 L(r) = 1 + k1·r² + k2·r⁴ + k3·r⁶
 ```
 
-然后计算畸变后的坐标：
+`L(r)` 是径向缩放：小于 1 时点向中心移动，呈桶形；大于 1 时点向外移动，呈枕形。
+
+`p1、p2` 再补上切向偏移：
 
 ```text
-xd = x·L(r) + 2·p1·x·y + p2·(r² + 2·x²)
-yd = y·L(r) + p1·(r² + 2·y²) + 2·p2·x·y
+Δxt = 2·p1·x·y + p2·(r² + 2·x²)
+Δyt = p1·(r² + 2·y²) + 2·p2·x·y
+
+xd = x·L(r) + Δxt
+yd = y·L(r) + Δyt
 ```
 
 <div class="distortion-parameter-cards">
-  <div><strong>k1、k2、k3</strong><p>径向系数，控制桶形或枕形弯曲。</p></div>
-  <div><strong>p1、p2</strong><p>切向系数，描述镜片偏心和装配误差。</p></div>
+  <div><strong>k1、k2、k3</strong><p>控制 L(r)，对应上面的桶形和枕形。</p></div>
+  <div><strong>p1、p2</strong><p>控制 Δxt、Δyt，对应上面的切向畸变。</p></div>
 </div>
 
-OpenCV 常见参数顺序是 `(k1, k2, p1, p2, k3)`。按上面的公式，`k1 < 0` 通常表现为桶形，`k1 > 0` 通常表现为枕形。
+OpenCV 常见参数顺序是 `(k1, k2, p1, p2, k3)`。
 
 ### Rational
 
