@@ -1,7 +1,7 @@
 const MODES = {
   barrel: {
     label: "桶形畸变",
-    describe: "离主点越远，点越向中心收缩；建筑边缘和车道线向外鼓起。"
+    describe: "同一视场内，边缘位置发生较温和的径向偏移；直线向外鼓起。"
   },
   pincushion: {
     label: "枕形畸变",
@@ -13,7 +13,7 @@ const MODES = {
   },
   fisheye: {
     label: "鱼眼投影",
-    describe: "按光线夹角压缩大视场，越靠近边缘，直线弯曲越明显。"
+    describe: "把更宽视场压进同一张图；两侧出现针孔画面外的建筑，边缘压缩也更强。"
   }
 };
 
@@ -28,8 +28,8 @@ function transformPoint(px, py, mode, strength) {
   let yd = y;
 
   if (mode === "barrel") {
-    const k1 = -.38 * amount;
-    const k2 = .07 * amount;
+    const k1 = -.19 * amount;
+    const k2 = .025 * amount;
     const scale = 1 + k1 * r2 + k2 * r2 * r2;
     xd = x * scale;
     yd = y * scale;
@@ -49,9 +49,9 @@ function transformPoint(px, py, mode, strength) {
     if (r > 1e-8) {
       const theta = Math.atan(r);
       const theta2 = theta * theta;
-      const thetaDistorted = theta * (1 + .08 * amount * theta2 + .015 * amount * theta2 * theta2);
+      const thetaDistorted = theta * (1 + .035 * amount * theta2);
       const fishScale = thetaDistorted / r;
-      const scale = 1 + amount * 1.35 * (fishScale - 1);
+      const scale = 1 + amount * (fishScale - 1);
       xd = x * scale;
       yd = y * scale;
     }
@@ -125,6 +125,14 @@ function drawScene(canvas, mode, strength) {
   polygon([[540, 95], [800, 95], [800, 350], [540, 320]], "#dce8ef", "#728fa0", 2);
   polygon([[285, 170], [515, 170], [515, 300], [285, 300]], "#e8efed", "#789b95", 2);
 
+  if (mode === "fisheye") {
+    polygon([[-205, 70], [-20, 70], [-20, 365], [-205, 390]], "#cfe3df", "#5d8981", 2);
+    polygon([[820, 55], [1010, 55], [1010, 390], [820, 365]], "#d2e1e9", "#658696", 2);
+    [-165, -100, 855, 920].forEach(x => {
+      [115, 185, 255].forEach(y => polygon([[x,y], [x+34,y], [x+34,y+34], [x,y+34]], "#f7fbfa", "#87a49e", 1.3));
+    });
+  }
+
   [55, 125, 195].forEach(x => {
     [150, 220, 290].forEach(y => polygon([[x,y], [x+38,y], [x+38,y+36], [x,y+36]], "#f7fbfa", "#91aaa5", 1.4));
   });
@@ -185,4 +193,3 @@ function mountDistortionLab(root) {
 export function mountDistortionLabs(scope = document) {
   scope.querySelectorAll("[data-distortion-lab]").forEach(mountDistortionLab);
 }
-
