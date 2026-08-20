@@ -238,12 +238,12 @@ r = √(x² + y²)
     <span>模型修正倍率<output data-kb-radius-factor-output>0.65</output></span>
     <input data-kb-radius-factor-range type="range" min="60" max="140" step="1" value="65" aria-label="调整 KB 半径修正倍率，使绿色预测点对准橙色观测点">
   </label>
-  <canvas role="img" aria-label="调整修正倍率，使加入 k 后的绿色预测点对准棋盘格角点的橙色实际观测位置"></canvas>
   <div class="kb-radius-lab__values">
     <span data-kind="base">灰点：不加 k 的预测 1.00</span>
     <span data-kind="observed">橙圈：实际观测 0.82</span>
     <span data-kind="corrected">绿点：加 k 的预测 <output data-kb-radius-result-output>0.65</output></span>
   </div>
+  <canvas role="img" aria-label="调整修正倍率，使加入 k 后的绿色预测点对准棋盘格角点的橙色实际观测位置"></canvas>
   <p data-kb-radius-explain aria-live="polite">绿色预测点太靠近 O，继续增大倍率。</p>
 </div>
 

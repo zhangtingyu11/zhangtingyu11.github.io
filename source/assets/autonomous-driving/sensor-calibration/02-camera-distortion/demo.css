@@ -256,7 +256,7 @@
   border-radius: 11px;
   background: #ffffff;
 }
-.kb-radius-lab__values { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; margin-top: 12px; }
+.kb-radius-lab__values { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; margin: 0 0 12px; }
 .kb-radius-lab__values span { display: inline-flex; align-items: center; gap: 6px; color: #526b66; font-size: 12px; }
 .kb-radius-lab__values span::before { width: 9px; height: 9px; border-radius: 50%; background: #829691; content: ""; }
 .kb-radius-lab__values span[data-kind="observed"]::before { box-sizing: border-box; border: 2px solid #d77f61; background: rgba(220, 132, 96, .12); }

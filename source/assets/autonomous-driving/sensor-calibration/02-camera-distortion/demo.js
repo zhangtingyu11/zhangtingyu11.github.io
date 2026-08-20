@@ -415,13 +415,14 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.clip();
   ctx.strokeStyle = "#e6efec";
   ctx.lineWidth = 1;
-  for (let x = plane.x + 34; x < plane.x + plane.width; x += 42) {
+  const gridStep = width >= 700 ? 70 : 42;
+  for (let x = plane.x + 34; x < plane.x + plane.width; x += gridStep) {
     ctx.beginPath();
     ctx.moveTo(x, plane.y);
     ctx.lineTo(x, plane.y + plane.height);
     ctx.stroke();
   }
-  for (let y = plane.y + 34; y < plane.y + plane.height; y += 42) {
+  for (let y = plane.y + 34; y < plane.y + plane.height; y += gridStep) {
     ctx.beginPath();
     ctx.moveTo(plane.x, y);
     ctx.lineTo(plane.x + plane.width, y);
@@ -487,43 +488,15 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.lineTo(correctedX, correctedY);
   ctx.stroke();
 
-  const distance = Math.hypot(correctedX - baseX, correctedY - baseY);
-  if (distance > 12) {
-    const normalX = -dy * 16;
-    const normalY = dx * 16;
-    const startX = baseX + normalX;
-    const startY = baseY + normalY;
-    const endX = correctedX + normalX;
-    const endY = correctedY + normalY;
-    const arrowAngle = Math.atan2(endY - startY, endX - startX);
-    ctx.strokeStyle = "#7898a2";
-    ctx.fillStyle = "#7898a2";
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(endX, endY);
-    ctx.lineTo(endX - Math.cos(arrowAngle - .55) * 9, endY - Math.sin(arrowAngle - .55) * 9);
-    ctx.lineTo(endX - Math.cos(arrowAngle + .55) * 9, endY - Math.sin(arrowAngle + .55) * 9);
-    ctx.closePath();
-    ctx.fill();
-    ctx.font = "700 12px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(factor < 1 ? "向 O" : "远离 O", (startX + endX) / 2, (startY + endY) / 2 - 4);
-  }
-
   ctx.beginPath();
   ctx.arc(originX, originY, 8, 0, Math.PI * 2);
   ctx.fillStyle = "#315c55";
   ctx.fill();
   ctx.fillStyle = "#315c55";
   ctx.font = "700 13px system-ui, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.fillText("原点 O=(0,0)", originX, originY + 13);
+  ctx.textAlign = "right";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("O", originX - 11, originY - 8);
 
   ctx.beginPath();
   ctx.arc(baseX, baseY, 8, 0, Math.PI * 2);
@@ -548,26 +521,6 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.lineWidth = 3;
   ctx.fill();
   ctx.stroke();
-
-  ctx.font = "700 13px system-ui, sans-serif";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "#6c7f7b";
-  ctx.textAlign = "left";
-  ctx.fillText(Math.abs(factor - 1) < .035 ? "无 k = 有 k" : "无 k 预测", baseX + 12, baseY - 14);
-  if (Math.abs(factor - observedFactor) <= .012) {
-    ctx.fillStyle = "#3f756d";
-    ctx.textAlign = "left";
-    ctx.fillText("有 k 预测 = 实测", observedX + 17, observedY + 15);
-  } else {
-    ctx.fillStyle = "#b7654d";
-    ctx.textAlign = "left";
-    ctx.fillText("棋盘格实测", observedX + 15, observedY + 15);
-    ctx.fillStyle = "#3f756d";
-    const labelOnLeft = factor < 1 || width < 420;
-    const correctedLabelX = labelOnLeft ? correctedX - 10 : correctedX + 13;
-    ctx.textAlign = labelOnLeft ? "right" : "left";
-    ctx.fillText("有 k 预测", correctedLabelX, correctedY + (factor > 1 ? 17 : -16));
-  }
 }
 
 function mountDistortionLab(root) {
