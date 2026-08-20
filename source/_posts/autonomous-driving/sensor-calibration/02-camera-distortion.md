@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 12:55:00
+updated: 2026-08-20 13:02:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -48,7 +48,7 @@ toc: true
 <div class="distortion-kind-cards">
   <div><strong>桶形畸变</strong><p>直线向外鼓，像套在木桶表面；广角镜头常见。</p></div>
   <div><strong>枕形畸变</strong><p>直线向内弯，画面像被四角向外拉伸。</p></div>
-  <div><strong>切向畸变</strong><p>镜头与传感器没有完全对正，画面产生不对称偏移。</p></div>
+  <div><strong>切向畸变</strong><p>径向是顺着中心连线移动；切向则让点横着“滑”，画面因此不对称。常见原因是镜头与传感器没有完全对正。</p></div>
 </div>
 
 桶形和枕形属于**径向畸变**：点离畸变中心越远，位置偏差通常越明显。
