@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 12:00:00
+updated: 2026-08-20 12:23:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -17,11 +17,45 @@ aside: true
 toc: true
 ---
 
-上一篇里的针孔相机默认“直线拍出来还是直线”。真实镜头却会让画面边缘弯曲，这就是**相机畸变**。
+上一篇的针孔模型假设光线会被理想地投到成像平面上。但真实镜头由多片镜片组成，光线经过镜头后的位置会与理想位置产生偏差，这种**几何位置的变形**就是相机畸变。
 
-## 畸变发生在哪一步？
+它不是画面模糊，而是画面中的点“跑偏了”：本该笔直的墙边、灯杆和车道线，可能在图像边缘变弯。
 
-畸变发生在归一化坐标和像素坐标之间：
+## 先看看畸变长什么样
+
+左右是同一个道路场景。切换类型并拖动强度，观察建筑边缘和车道线怎样变化。
+
+<div class="distortion-lab" data-distortion-lab>
+  <div class="distortion-lab__tabs" data-distortion-tabs role="group" aria-label="选择畸变类型">
+    <button class="is-active" type="button" data-distortion-mode="barrel">桶形</button>
+    <button type="button" data-distortion-mode="pincushion">枕形</button>
+    <button type="button" data-distortion-mode="tangential">切向</button>
+    <button type="button" data-distortion-mode="fisheye">鱼眼</button>
+  </div>
+  <label class="distortion-lab__control">
+    <span>畸变强度 <output data-distortion-output>70%</output></span>
+    <input data-distortion-range type="range" min="0" max="100" step="1" value="70" aria-label="调整畸变强度">
+  </label>
+  <div class="distortion-lab__comparison">
+    <div><strong>理想针孔图像</strong><canvas role="img" aria-label="无畸变的道路场景"></canvas></div>
+    <div><strong>真实镜头可能拍到的形状</strong><canvas role="img" aria-label="应用当前畸变模型后的道路场景"></canvas></div>
+  </div>
+  <p data-distortion-explain aria-live="polite"></p>
+</div>
+
+## 三种常见畸变
+
+<div class="distortion-kind-cards">
+  <div><strong>桶形畸变</strong><p>直线向外鼓，像套在木桶表面；广角镜头常见。</p></div>
+  <div><strong>枕形畸变</strong><p>直线向内弯，画面像被四角向外拉伸。</p></div>
+  <div><strong>切向畸变</strong><p>镜头与传感器没有完全对正，画面产生不对称偏移。</p></div>
+</div>
+
+桶形和枕形属于**径向畸变**：点离畸变中心越远，位置偏差通常越明显。
+
+## 畸变加在投影链路的哪里？
+
+准确地说，畸变作用在**归一化坐标上，并且发生在乘内参矩阵 K 之前**：
 
 <div class="distortion-flow" role="img" aria-label="归一化坐标先经过畸变模型，再乘以内参矩阵得到像素坐标">
   <div><small>理想投影</small><strong>(x, y)</strong></div>
@@ -31,17 +65,7 @@ toc: true
   <div><small>数字图像</small><strong>(u, v)</strong></div>
 </div>
 
-所以 `K` 可以保持同样的 3×3 形式，真正变化的是前面选用了哪一种畸变或投影模型。
-
-## 先认识三种常见现象
-
-<div class="distortion-kind-cards">
-  <div><strong>桶形畸变</strong><p>画面像木桶一样鼓起，边缘被拉向中心，广角镜头常见。</p></div>
-  <div><strong>枕形畸变</strong><p>画面像软垫一样向内收紧，边缘被推离中心。</p></div>
-  <div><strong>切向畸变</strong><p>镜头与传感器没有完全对正，变形通常不再左右对称。</p></div>
-</div>
-
-桶形和枕形都属于**径向畸变**：离主点越远，变化通常越明显。
+也就是先把理想点 `(x, y)` 变成畸变点 `(xd, yd)`，再由 `K` 换算成像素 `(u, v)`。因此，`K` 仍然是上一篇的 3×3 内参矩阵；描述镜头弯曲的是额外的畸变参数。
 
 ## RadTan：最常见的普通镜头模型
 
@@ -102,28 +126,6 @@ L(r) = ────────────────────────�
 
 工程中还会看到 Thin Prism、Tilted Sensor、Double Sphere 和 EUCM。名字很多，但核心问题只有一个：**像素点对应哪一条空间光线？**
 
-## 亲手改变畸变看看
-
-左右是同一个道路场景。切换畸变类型，再拖动强度滑块，重点观察建筑边缘和车道线。
-
-<div class="distortion-lab" data-distortion-lab>
-  <div class="distortion-lab__tabs" data-distortion-tabs role="group" aria-label="选择畸变类型">
-    <button class="is-active" type="button" data-distortion-mode="barrel">桶形</button>
-    <button type="button" data-distortion-mode="pincushion">枕形</button>
-    <button type="button" data-distortion-mode="tangential">切向</button>
-    <button type="button" data-distortion-mode="fisheye">鱼眼</button>
-  </div>
-  <label class="distortion-lab__control">
-    <span>畸变强度 <output data-distortion-output>70%</output></span>
-    <input data-distortion-range type="range" min="0" max="100" step="1" value="70" aria-label="调整畸变强度">
-  </label>
-  <div class="distortion-lab__comparison">
-    <div><strong>理想针孔图像</strong><canvas role="img" aria-label="无畸变的道路场景"></canvas></div>
-    <div><strong>畸变后</strong><canvas role="img" aria-label="应用当前畸变模型后的道路场景"></canvas></div>
-  </div>
-  <p data-distortion-explain aria-live="polite"></p>
-</div>
-
 ## 模型怎么选？
 
 - 普通镜头先用 RadTan；边缘仍有系统性残差，再考虑 Rational。
@@ -137,4 +139,3 @@ L(r) = ────────────────────────�
 - Rational 是 RadTan 的分式扩展，表达力更强，也更容易过拟合。
 - KB 用光线夹角 `θ` 建模，适合鱼眼和超广角。
 - `K` 与畸变模型必须配套保存，不能只拿一个 3×3 矩阵描述整台相机。
-
