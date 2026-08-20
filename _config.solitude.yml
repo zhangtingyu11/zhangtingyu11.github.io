@@ -753,7 +753,7 @@ extends:
   # Insert in body
   # 插入到 body
   body:
-    - <script type="module" src="/assets/site.js?v=20260820-12"></script>
+    - <script type="module" src="/assets/site.js?v=20260820-13"></script>
 # --------------------------- end ---------------------------
 
 # --------------------------- start ---------------------------

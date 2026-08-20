@@ -369,7 +369,7 @@ function drawKbAngleGeometry(canvas, angleDegrees) {
 function drawKbRadiusMapping(canvas, factor) {
   const rect = canvas.getBoundingClientRect();
   const width = Math.max(280, rect.width || 600);
-  const height = width >= 520 ? 250 : 225;
+  const height = width >= 520 ? 280 : 250;
   const ratio = Math.max(1, window.devicePixelRatio || 1);
   canvas.width = Math.round(width * ratio);
   canvas.height = Math.round(height * ratio);
@@ -378,13 +378,19 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
-  const originX = Math.max(42, width * .12);
-  const originY = height - 38;
-  const angle = -.44;
+  const plane = { x: 12, y: 12, width: width - 24, height: height - 24 };
+  const originX = width >= 520 ? plane.x + plane.width * .25 : plane.x + 62;
+  const originY = plane.y + plane.height * .42;
+  const angle = .42;
   const dx = Math.cos(angle);
   const dy = Math.sin(angle);
-  const baseLength = Math.min(width * .46, (originY - 48) / Math.abs(dy));
-  const guideLength = baseLength * 1.43;
+  const maxFactor = 1.45;
+  const baseLength = Math.min(
+    width * .39,
+    (plane.x + plane.width - 30 - originX) / (dx * maxFactor),
+    (plane.y + plane.height - 34 - originY) / (dy * maxFactor)
+  );
+  const guideLength = baseLength * maxFactor;
   const baseX = originX + dx * baseLength;
   const baseY = originY + dy * baseLength;
   const correctedX = originX + dx * baseLength * factor;
@@ -392,9 +398,66 @@ function drawKbRadiusMapping(canvas, factor) {
 
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "#f8fbfa";
+  ctx.strokeStyle = "#d8e6e2";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(plane.x, plane.y, plane.width, plane.height, 10);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(plane.x, plane.y, plane.width, plane.height, 10);
+  ctx.clip();
+  ctx.strokeStyle = "#e6efec";
+  ctx.lineWidth = 1;
+  for (let x = plane.x + 34; x < plane.x + plane.width; x += 42) {
+    ctx.beginPath();
+    ctx.moveTo(x, plane.y);
+    ctx.lineTo(x, plane.y + plane.height);
+    ctx.stroke();
+  }
+  for (let y = plane.y + 34; y < plane.y + plane.height; y += 42) {
+    ctx.beginPath();
+    ctx.moveTo(plane.x, y);
+    ctx.lineTo(plane.x + plane.width, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  ctx.fillStyle = "#526b66";
+  ctx.font = "700 13px system-ui, sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  ctx.fillText("归一化成像平面（正面看）", plane.x + 14, plane.y + 11);
+
+  ctx.strokeStyle = "#9eb3ae";
+  ctx.fillStyle = "#718681";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(plane.x + 18, originY);
+  ctx.lineTo(plane.x + plane.width - 17, originY);
+  ctx.lineTo(plane.x + plane.width - 24, originY - 4);
+  ctx.moveTo(plane.x + plane.width - 17, originY);
+  ctx.lineTo(plane.x + plane.width - 24, originY + 4);
+  ctx.moveTo(originX, plane.y + 34);
+  ctx.lineTo(originX, plane.y + plane.height - 16);
+  ctx.lineTo(originX - 4, plane.y + plane.height - 23);
+  ctx.moveTo(originX, plane.y + plane.height - 16);
+  ctx.lineTo(originX + 4, plane.y + plane.height - 23);
+  ctx.stroke();
+  ctx.font = "700 12px ui-monospace, monospace";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("x", plane.x + plane.width - 20, originY - 7);
+  ctx.textAlign = "left";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("y", originX + 8, plane.y + plane.height - 17);
+
   ctx.fillStyle = "rgba(220, 241, 235, .72)";
   ctx.beginPath();
-  ctx.arc(originX - 18, originY + 18, 75, 0, Math.PI * 2);
+  ctx.arc(originX, originY, 22, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.strokeStyle = "#b3c4c0";
@@ -423,8 +486,8 @@ function drawKbRadiusMapping(canvas, factor) {
 
   const distance = Math.hypot(correctedX - baseX, correctedY - baseY);
   if (distance > 12) {
-    const normalX = -dy * 15;
-    const normalY = dx * 15;
+    const normalX = -dy * 16;
+    const normalY = dx * 16;
     const startX = baseX + normalX;
     const startY = baseY + normalY;
     const endX = correctedX + normalX;
@@ -446,8 +509,16 @@ function drawKbRadiusMapping(canvas, factor) {
     ctx.font = "700 12px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
-    ctx.fillText(factor < 1 ? "向 O" : "远离 O", (startX + endX) / 2, (startY + endY) / 2 - 5);
+    ctx.fillText(factor < 1 ? "向 O" : "远离 O", (startX + endX) / 2, (startY + endY) / 2 - 4);
   }
+
+  const radiusLabelX = originX + dx * baseLength * .48 + dy * 19;
+  const radiusLabelY = originY + dy * baseLength * .48 - dx * 19;
+  ctx.fillStyle = "#607772";
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("这条线段的长度就是平面距离", radiusLabelX, radiusLabelY);
 
   ctx.beginPath();
   ctx.arc(originX, originY, 8, 0, Math.PI * 2);
@@ -457,7 +528,7 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.font = "700 13px system-ui, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  ctx.fillText("原点 O", originX, originY + 13);
+  ctx.fillText("原点 O=(0,0)", originX, originY + 13);
 
   ctx.beginPath();
   ctx.arc(baseX, baseY, 8, 0, Math.PI * 2);
