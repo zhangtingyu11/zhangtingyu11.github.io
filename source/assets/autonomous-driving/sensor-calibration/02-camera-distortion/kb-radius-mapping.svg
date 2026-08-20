@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 270" role="img" aria-labelledby="title desc">
+  <title id="title">KB 模型只改变点到图像中心的距离</title>
+  <desc id="desc">原位置和新位置都在从图像中心出发的同一条射线上，k1 到 k4 只调整新半径 theta d，不改变方向。</desc>
+  <defs>
+    <marker id="arrow-mint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5caa9b"/>
+    </marker>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#829691"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="678" height="268" rx="22" fill="#f6fbf9" stroke="#d8e8e3" stroke-width="2"/>
+  <circle cx="625" cy="31" r="74" fill="#e9f3fb" opacity=".75"/>
+  <circle cx="39" cy="264" r="72" fill="#e3f5ef" opacity=".9"/>
+  <text x="34" y="40" fill="#315c55" font-family="system-ui, sans-serif" font-size="22" font-weight="700">先改距离，不改方向</text>
+
+  <line x1="91" y1="215" x2="446" y2="63" stroke="#9cb0ab" stroke-width="2" stroke-dasharray="7 7"/>
+  <text x="183" y="195" fill="#687e79" font-family="system-ui, sans-serif" font-size="17">方向不变</text>
+
+  <line x1="99" y1="229" x2="421" y2="91" stroke="#829691" stroke-width="2.5" marker-end="url(#arrow-gray)"/>
+  <text x="265" y="184" fill="#687e79" font-family="ui-monospace, monospace" font-size="20" font-weight="700">原半径 r</text>
+
+  <line x1="91" y1="215" x2="293" y2="128" stroke="#5caa9b" stroke-width="5" marker-end="url(#arrow-mint)"/>
+  <text x="174" y="136" fill="#3f756d" font-family="ui-monospace, monospace" font-size="20" font-weight="700">新半径 θd</text>
+
+  <circle cx="91" cy="215" r="8" fill="#315c55"/>
+  <text x="53" y="245" fill="#315c55" font-family="system-ui, sans-serif" font-size="18" font-weight="700">图像中心</text>
+
+  <circle cx="293" cy="128" r="9" fill="#5caa9b" stroke="#ffffff" stroke-width="3"/>
+  <text x="302" y="121" fill="#3f756d" font-family="system-ui, sans-serif" font-size="18" font-weight="700">新位置 (xd, yd)</text>
+  <circle cx="421" cy="91" r="8" fill="#829691" stroke="#ffffff" stroke-width="3"/>
+  <text x="431" y="84" fill="#687e79" font-family="system-ui, sans-serif" font-size="18">原位置 (x, y)</text>
+
+  <rect x="472" y="133" width="176" height="82" rx="15" fill="#ffffff" stroke="#d8e8e3" stroke-width="2"/>
+  <text x="560" y="164" text-anchor="middle" fill="#607772" font-family="system-ui, sans-serif" font-size="17">k1～k4 调整</text>
+  <text x="560" y="193" text-anchor="middle" fill="#315c55" font-family="ui-monospace, monospace" font-size="21" font-weight="700">θ → θd</text>
+</svg>

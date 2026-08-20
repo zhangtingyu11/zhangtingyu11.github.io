@@ -215,20 +215,28 @@ r = √(x² + y²)
 θ = atan(r)
 ```
 
-再用 `k1、k2、k3、k4` 修正“角度到图像半径”的关系：
+把后面的公式拆成两步就好。
+
+**第一步：算新半径。** 在 KB 模型里，`θd` 就是光线最终落在归一化图像上的半径：
 
 ```text
 θd = θ·(1 + k1·θ² + k2·θ⁴ + k3·θ⁶ + k4·θ⁸)
 ```
 
-最后保持原来的方向，只替换半径：
+`k1～k4` 是标定时拟合出来的调节量。它们全为 0 时，`θd = θ`；不为 0 时，就把点向中心拉或向外推。越靠后的 `k` 乘着越高次方，主要微调画面最外圈。
+
+<figure class="coordinate-figure">
+  <img src="/assets/autonomous-driving/sensor-calibration/02-camera-distortion/kb-radius-mapping.svg?v=1" alt="KB 模型保持点相对图像中心的方向不变，只把原半径 r 替换成新半径 θd">
+</figure>
+
+**第二步：放回原方向。** `(x/r, y/r)` 只表示方向；乘上新半径 `θd`，就得到新位置：
 
 ```text
 xd = (θd / r)·x
 yd = (θd / r)·y
 ```
 
-`θ` 前面的系数固定为 1，保证中心附近接近针孔投影；后面的高次项主要调整大角度光线。OpenCV `fisheye` 的四个 `k` 与 RadTan 的 `k` 含义不同，不能混用。
+一句话：`k1～k4` 只决定点离中心多远，不改变它位于中心的哪个方向。OpenCV `fisheye` 的四个 `k` 与 RadTan 的 `k` 含义不同，不能混用。
 
 ### 选哪个？
 
