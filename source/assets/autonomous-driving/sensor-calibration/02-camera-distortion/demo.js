@@ -191,10 +191,11 @@ function drawScene(canvas, mode, strength, coefficients = null) {
   circle([684, 230], 8, "#f1c879", "#ffffff", 2);
 }
 
-function drawKbAnglePlot(canvas, angleDegrees) {
+function drawKbAngleGeometry(canvas, angleDegrees) {
   const rect = canvas.getBoundingClientRect();
   const width = Math.max(280, rect.width || 600);
-  const height = Math.max(220, Math.min(310, width * .48));
+  const horizontal = width >= 560;
+  const height = horizontal ? 290 : 430;
   const ratio = Math.max(1, window.devicePixelRatio || 1);
   canvas.width = Math.round(width * ratio);
   canvas.height = Math.round(height * ratio);
@@ -203,84 +204,120 @@ function drawKbAnglePlot(canvas, angleDegrees) {
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
-  const margin = { left: 48, right: 18, top: 18, bottom: 38 };
-  const plotWidth = width - margin.left - margin.right;
-  const plotHeight = height - margin.top - margin.bottom;
-  const maxRadius = 4;
-  const x = degrees => margin.left + degrees / 90 * plotWidth;
-  const y = radius => margin.top + plotHeight - Math.min(radius, maxRadius) / maxRadius * plotHeight;
+  const gap = 12;
+  const panels = horizontal
+    ? [
+        { x: 8, y: 8, width: (width - gap - 16) / 2, height: height - 16 },
+        { x: 8 + (width - gap - 16) / 2 + gap, y: 8, width: (width - gap - 16) / 2, height: height - 16 }
+      ]
+    : [
+        { x: 8, y: 8, width: width - 16, height: 201 },
+        { x: 8, y: 221, width: width - 16, height: 201 }
+      ];
+  const radians = angleDegrees * Math.PI / 180;
 
-  ctx.strokeStyle = "#d7e4e1";
-  ctx.lineWidth = 1;
-  ctx.fillStyle = "#70837f";
-  ctx.font = "11px system-ui, sans-serif";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-  [0, 1, 2, 3, 4].forEach(value => {
+  const drawPanel = (panel, type) => {
+    ctx.fillStyle = type === "pinhole" ? "#f7fafb" : "#f7fbfa";
+    ctx.strokeStyle = type === "pinhole" ? "#dbe6eb" : "#d8e8e4";
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(margin.left, y(value));
-    ctx.lineTo(width - margin.right, y(value));
+    ctx.roundRect(panel.x, panel.y, panel.width, panel.height, 11);
+    ctx.fill();
     ctx.stroke();
-    ctx.fillText(String(value), margin.left - 8, y(value));
-  });
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  [0, 30, 60, 90].forEach(value => ctx.fillText(`${value}°`, x(value), height - margin.bottom + 9));
 
-  const drawCurve = (color, radiusForAngle, end = 89) => {
+    ctx.fillStyle = "#315c55";
+    ctx.font = "700 13px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(type === "pinhole" ? "针孔：光线保持直线" : "鱼眼：大角度光线压回图内", panel.x + 14, panel.y + 13);
+
+    const originX = panel.x + 38;
+    const centerY = panel.y + panel.height * .59;
+    const focal = Math.min(76, panel.width * .27);
+    const sensorX = originX + focal;
+    const sensorHalf = Math.min(panel.height * .32, focal * 1.6);
+    const sensorTop = centerY - sensorHalf;
+    const sensorBottom = centerY + sensorHalf;
+    const outputRadius = type === "pinhole" ? Math.tan(radians) : radians;
+    const targetY = centerY - focal * outputRadius;
+    const color = type === "pinhole" ? "#6f93a3" : "#58a99a";
+
+    ctx.strokeStyle = "#9eb3ae";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
     ctx.beginPath();
-    for (let degree = 0; degree <= end; degree += .5) {
-      const radius = radiusForAngle(degree * Math.PI / 180);
-      const px = x(degree);
-      const py = y(radius);
-      if (degree === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-      if (radius >= maxRadius) break;
-    }
+    ctx.moveTo(originX, centerY);
+    ctx.lineTo(panel.x + panel.width - 16, centerY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#70837f";
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.fillText("光轴", panel.x + panel.width - 42, centerY + 6);
+
+    ctx.strokeStyle = "#809b95";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(sensorX, sensorTop);
+    ctx.lineTo(sensorX, sensorBottom);
+    ctx.stroke();
+    ctx.fillStyle = "#70837f";
+    ctx.textAlign = "center";
+    ctx.fillText("归一化平面", sensorX, sensorBottom + 7);
+
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     ctx.lineCap = "round";
-    ctx.stroke();
-  };
-
-  drawCurve("#6f93a3", radians => Math.tan(radians));
-  drawCurve("#58a99a", radians => radians);
-
-  const angleRadians = angleDegrees * Math.PI / 180;
-  const pinholeRadius = Math.tan(angleRadians);
-  const fisheyeRadius = angleRadians;
-  ctx.strokeStyle = "#9bb0ab";
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath();
-  ctx.moveTo(x(angleDegrees), margin.top);
-  ctx.lineTo(x(angleDegrees), margin.top + plotHeight);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  const marker = (radius, color) => {
     ctx.beginPath();
-    ctx.arc(x(angleDegrees), y(radius), 5, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
+    ctx.moveTo(originX, centerY);
+    if (type === "pinhole") {
+      if (targetY >= sensorTop) {
+        ctx.lineTo(sensorX, targetY);
+      } else {
+        const topY = panel.y + 48;
+        const topX = originX + (centerY - topY) / Math.max(Math.tan(radians), .001);
+        ctx.lineTo(topX, topY);
+      }
+    } else {
+      const controlLength = Math.min(52, focal * .72);
+      const controlX = originX + Math.cos(radians) * controlLength;
+      const controlY = centerY - Math.sin(radians) * controlLength;
+      ctx.quadraticCurveTo(controlX, controlY, sensorX, targetY);
+    }
     ctx.stroke();
-  };
-  marker(fisheyeRadius, "#58a99a");
-  marker(Math.min(pinholeRadius, maxRadius), "#6f93a3");
 
-  ctx.save();
-  ctx.translate(14, margin.top + plotHeight / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillStyle = "#627773";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.fillText("输出半径", 0, 0);
-  ctx.restore();
-  ctx.fillStyle = "#627773";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
-  ctx.fillText("光线角度 θ", margin.left + plotWidth / 2, height - 1);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(originX, centerY, 22, -radians, 0);
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.textAlign = "left";
+    ctx.fillText("θ", originX + 24, centerY - 18);
+
+    ctx.beginPath();
+    ctx.arc(originX, centerY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = "#315c55";
+    ctx.fill();
+    ctx.fillStyle = "#526b66";
+    ctx.fillText("O", originX - 14, centerY + 8);
+
+    if (targetY >= sensorTop && targetY <= sensorBottom) {
+      ctx.beginPath();
+      ctx.arc(sensorX, targetY, 6, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = "#6f7f85";
+      ctx.textAlign = "left";
+      ctx.fillText("交点跑出画面", sensorX + 9, sensorTop + 2);
+    }
+  };
+
+  drawPanel(panels[0], "pinhole");
+  drawPanel(panels[1], "fisheye");
 }
 
 function mountDistortionLab(root) {
@@ -414,10 +451,10 @@ function mountKbAngleLab(root) {
     angleOutput.value = `${degrees}°`;
     pinholeOutput.value = pinhole.toFixed(2);
     fisheyeOutput.value = radians.toFixed(2);
-    explain.textContent = pinhole > 4
-      ? "针孔投影已经超出图框；鱼眼输出仍保持有限。"
-      : "角度越大，针孔半径增长越快；鱼眼半径仍近似线性增长。";
-    drawKbAnglePlot(canvas, degrees);
+    explain.textContent = pinhole > 1.6
+      ? "针孔光线的交点已经跑出成像平面；鱼眼把它映射回有限的图像位置。"
+      : "当前角度下两者都能成像；继续增大角度，针孔交点会更快向外移动。";
+    drawKbAngleGeometry(canvas, degrees);
   };
 
   range.addEventListener("input", render);

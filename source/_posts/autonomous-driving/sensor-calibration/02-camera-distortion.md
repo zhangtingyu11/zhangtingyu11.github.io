@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 15:06:00
+updated: 2026-08-20 15:22:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -187,24 +187,24 @@ OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，分母会增加 `k4、k5、k6`。它�
 
 ### Kannala–Brandt / Fisheye
 
-针孔模型按 `r = tan(θ)` 投影。光线接近 90° 时，`tan(θ)` 会迅速趋向无穷大，有限尺寸的传感器装不下接近 180° 的视场。
+先把相机从侧面切开。`θ` 是光线与正前方光轴的夹角；180° 是左右两边的总视场，所以最边缘的光线相对光轴接近 ±90°。
 
-鱼眼改为直接按角度映射。拖动下面的 `θ`，比较两种投影的输出半径：
+针孔模型假设光线保持直线。光线越接近 90°，就越接近平行于成像平面，交点会越跑越远。鱼眼镜头会强烈折射大角度光线；模型等效为把它们压到有限的图像半径。
 
 <div class="kb-angle-lab" data-kb-angle-lab>
   <label class="kb-angle-lab__control">
     <span>光线与光轴夹角 θ <output data-kb-angle-output>75°</output></span>
     <input data-kb-angle-range type="range" min="0" max="89" step="1" value="75" aria-label="调整光线与光轴夹角">
   </label>
-  <canvas role="img" aria-label="针孔 tan theta 与鱼眼 theta 的输出半径对比曲线"></canvas>
+  <canvas role="img" aria-label="针孔直线投影与鱼眼弯折光线的侧视对比"></canvas>
   <div class="kb-angle-lab__values">
-    <span><i aria-hidden="true"></i>针孔 tan(θ)<output data-kb-pinhole-output>3.73</output></span>
-    <span><i aria-hidden="true"></i>鱼眼 θ<output data-kb-fisheye-output>1.31</output></span>
+    <span><i aria-hidden="true"></i>针孔交点 r = tan(θ)<output data-kb-pinhole-output>3.73</output></span>
+    <span><i aria-hidden="true"></i>鱼眼位置 r = θ<output data-kb-fisheye-output>1.31</output></span>
   </div>
   <p data-kb-angle-explain aria-live="polite"></p>
 </div>
 
-KB 的计算分三步。先从理想归一化坐标得到光线角度：
+在归一化成像平面上取焦距 `f = 1`，直角三角形给出 `r = tan(θ)`。KB 先反算光线角度：
 
 ```text
 r = √(x² + y²)
