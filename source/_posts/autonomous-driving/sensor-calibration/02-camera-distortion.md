@@ -199,7 +199,7 @@ OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，分母会增加 `k4、k5、k6`。它�
   <canvas role="img" aria-label="针孔直线传播与鱼眼光线在镜片处折射的侧视对比"></canvas>
   <div class="kb-angle-lab__values">
     <span><i aria-hidden="true"></i>针孔交点 r = tan(θ)<output data-kb-pinhole-output>3.73</output></span>
-    <span><i aria-hidden="true"></i>鱼眼位置 r = θ<output data-kb-fisheye-output>1.31</output></span>
+    <span><i aria-hidden="true"></i>鱼眼基础半径 θ<output data-kb-fisheye-output>1.31</output></span>
   </div>
   <p data-kb-angle-explain aria-live="polite"></p>
 </div>
@@ -215,28 +215,29 @@ r = √(x² + y²)
 θ = atan(r)
 ```
 
-把后面的公式拆成两步就好。
+到这里，我们只知道光线的角度 `θ`。接下来的问题很具体：**这条光线应该落在离图像中心多远的位置？**
 
-**第一步：算新半径。** 在 KB 模型里，`θd` 就是光线最终落在归一化图像上的半径：
+最简单的鱼眼模型直接令半径等于角度：`半径 = θ`。但真实镜头没这么理想，所以标定程序会根据棋盘格角点的实际位置，用 `k1～k4` 把这个半径微调成 `θd`：
 
 ```text
-θd = θ·(1 + k1·θ² + k2·θ⁴ + k3·θ⁶ + k4·θ⁸)
+θd = θ × 修正倍率
+修正倍率 = 1 + k1·θ² + k2·θ⁴ + k3·θ⁶ + k4·θ⁸
 ```
 
-`k1～k4` 是标定时拟合出来的调节量。它们全为 0 时，`θd = θ`；不为 0 时，就把点向中心拉或向外推。越靠后的 `k` 乘着越高次方，主要微调画面最外圈。
+这些 `k` 不是手动猜的，而是标定程序拟合出来的。它们全为 0 时，`θd = θ`；不为 0 时，点就会被向中心拉或向外推。越靠后的 `k`，主要微调画面最外圈。
 
 <figure class="coordinate-figure">
-  <img src="/assets/autonomous-driving/sensor-calibration/02-camera-distortion/kb-radius-mapping.svg?v=1" alt="KB 模型保持点相对图像中心的方向不变，只把原半径 r 替换成新半径 θd">
+  <img src="/assets/autonomous-driving/sensor-calibration/02-camera-distortion/kb-radius-mapping.svg?v=2" alt="KB 模型保持点相对图像中心的方向不变，只把针孔半径 r 替换成鱼眼半径 θd">
 </figure>
 
-**第二步：放回原方向。** `(x/r, y/r)` 只表示方向；乘上新半径 `θd`，就得到新位置：
+最后还要确定点往哪个方向放。`r` 是 `(x, y)` 这支箭头的长度；除以 `r`，就得到一支长度为 1、方向不变的箭头：
 
 ```text
-xd = (θd / r)·x
-yd = (θd / r)·y
+方向箭头 = (x/r, y/r)
+新位置 (xd, yd) = θd × 方向箭头
 ```
 
-一句话：`k1～k4` 只决定点离中心多远，不改变它位于中心的哪个方向。OpenCV `fisheye` 的四个 `k` 与 RadTan 的 `k` 含义不同，不能混用。
+所以，`k1～k4` 只决定点离中心多远，不改变方向。OpenCV `fisheye` 的四个 `k` 与 RadTan 的 `k` 含义不同，不能混用。
 
 ### 选哪个？
 
