@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 13:53:00
+updated: 2026-08-20 14:02:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -46,7 +46,7 @@ toc: true
 <div class="distortion-kind-cards">
   <div><strong>桶形</strong><p>边缘向中心压缩，直线向外鼓。</p></div>
   <div><strong>枕形</strong><p>边缘向外拉伸，直线向内弯。</p></div>
-  <div><strong>切向</strong><p>点没有沿中心连线移动，而是向侧面偏，变形通常不对称。</p></div>
+  <div><strong>切向</strong><p>点没有沿畸变中心与它的连线移动，而是向侧面偏，变形通常不对称。</p></div>
 </div>
 
 桶形和枕形属于径向畸变，离畸变中心越远通常越明显。切向畸变多与镜片偏心、装配不同轴有关。
@@ -95,7 +95,7 @@ toc: true
   <div><small>畸变点</small><strong>(x<sub>d</sub>, y<sub>d</sub>)</strong></div>
 </div>
 
-这里的 `(x, y)` 是理想归一化坐标，`r` 是它到图像中心的距离：
+这里的 `(x, y)` 是理想归一化坐标。原点 `(0, 0)` 对应像素图像中的主点 `(cx, cy)`；`r` 是点到这个原点的距离，不是到图像几何中心的距离：
 
 ```text
 r² = x² + y²
