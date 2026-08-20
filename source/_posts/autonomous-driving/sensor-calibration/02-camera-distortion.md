@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 13:14:00
+updated: 2026-08-20 13:23:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -41,7 +41,7 @@ toc: true
   <p data-distortion-explain aria-live="polite"></p>
 </div>
 
-## 三种常见畸变
+### 桶形、枕形和切向
 
 <div class="distortion-kind-cards">
   <div><strong>桶形畸变</strong><p>直线向外鼓，像套在木桶表面；广角镜头常见。</p></div>
@@ -68,7 +68,7 @@ toc: true
 
 看上面的动画两侧：切到鱼眼后，会多出两栋建筑。
 
-## 畸变加在投影链路的哪里？
+## 畸变加在计算的哪一步？
 
 畸变作用在**归一化坐标上，发生在乘 K 之前**：
 
@@ -82,7 +82,9 @@ toc: true
 
 `K` 仍是上一篇的 3×3 矩阵；镜头弯曲由额外的畸变参数描述。
 
-## RadTan：最常见的普通镜头模型
+## 常见畸变模型
+
+### RadTan：普通镜头
 
 Brown–Conrady 模型也叫 `RadTan`。先计算半径：
 
@@ -105,7 +107,7 @@ yd = y·L(r) + p1·(r² + 2·y²) + 2·p2·x·y
 
 OpenCV 常用顺序为 `(k1, k2, p1, p2, k3)`。在这套公式下，`k1 < 0` 通常是桶形，`k1 > 0` 通常是枕形。
 
-## Rational：RadTan 的宽角扩展
+### Rational：更复杂的径向畸变
 
 RadTan 拟合不够时，可把径向缩放改成分式：
 
@@ -117,7 +119,7 @@ L(r) = ────────────────────────�
 
 它更灵活，也更容易过拟合。
 
-## Kannala–Brandt：鱼眼常用模型
+### Kannala–Brandt：鱼眼
 
 Kannala–Brandt（KB）直接使用光线与光轴的夹角 `θ`：
 
@@ -128,7 +130,7 @@ Kannala–Brandt（KB）直接使用光线与光轴的夹角 `θ`：
 
 RadTan 调整平面半径，KB 则按光线角度投影。OpenCV 的 `fisheye` 模块使用这一类模型。
 
-## 常用模型怎么选？
+### 选型速查
 
 <div class="distortion-model-cards">
   <div><strong>RadTan</strong><p>普通针孔、前视或长焦相机。</p></div>
