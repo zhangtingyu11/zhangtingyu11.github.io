@@ -208,7 +208,7 @@ OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，分母会增加 `k4、k5、k6`。它�
   <img src="/assets/autonomous-driving/sensor-calibration/02-camera-distortion/pinhole-triangle.svg?v=1" alt="针孔投影中的直角三角形：邻边是焦距 1，对边是图像半径 r">
 </figure>
 
-看图中的直角三角形：邻边是 `f = 1`，对边是 `r`，所以 `tan(θ) = r / 1 = r`。反过来，`θ = atan(r)`。KB 就从这个角度开始建模：
+完整的针孔关系是 `图像半径 = f·tan(θ)`。这里使用归一化坐标，相当于先除以 `f`，所以图中取 `f = 1`，得到归一化半径 `r = tan(θ)`。反过来，`θ = atan(r)`：
 
 ```text
 r = √(x² + y²)
@@ -221,7 +221,15 @@ r = √(x² + y²)
 
 到这里，我们只知道光线的角度 `θ`。接下来的问题很具体：**这条光线应该落在离原点 `O` 多远的位置？**
 
-最简单的鱼眼模型直接令半径等于角度：`半径 = θ`。真实镜头没这么理想，还要乘一个修正倍率。先固定 `θ = 1`，只看这个倍率会怎样移动点：
+鱼眼的完整写法是：
+
+```text
+图像半径 ρ = f·θ
+```
+
+`θ` 用弧度，`f` 负责把角度换成传感器长度或像素距离。归一化时再除以 `f`，才会得到 `ρ/f = θ`。所以这里不是“长度等于角度”，而是**归一化半径的数值等于弧度值**。
+
+真实镜头还要乘一个修正倍率。下面固定 `θ = 1 rad`、归一化焦距 `f = 1`，只看这个倍率怎样移动点：
 
 <div class="kb-radius-lab" data-kb-radius-lab>
   <label class="kb-radius-lab__control">
@@ -230,13 +238,14 @@ r = √(x² + y²)
   </label>
   <canvas role="img" aria-label="修正倍率改变时，鱼眼点沿着穿过归一化坐标原点 O 的直线向内或向外移动"></canvas>
   <div class="kb-radius-lab__values">
-    <span>O 到灰点：θ = 1.00</span>
-    <span>O 到绿点：θd = <output data-kb-radius-result-output>0.75</output></span>
+    <span>入射角 θ = 1.00 rad</span>
+    <span>灰点半径 f·θ = 1.00</span>
+    <span>绿点半径 f·θd = <output data-kb-radius-result-output>0.75</output></span>
   </div>
   <p data-kb-radius-explain aria-live="polite">倍率小于 1：绿点被拉向原点 O。</p>
 </div>
 
-动画里的修正倍率，就是 `k1～k4` 共同算出的结果：
+动画里的修正倍率，就是 `k1～k4` 共同算出的结果。`θd` 是由角度算出的无量纲数，在归一化平面上直接用作新半径；它不是毫米或像素长度：
 
 ```text
 θd = θ × 修正倍率
@@ -245,7 +254,7 @@ r = √(x² + y²)
 
 这些 `k` 由标定程序根据棋盘格角点拟合出来。越靠后的 `k`，主要微调画面最外圈。
 
-动画中点始终在同一条线上，因为 `(x/r, y/r)` 只保留方向。最后把这支方向箭头乘上新半径 `θd`：
+动画中点始终在同一条线上，因为 `(x/r, y/r)` 只保留方向。最后把这支方向箭头乘上归一化半径 `θd`；再由内参中的 `fx、fy` 换算成像素坐标：
 
 ```text
 方向箭头 = (x/r, y/r)

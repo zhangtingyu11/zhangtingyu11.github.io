@@ -550,16 +550,16 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.textBaseline = "middle";
   if (Math.abs(factor - 1) < .035) {
     ctx.fillStyle = "#315c55";
-    ctx.textAlign = "left";
-    ctx.fillText("两个位置重合", baseX + 14, baseY - 12);
+    ctx.textAlign = width < 420 ? "right" : "left";
+    ctx.fillText("f·θ 与 f·θd 重合", width < 420 ? baseX - 12 : baseX + 14, baseY - 12);
   } else {
     ctx.fillStyle = "#6c7f7b";
     ctx.textAlign = "left";
-    ctx.fillText("基础位置", baseX + 13, baseY - 13);
+    ctx.fillText("f·θ 基础位置", baseX + 13, baseY - 13);
     ctx.fillStyle = "#3f756d";
     const correctedLabelX = factor < 1 ? correctedX - 10 : correctedX + 13;
     ctx.textAlign = factor < 1 ? "right" : "left";
-    ctx.fillText("修正后", correctedLabelX, correctedY + 16);
+    ctx.fillText("f·θd 修正后", correctedLabelX, correctedY + 16);
   }
 }
 
