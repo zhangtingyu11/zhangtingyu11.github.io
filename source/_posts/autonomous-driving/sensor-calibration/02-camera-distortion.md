@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 13:23:00
+updated: 2026-08-20 13:38:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -17,11 +17,11 @@ aside: true
 toc: true
 ---
 
-真实镜头会让像素偏离理想位置，这就是**相机畸变**。它不是模糊，而是墙边、灯杆和车道线真的被拍弯了。
+相机标定通常会输出两样东西：内参矩阵 `K` 和畸变系数 `D`。上一篇讲了 `K`，这篇看 `D` 到底改了什么。
 
-## 先看看畸变长什么样
+## 先看效果
 
-切换类型并拖动强度，观察建筑边缘和车道线。
+拖动滑块时，重点看建筑边缘和车道线。
 
 <div class="distortion-lab" data-distortion-lab>
   <div class="distortion-lab__tabs" data-distortion-tabs role="group" aria-label="选择畸变类型">
@@ -41,36 +41,36 @@ toc: true
   <p data-distortion-explain aria-live="polite"></p>
 </div>
 
-### 桶形、枕形和切向
+### 三种常见现象
 
 <div class="distortion-kind-cards">
-  <div><strong>桶形畸变</strong><p>直线向外鼓，像套在木桶表面；广角镜头常见。</p></div>
-  <div><strong>枕形畸变</strong><p>直线向内弯，画面像被四角向外拉伸。</p></div>
-  <div><strong>切向畸变</strong><p>径向是顺着中心连线移动；切向则让点横着“滑”，画面因此不对称。常见原因是镜头与传感器没有完全对正。</p></div>
+  <div><strong>桶形</strong><p>边缘向中心压缩，直线向外鼓。</p></div>
+  <div><strong>枕形</strong><p>边缘向外拉伸，直线向内弯。</p></div>
+  <div><strong>切向</strong><p>点没有沿中心连线移动，而是向侧面偏，变形通常不对称。</p></div>
 </div>
 
-桶形和枕形属于**径向畸变**：越靠近画面边缘，通常越明显。
+桶形和枕形属于径向畸变，离畸变中心越远通常越明显。切向畸变多与镜片偏心、装配不同轴有关。
 
-### 桶形和鱼眼有什么不同？
+### 桶形不等于鱼眼
 
 <div class="distortion-concept-compare">
   <div>
-    <small>桶形畸变</small>
-    <strong>同一批景物，位置变形了</strong>
+    <small>桶形</small>
+    <strong>针孔投影上的径向偏移</strong>
     <span>视野基本没变</span>
   </div>
   <div>
-    <small>鱼眼投影</small>
-    <strong>更宽的视野，被压进画面</strong>
-    <span>画面两侧会多出内容</span>
+    <small>鱼眼</small>
+    <strong>按光线角度压缩宽视场</strong>
+    <span>两侧能容纳更多内容</span>
   </div>
 </div>
 
-看上面的动画两侧：切到鱼眼后，会多出两栋建筑。
+上面的演示里，桶形只改变原有建筑的位置；鱼眼模式还会显示两侧建筑。
 
-## 畸变加在计算的哪一步？
+## 畸变放在公式的哪里？
 
-畸变作用在**归一化坐标上，发生在乘 K 之前**：
+上一篇从归一化坐标 `(x, y)` 乘 `K` 得到像素坐标。加入畸变后，计算顺序变成：
 
 <div class="distortion-flow" role="img" aria-label="归一化坐标先经过畸变模型，再乘以内参矩阵得到像素坐标">
   <div><small>理想投影</small><strong>(x, y)</strong></div>
@@ -80,20 +80,20 @@ toc: true
   <div><small>数字图像</small><strong>(u, v)</strong></div>
 </div>
 
-`K` 仍是上一篇的 3×3 矩阵；镜头弯曲由额外的畸变参数描述。
+所以畸变发生在乘 `K` 之前，并不包含在 `K` 中。保存标定结果时，至少要同时记录 `K`、`D` 和模型类型。
 
 ## 常见畸变模型
 
-### RadTan：普通镜头
+### RadTan
 
-Brown–Conrady 模型也叫 `RadTan`。先计算半径：
+OpenCV 的普通相机标定最常用 RadTan（Brown–Conrady）。先计算归一化平面上的半径：
 
 ```text
 r² = x² + y²
 L(r) = 1 + k1·r² + k2·r⁴ + k3·r⁶
 ```
 
-再加入径向和切向偏移：
+然后计算畸变后的坐标：
 
 ```text
 xd = x·L(r) + 2·p1·x·y + p2·(r² + 2·x²)
@@ -102,14 +102,14 @@ yd = y·L(r) + p1·(r² + 2·y²) + 2·p2·x·y
 
 <div class="distortion-parameter-cards">
   <div><strong>k1、k2、k3</strong><p>径向系数，控制桶形或枕形弯曲。</p></div>
-  <div><strong>p1、p2</strong><p>切向系数，描述镜头偏心或倾斜。</p></div>
+  <div><strong>p1、p2</strong><p>切向系数，描述镜片偏心和装配误差。</p></div>
 </div>
 
-OpenCV 常用顺序为 `(k1, k2, p1, p2, k3)`。在这套公式下，`k1 < 0` 通常是桶形，`k1 > 0` 通常是枕形。
+OpenCV 常见参数顺序是 `(k1, k2, p1, p2, k3)`。按上面的公式，`k1 < 0` 通常表现为桶形，`k1 > 0` 通常表现为枕形。
 
-### Rational：更复杂的径向畸变
+### Rational
 
-RadTan 拟合不够时，可把径向缩放改成分式：
+OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，会增加 `k4、k5、k6`：
 
 ```text
        1 + k1·r² + k2·r⁴ + k3·r⁶
@@ -117,20 +117,20 @@ L(r) = ────────────────────────�
        1 + k4·r² + k5·r⁴ + k6·r⁶
 ```
 
-它更灵活，也更容易过拟合。
+它适合 RadTan 无法拟合的复杂径向变化。代价是参数更多，标定板没有覆盖到画面边缘时容易过拟合。
 
-### Kannala–Brandt：鱼眼
+### Kannala–Brandt / Fisheye
 
-Kannala–Brandt（KB）直接使用光线与光轴的夹角 `θ`：
+鱼眼模型不再从平面半径直接拟合，而是先计算光线与光轴的夹角 `θ`：
 
 ```text
 θ = atan(r)
 θd = θ·(1 + k1·θ² + k2·θ⁴ + k3·θ⁶ + k4·θ⁸)
 ```
 
-RadTan 调整平面半径，KB 则按光线角度投影。OpenCV 的 `fisheye` 模块使用这一类模型。
+OpenCV 的 `fisheye` 模块使用这一类角度模型。它的系数不能直接拿给普通 `calibrateCamera` 使用。
 
-### 选型速查
+### 选哪个？
 
 <div class="distortion-model-cards">
   <div><strong>RadTan</strong><p>普通针孔、前视或长焦相机。</p></div>
@@ -139,4 +139,4 @@ RadTan 调整平面半径，KB 则按光线角度投影。OpenCV 的 `fisheye` �
   <div><strong>UCM / Mei</strong><p>全向或折反射相机；通过单位球和参数 ξ 建模。</p></div>
 </div>
 
-模型越复杂，越需要覆盖到画面边缘的标定数据。不要只看总 RMS，还要检查边缘残差。
+一般从最简单的模型开始。只有边缘残差仍有明显规律时，再增加参数。
