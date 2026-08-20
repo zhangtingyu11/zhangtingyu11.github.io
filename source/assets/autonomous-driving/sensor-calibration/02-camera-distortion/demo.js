@@ -17,6 +17,14 @@ const MODES = {
   }
 };
 
+const RADTAN_PARAMETERS = {
+  k1: { scale: .32, initial: -65, describe: "r² 项：从画面中部开始明显。负值偏桶形，正值偏枕形。" },
+  k2: { scale: .18, initial: -70, describe: "r⁴ 项：中心变化较小，主要修正画面边缘。" },
+  k3: { scale: .1, initial: -80, describe: "r⁶ 项：变化集中在最外圈，对边缘标定数据很敏感。" },
+  p1: { scale: .08, initial: 65, describe: "切向项：主要表现为上下方向的不对称偏移。" },
+  p2: { scale: .08, initial: 65, describe: "切向项：主要表现为左右方向的不对称偏移。" }
+};
+
 function transformPoint(px, py, mode, strength) {
   if (mode === "none" || strength === 0) return [px, py];
   const focal = 360;
@@ -60,6 +68,20 @@ function transformPoint(px, py, mode, strength) {
   return [400 + focal * xd, 225 + focal * yd];
 }
 
+function transformRadTanPoint(px, py, coefficients) {
+  const focal = 360;
+  const x = (px - 400) / focal;
+  const y = (py - 225) / focal;
+  const r2 = x * x + y * y;
+  const radial = 1 + coefficients.k1 * r2 + coefficients.k2 * r2 ** 2 + coefficients.k3 * r2 ** 3;
+  const deltaX = 2 * coefficients.p1 * x * y + coefficients.p2 * (r2 + 2 * x * x);
+  const deltaY = coefficients.p1 * (r2 + 2 * y * y) + 2 * coefficients.p2 * x * y;
+  return [
+    400 + focal * (x * radial + deltaX),
+    225 + focal * (y * radial + deltaY)
+  ];
+}
+
 function sampleEdge(a, b, count = 22) {
   const points = [];
   for (let index = 0; index <= count; index += 1) {
@@ -78,7 +100,7 @@ function samplePolygon(vertices) {
   return points;
 }
 
-function drawScene(canvas, mode, strength) {
+function drawScene(canvas, mode, strength, coefficients = null) {
   const rect = canvas.getBoundingClientRect();
   const cssWidth = Math.max(280, rect.width || 400);
   const cssHeight = cssWidth * 9 / 16;
@@ -89,7 +111,9 @@ function drawScene(canvas, mode, strength) {
   if (!ctx) return;
   ctx.setTransform(cssWidth / 800 * ratio, 0, 0, cssHeight / 450 * ratio, 0, 0);
 
-  const map = point => transformPoint(point[0], point[1], mode, strength);
+  const map = point => coefficients
+    ? transformRadTanPoint(point[0], point[1], coefficients)
+    : transformPoint(point[0], point[1], mode, strength);
   const path = (points, { stroke = null, fill = null, width = 2, close = false, dash = [] } = {}) => {
     const mapped = points.map(map);
     ctx.beginPath();
@@ -190,6 +214,48 @@ function mountDistortionLab(root) {
   render();
 }
 
+function mountRadTanParameterLab(root) {
+  if (root.dataset.mounted === "true") return;
+  root.dataset.mounted = "true";
+  const tabs = root.querySelector("[data-radtan-parameter-tabs]");
+  const range = root.querySelector("[data-radtan-parameter-range]");
+  const name = root.querySelector("[data-radtan-parameter-name]");
+  const output = root.querySelector("[data-radtan-parameter-output]");
+  const explain = root.querySelector("[data-radtan-parameter-explain]");
+  const canvases = root.querySelectorAll("canvas");
+  const values = Object.fromEntries(Object.entries(RADTAN_PARAMETERS).map(([key, item]) => [key, item.initial]));
+  let active = "k1";
+
+  const render = () => {
+    const definition = RADTAN_PARAMETERS[active];
+    const coefficient = definition.scale * values[active] / 100;
+    const coefficients = { k1: 0, k2: 0, k3: 0, p1: 0, p2: 0, [active]: coefficient };
+    name.textContent = active;
+    output.value = `${coefficient >= 0 ? "+" : ""}${coefficient.toFixed(3)}`;
+    explain.textContent = definition.describe;
+    drawScene(canvases[0], "none", 0);
+    drawScene(canvases[1], "radtan", 0, coefficients);
+  };
+
+  tabs.addEventListener("click", event => {
+    const button = event.target.closest("button[data-radtan-parameter]");
+    if (!button) return;
+    active = button.dataset.radtanParameter;
+    range.value = values[active];
+    tabs.querySelectorAll("button").forEach(item => item.classList.toggle("is-active", item === button));
+    render();
+  });
+  range.addEventListener("input", () => {
+    values[active] = Number(range.value);
+    render();
+  });
+  const observer = new ResizeObserver(render);
+  canvases.forEach(canvas => observer.observe(canvas));
+  range.value = values[active];
+  render();
+}
+
 export function mountDistortionLabs(scope = document) {
   scope.querySelectorAll("[data-distortion-lab]").forEach(mountDistortionLab);
+  scope.querySelectorAll("[data-radtan-parameter-lab]").forEach(mountRadTanParameterLab);
 }

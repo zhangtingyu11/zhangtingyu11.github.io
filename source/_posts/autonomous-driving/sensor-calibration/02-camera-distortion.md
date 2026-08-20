@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 14:02:00
+updated: 2026-08-20 14:18:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -117,6 +117,25 @@ yd = y·L(r) + Δyt
 <div class="distortion-parameter-cards">
   <div><strong>k1、k2、k3</strong><p>控制 L(r)，对应上面的桶形和枕形。</p></div>
   <div><strong>p1、p2</strong><p>控制 Δxt、Δyt，对应上面的切向畸变。</p></div>
+</div>
+
+<div class="radtan-parameter-lab" data-radtan-parameter-lab>
+  <div class="radtan-parameter-lab__tabs" data-radtan-parameter-tabs role="group" aria-label="选择一个 RadTan 参数">
+    <button class="is-active" type="button" data-radtan-parameter="k1">k1</button>
+    <button type="button" data-radtan-parameter="k2">k2</button>
+    <button type="button" data-radtan-parameter="k3">k3</button>
+    <button type="button" data-radtan-parameter="p1">p1</button>
+    <button type="button" data-radtan-parameter="p2">p2</button>
+  </div>
+  <label class="radtan-parameter-lab__control">
+    <span><b data-radtan-parameter-name>k1</b><output data-radtan-parameter-output>-0.208</output></span>
+    <input data-radtan-parameter-range type="range" min="-100" max="100" step="1" value="-65" aria-label="调整当前 RadTan 参数">
+  </label>
+  <div class="radtan-parameter-lab__comparison">
+    <div><strong>参数为 0</strong><canvas role="img" aria-label="无畸变的道路场景"></canvas></div>
+    <div><strong>只改变当前参数</strong><canvas role="img" aria-label="只改变当前 RadTan 参数后的道路场景"></canvas></div>
+  </div>
+  <p data-radtan-parameter-explain aria-live="polite"></p>
 </div>
 
 OpenCV 常见参数顺序是 `(k1, k2, p1, p2, k3)`。
