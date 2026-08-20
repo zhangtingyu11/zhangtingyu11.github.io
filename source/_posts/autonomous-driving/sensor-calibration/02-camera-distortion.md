@@ -215,7 +215,9 @@ r = √(x² + y²)
 θ = atan(r)
 ```
 
-到这里，我们只知道光线的角度 `θ`。接下来的问题很具体：**这条光线应该落在离图像中心多远的位置？**
+这里的“半径”，是从归一化坐标原点 `O = (0, 0)` 到投影点的距离。`O` 是光轴穿过归一化成像平面的位置；乘上内参后，它对应像素坐标里的主点 `(cx, cy)`，不一定是图片的几何中心。
+
+到这里，我们只知道光线的角度 `θ`。接下来的问题很具体：**这条光线应该落在离原点 `O` 多远的位置？**
 
 最简单的鱼眼模型直接令半径等于角度：`半径 = θ`。真实镜头没这么理想，还要乘一个修正倍率。先固定 `θ = 1`，只看这个倍率会怎样移动点：
 
@@ -224,12 +226,12 @@ r = √(x² + y²)
     <span>修正倍率（拖动看看）<output data-kb-radius-factor-output>0.75</output></span>
     <input data-kb-radius-factor-range type="range" min="60" max="140" step="1" value="75" aria-label="调整 KB 半径修正倍率">
   </label>
-  <canvas role="img" aria-label="修正倍率改变时，鱼眼点沿着穿过图像中心的直线向内或向外移动"></canvas>
+  <canvas role="img" aria-label="修正倍率改变时，鱼眼点沿着穿过归一化坐标原点 O 的直线向内或向外移动"></canvas>
   <div class="kb-radius-lab__values">
-    <span>基础半径 θ = 1.00</span>
-    <span>修正后 θd = <output data-kb-radius-result-output>0.75</output></span>
+    <span>O 到灰点：θ = 1.00</span>
+    <span>O 到绿点：θd = <output data-kb-radius-result-output>0.75</output></span>
   </div>
-  <p data-kb-radius-explain aria-live="polite">倍率小于 1：点被拉向图像中心。</p>
+  <p data-kb-radius-explain aria-live="polite">倍率小于 1：绿点被拉向原点 O。</p>
 </div>
 
 动画里的修正倍率，就是 `k1～k4` 共同算出的结果：
@@ -248,7 +250,7 @@ r = √(x² + y²)
 新位置 (xd, yd) = θd × 方向箭头
 ```
 
-所以，`k1～k4` 只决定点离中心多远，不改变方向。OpenCV `fisheye` 的四个 `k` 与 RadTan 的 `k` 含义不同，不能混用。
+所以，`k1～k4` 只决定点离原点 `O` 多远，不改变方向。OpenCV `fisheye` 的四个 `k` 与 RadTan 的 `k` 含义不同，不能混用。
 
 ### 选哪个？
 

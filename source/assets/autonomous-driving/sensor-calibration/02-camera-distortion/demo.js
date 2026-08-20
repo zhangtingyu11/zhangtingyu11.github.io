@@ -446,7 +446,7 @@ function drawKbRadiusMapping(canvas, factor) {
     ctx.font = "700 12px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
-    ctx.fillText(factor < 1 ? "向中心" : "向外", (startX + endX) / 2, (startY + endY) / 2 - 5);
+    ctx.fillText(factor < 1 ? "向 O" : "远离 O", (startX + endX) / 2, (startY + endY) / 2 - 5);
   }
 
   ctx.beginPath();
@@ -457,7 +457,7 @@ function drawKbRadiusMapping(canvas, factor) {
   ctx.font = "700 13px system-ui, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  ctx.fillText("图像中心", originX, originY + 13);
+  ctx.fillText("原点 O", originX, originY + 13);
 
   ctx.beginPath();
   ctx.arc(baseX, baseY, 8, 0, Math.PI * 2);
@@ -648,8 +648,8 @@ function mountKbRadiusLab(root) {
     const factor = Number(range.value) / 100;
     factorOutput.value = factor.toFixed(2);
     resultOutput.value = factor.toFixed(2);
-    if (factor < .99) explain.textContent = "倍率小于 1：点被拉向图像中心。";
-    else if (factor > 1.01) explain.textContent = "倍率大于 1：点被推向图像外侧。";
+    if (factor < .99) explain.textContent = "倍率小于 1：绿点被拉向原点 O。";
+    else if (factor > 1.01) explain.textContent = "倍率大于 1：绿点远离原点 O。";
     else explain.textContent = "倍率等于 1：修正前后的位置重合。";
     drawKbRadiusMapping(canvas, factor);
   };

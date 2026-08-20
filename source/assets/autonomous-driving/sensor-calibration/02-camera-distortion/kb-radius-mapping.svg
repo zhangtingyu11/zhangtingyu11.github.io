@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 270" role="img" aria-labelledby="title desc">
-  <title id="title">KB 模型只改变点到图像中心的距离</title>
-  <desc id="desc">原位置和新位置都在从图像中心出发的同一条射线上，k1 到 k4 只调整新半径 theta d，不改变方向。</desc>
+  <title id="title">KB 模型只改变点到归一化坐标原点的距离</title>
+  <desc id="desc">原位置和新位置都在从归一化坐标原点 O 出发的同一条射线上，k1 到 k4 只调整新半径 theta d，不改变方向。</desc>
   <defs>
     <marker id="arrow-mint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#5caa9b"/>
@@ -25,7 +25,7 @@
   <text x="163" y="136" fill="#3f756d" font-family="ui-monospace, monospace" font-size="20" font-weight="700">鱼眼半径 θd</text>
 
   <circle cx="91" cy="215" r="8" fill="#315c55"/>
-  <text x="53" y="245" fill="#315c55" font-family="system-ui, sans-serif" font-size="18" font-weight="700">图像中心</text>
+  <text x="53" y="245" fill="#315c55" font-family="system-ui, sans-serif" font-size="18" font-weight="700">原点 O</text>
 
   <circle cx="293" cy="128" r="9" fill="#5caa9b" stroke="#ffffff" stroke-width="3"/>
   <text x="302" y="121" fill="#3f756d" font-family="system-ui, sans-serif" font-size="18" font-weight="700">鱼眼位置 (xd, yd)</text>
