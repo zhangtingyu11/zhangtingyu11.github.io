@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 14:47:00
+updated: 2026-08-20 15:06:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -187,14 +187,44 @@ OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，分母会增加 `k4、k5、k6`。它�
 
 ### Kannala–Brandt / Fisheye
 
-鱼眼模型不再从平面半径直接拟合，而是先计算光线与光轴的夹角 `θ`：
+针孔模型按 `r = tan(θ)` 投影。光线接近 90° 时，`tan(θ)` 会迅速趋向无穷大，有限尺寸的传感器装不下接近 180° 的视场。
+
+鱼眼改为直接按角度映射。拖动下面的 `θ`，比较两种投影的输出半径：
+
+<div class="kb-angle-lab" data-kb-angle-lab>
+  <label class="kb-angle-lab__control">
+    <span>光线与光轴夹角 θ <output data-kb-angle-output>75°</output></span>
+    <input data-kb-angle-range type="range" min="0" max="89" step="1" value="75" aria-label="调整光线与光轴夹角">
+  </label>
+  <canvas role="img" aria-label="针孔 tan theta 与鱼眼 theta 的输出半径对比曲线"></canvas>
+  <div class="kb-angle-lab__values">
+    <span><i aria-hidden="true"></i>针孔 tan(θ)<output data-kb-pinhole-output>3.73</output></span>
+    <span><i aria-hidden="true"></i>鱼眼 θ<output data-kb-fisheye-output>1.31</output></span>
+  </div>
+  <p data-kb-angle-explain aria-live="polite"></p>
+</div>
+
+KB 的计算分三步。先从理想归一化坐标得到光线角度：
 
 ```text
+r = √(x² + y²)
 θ = atan(r)
+```
+
+再用 `k1、k2、k3、k4` 修正“角度到图像半径”的关系：
+
+```text
 θd = θ·(1 + k1·θ² + k2·θ⁴ + k3·θ⁶ + k4·θ⁸)
 ```
 
-OpenCV 的 `fisheye` 模块使用这一类角度模型。它的系数不能直接拿给普通 `calibrateCamera` 使用。
+最后保持原来的方向，只替换半径：
+
+```text
+xd = (θd / r)·x
+yd = (θd / r)·y
+```
+
+`θ` 前面的系数固定为 1，保证中心附近接近针孔投影；后面的高次项主要调整大角度光线。OpenCV `fisheye` 的四个 `k` 与 RadTan 的 `k` 含义不同，不能混用。
 
 ### 选哪个？
 

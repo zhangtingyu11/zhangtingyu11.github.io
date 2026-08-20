@@ -191,6 +191,98 @@ function drawScene(canvas, mode, strength, coefficients = null) {
   circle([684, 230], 8, "#f1c879", "#ffffff", 2);
 }
 
+function drawKbAnglePlot(canvas, angleDegrees) {
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(280, rect.width || 600);
+  const height = Math.max(220, Math.min(310, width * .48));
+  const ratio = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const margin = { left: 48, right: 18, top: 18, bottom: 38 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const maxRadius = 4;
+  const x = degrees => margin.left + degrees / 90 * plotWidth;
+  const y = radius => margin.top + plotHeight - Math.min(radius, maxRadius) / maxRadius * plotHeight;
+
+  ctx.strokeStyle = "#d7e4e1";
+  ctx.lineWidth = 1;
+  ctx.fillStyle = "#70837f";
+  ctx.font = "11px system-ui, sans-serif";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  [0, 1, 2, 3, 4].forEach(value => {
+    ctx.beginPath();
+    ctx.moveTo(margin.left, y(value));
+    ctx.lineTo(width - margin.right, y(value));
+    ctx.stroke();
+    ctx.fillText(String(value), margin.left - 8, y(value));
+  });
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  [0, 30, 60, 90].forEach(value => ctx.fillText(`${value}°`, x(value), height - margin.bottom + 9));
+
+  const drawCurve = (color, radiusForAngle, end = 89) => {
+    ctx.beginPath();
+    for (let degree = 0; degree <= end; degree += .5) {
+      const radius = radiusForAngle(degree * Math.PI / 180);
+      const px = x(degree);
+      const py = y(radius);
+      if (degree === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      if (radius >= maxRadius) break;
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.stroke();
+  };
+
+  drawCurve("#6f93a3", radians => Math.tan(radians));
+  drawCurve("#58a99a", radians => radians);
+
+  const angleRadians = angleDegrees * Math.PI / 180;
+  const pinholeRadius = Math.tan(angleRadians);
+  const fisheyeRadius = angleRadians;
+  ctx.strokeStyle = "#9bb0ab";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(x(angleDegrees), margin.top);
+  ctx.lineTo(x(angleDegrees), margin.top + plotHeight);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  const marker = (radius, color) => {
+    ctx.beginPath();
+    ctx.arc(x(angleDegrees), y(radius), 5, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  };
+  marker(fisheyeRadius, "#58a99a");
+  marker(Math.min(pinholeRadius, maxRadius), "#6f93a3");
+
+  ctx.save();
+  ctx.translate(14, margin.top + plotHeight / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = "#627773";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillText("输出半径", 0, 0);
+  ctx.restore();
+  ctx.fillStyle = "#627773";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("光线角度 θ", margin.left + plotWidth / 2, height - 1);
+}
+
 function mountDistortionLab(root) {
   if (root.dataset.mounted === "true") return;
   root.dataset.mounted = "true";
@@ -305,8 +397,38 @@ function mountRationalParameterLab(root) {
   render();
 }
 
+function mountKbAngleLab(root) {
+  if (root.dataset.mounted === "true") return;
+  root.dataset.mounted = "true";
+  const range = root.querySelector("[data-kb-angle-range]");
+  const angleOutput = root.querySelector("[data-kb-angle-output]");
+  const pinholeOutput = root.querySelector("[data-kb-pinhole-output]");
+  const fisheyeOutput = root.querySelector("[data-kb-fisheye-output]");
+  const explain = root.querySelector("[data-kb-angle-explain]");
+  const canvas = root.querySelector("canvas");
+
+  const render = () => {
+    const degrees = Number(range.value);
+    const radians = degrees * Math.PI / 180;
+    const pinhole = Math.tan(radians);
+    angleOutput.value = `${degrees}°`;
+    pinholeOutput.value = pinhole.toFixed(2);
+    fisheyeOutput.value = radians.toFixed(2);
+    explain.textContent = pinhole > 4
+      ? "针孔投影已经超出图框；鱼眼输出仍保持有限。"
+      : "角度越大，针孔半径增长越快；鱼眼半径仍近似线性增长。";
+    drawKbAnglePlot(canvas, degrees);
+  };
+
+  range.addEventListener("input", render);
+  const observer = new ResizeObserver(render);
+  observer.observe(canvas);
+  render();
+}
+
 export function mountDistortionLabs(scope = document) {
   scope.querySelectorAll("[data-distortion-lab]").forEach(mountDistortionLab);
   scope.querySelectorAll("[data-radtan-parameter-lab]").forEach(mountRadTanParameterLab);
   scope.querySelectorAll("[data-rational-parameter-lab]").forEach(mountRationalParameterLab);
+  scope.querySelectorAll("[data-kb-angle-lab]").forEach(mountKbAngleLab);
 }
