@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-20 14:29:00
+updated: 2026-08-20 14:47:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -88,6 +88,13 @@ toc: true
 
 `RadTan` 是两个单词的缩写：`Radial + Tangential`。它把前面提到的径向畸变和切向畸变放在同一个模型里。
 
+这个形式不是随便凑的：
+
+1. 镜头大致绕光轴对称，所以径向缩放只需要看半径 `r`。
+2. 中心点不应移动，所以缩放从常数 `1` 开始。
+3. 对称且平滑的径向变化，可以用 `r²、r⁴、r⁶` 逐级逼近。
+4. 镜片偏心会破坏对称性，再用 `p1、p2` 补上切向偏移。
+
 <div class="radtan-flow" role="img" aria-label="理想点先经过径向畸变，再叠加切向畸变，得到畸变点">
   <div><small>理想点</small><strong>(x, y)</strong></div>
   <span><b>径向 k</b><i aria-hidden="true"></i><small>桶形 / 枕形</small></span>
@@ -151,7 +158,7 @@ OpenCV 常见参数顺序是 `(k1, k2, p1, p2, k3)`。
 
 ### Rational
 
-OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，会增加 `k4、k5、k6`：
+RadTan 的 `L(r)` 是有限多项式。宽视场镜头的边缘变化较快时，只在分子继续增加高次项，拟合容易变得敏感。Rational 把它改成两个多项式的比值：
 
 ```text
        1 + k1·r² + k2·r⁴ + k3·r⁶
@@ -159,7 +166,24 @@ L(r) = ────────────────────────�
        1 + k4·r² + k5·r⁴ + k6·r⁶
 ```
 
-它适合 RadTan 无法拟合的复杂径向变化。代价是参数更多，标定板没有覆盖到画面边缘时容易过拟合。
+OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，分母会增加 `k4、k5、k6`。它能更灵活地调整边缘曲线，但分母接近 0 时会变得不稳定。
+
+<div class="radtan-parameter-lab" data-rational-parameter-lab>
+  <div class="radtan-parameter-lab__tabs" data-rational-parameter-tabs role="group" aria-label="选择一个 Rational 分母参数">
+    <button class="is-active" type="button" data-rational-parameter="k4">k4</button>
+    <button type="button" data-rational-parameter="k5">k5</button>
+    <button type="button" data-rational-parameter="k6">k6</button>
+  </div>
+  <label class="radtan-parameter-lab__control">
+    <span><b data-rational-parameter-name>k4</b><output data-rational-parameter-output>+0.056</output></span>
+    <input data-rational-parameter-range type="range" min="-100" max="100" step="1" value="70" aria-label="调整当前 Rational 分母参数">
+  </label>
+  <div class="radtan-parameter-lab__comparison">
+    <div><strong>分母为 1（RadTan）</strong><canvas role="img" aria-label="只使用 RadTan 分子的道路场景"></canvas></div>
+    <div><strong>加入分母（Rational）</strong><canvas role="img" aria-label="加入当前 Rational 分母参数后的道路场景"></canvas></div>
+  </div>
+  <p data-rational-parameter-explain aria-live="polite"></p>
+</div>
 
 ### Kannala–Brandt / Fisheye
 

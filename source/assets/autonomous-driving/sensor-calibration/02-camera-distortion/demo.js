@@ -25,6 +25,12 @@ const RADTAN_PARAMETERS = {
   p2: { scale: .08, initial: 65, describe: "切向项：主要表现为左右方向的不对称偏移。" }
 };
 
+const RATIONAL_PARAMETERS = {
+  k4: { scale: .08, initial: 70, describe: "分母的 r² 项：从画面中部开始改变径向缩放。" },
+  k5: { scale: .08, initial: 70, describe: "分母的 r⁴ 项：变化主要集中在画面边缘。" },
+  k6: { scale: .08, initial: 70, describe: "分母的 r⁶ 项：主要调整最外圈，数值过大时最容易不稳定。" }
+};
+
 function transformPoint(px, py, mode, strength) {
   if (mode === "none" || strength === 0) return [px, py];
   const focal = 360;
@@ -73,7 +79,9 @@ function transformRadTanPoint(px, py, coefficients) {
   const x = (px - 400) / focal;
   const y = (py - 225) / focal;
   const r2 = x * x + y * y;
-  const radial = 1 + coefficients.k1 * r2 + coefficients.k2 * r2 ** 2 + coefficients.k3 * r2 ** 3;
+  const numerator = 1 + coefficients.k1 * r2 + coefficients.k2 * r2 ** 2 + coefficients.k3 * r2 ** 3;
+  const denominator = 1 + (coefficients.k4 || 0) * r2 + (coefficients.k5 || 0) * r2 ** 2 + (coefficients.k6 || 0) * r2 ** 3;
+  const radial = numerator / denominator;
   const deltaX = 2 * coefficients.p1 * x * y + coefficients.p2 * (r2 + 2 * x * x);
   const deltaY = coefficients.p1 * (r2 + 2 * y * y) + 2 * coefficients.p2 * x * y;
   return [
@@ -255,7 +263,50 @@ function mountRadTanParameterLab(root) {
   render();
 }
 
+function mountRationalParameterLab(root) {
+  if (root.dataset.mounted === "true") return;
+  root.dataset.mounted = "true";
+  const tabs = root.querySelector("[data-rational-parameter-tabs]");
+  const range = root.querySelector("[data-rational-parameter-range]");
+  const name = root.querySelector("[data-rational-parameter-name]");
+  const output = root.querySelector("[data-rational-parameter-output]");
+  const explain = root.querySelector("[data-rational-parameter-explain]");
+  const canvases = root.querySelectorAll("canvas");
+  const values = Object.fromEntries(Object.entries(RATIONAL_PARAMETERS).map(([key, item]) => [key, item.initial]));
+  const base = { k1: -.12, k2: .025, k3: 0, p1: 0, p2: 0, k4: 0, k5: 0, k6: 0 };
+  let active = "k4";
+
+  const render = () => {
+    const definition = RATIONAL_PARAMETERS[active];
+    const coefficient = definition.scale * values[active] / 100;
+    const rational = { ...base, [active]: coefficient };
+    name.textContent = active;
+    output.value = `${coefficient >= 0 ? "+" : ""}${coefficient.toFixed(3)}`;
+    explain.textContent = `${definition.describe} 正值增大分母，负值减小分母。`;
+    drawScene(canvases[0], "radtan", 0, base);
+    drawScene(canvases[1], "rational", 0, rational);
+  };
+
+  tabs.addEventListener("click", event => {
+    const button = event.target.closest("button[data-rational-parameter]");
+    if (!button) return;
+    active = button.dataset.rationalParameter;
+    range.value = values[active];
+    tabs.querySelectorAll("button").forEach(item => item.classList.toggle("is-active", item === button));
+    render();
+  });
+  range.addEventListener("input", () => {
+    values[active] = Number(range.value);
+    render();
+  });
+  const observer = new ResizeObserver(render);
+  canvases.forEach(canvas => observer.observe(canvas));
+  range.value = values[active];
+  render();
+}
+
 export function mountDistortionLabs(scope = document) {
   scope.querySelectorAll("[data-distortion-lab]").forEach(mountDistortionLab);
   scope.querySelectorAll("[data-radtan-parameter-lab]").forEach(mountRadTanParameterLab);
+  scope.querySelectorAll("[data-rational-parameter-lab]").forEach(mountRationalParameterLab);
 }
