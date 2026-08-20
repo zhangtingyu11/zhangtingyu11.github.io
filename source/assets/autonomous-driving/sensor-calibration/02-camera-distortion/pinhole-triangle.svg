@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 290" role="img" aria-labelledby="title desc">
+  <title id="title">针孔投影中的直角三角形</title>
+  <desc id="desc">光心 O 到归一化成像平面的水平距离是焦距 1，投影点到光轴的距离是 r，光线与光轴夹角是 theta，因此 tan theta 等于 r。</desc>
+  <rect x="1" y="1" width="678" height="288" rx="22" fill="#f6fbf9" stroke="#d8e8e3" stroke-width="2"/>
+  <circle cx="604" cy="48" r="70" fill="#e9f3fb" opacity=".8"/>
+  <circle cx="42" cy="276" r="86" fill="#e3f5ef" opacity=".9"/>
+
+  <text x="34" y="40" fill="#315c55" font-family="system-ui, sans-serif" font-size="22" font-weight="700">为什么 r = tan(θ)？</text>
+
+  <line x1="72" y1="228" x2="410" y2="228" stroke="#8fa7a2" stroke-width="2" stroke-dasharray="7 7"/>
+  <text x="323" y="253" fill="#607772" font-family="system-ui, sans-serif" font-size="18">光轴</text>
+
+  <line x1="398" y1="66" x2="398" y2="248" stroke="#75bcae" stroke-width="4" stroke-linecap="round"/>
+  <text x="319" y="88" fill="#52726b" font-family="system-ui, sans-serif" font-size="18">归一化平面</text>
+
+  <line x1="82" y1="228" x2="398" y2="78" stroke="#5d91a6" stroke-width="4" stroke-linecap="round"/>
+  <line x1="82" y1="228" x2="398" y2="228" stroke="#75bcae" stroke-width="5" stroke-linecap="round"/>
+  <line x1="398" y1="228" x2="398" y2="78" stroke="#e68d72" stroke-width="5" stroke-linecap="round"/>
+
+  <path d="M 378 228 L 378 208 L 398 208" fill="none" stroke="#607772" stroke-width="2"/>
+  <path d="M 124 228 A 42 42 0 0 0 120 210" fill="none" stroke="#d69a55" stroke-width="3"/>
+
+  <circle cx="82" cy="228" r="7" fill="#315c55"/>
+  <text x="56" y="258" fill="#315c55" font-family="system-ui, sans-serif" font-size="19" font-weight="700">光心 O</text>
+  <circle cx="398" cy="78" r="8" fill="#e68d72" stroke="#ffffff" stroke-width="3"/>
+  <text x="412" y="79" fill="#b7644f" font-family="system-ui, sans-serif" font-size="19" font-weight="700">投影点</text>
+
+  <text x="225" y="218" fill="#3f756d" font-family="ui-monospace, monospace" font-size="21" font-weight="700">f = 1</text>
+  <text x="411" y="161" fill="#b7644f" font-family="ui-monospace, monospace" font-size="22" font-weight="700">r</text>
+  <text x="126" y="202" fill="#ae7433" font-family="serif" font-size="24" font-style="italic">θ</text>
+
+  <rect x="480" y="128" width="166" height="90" rx="15" fill="#ffffff" stroke="#d8e8e3" stroke-width="2"/>
+  <text x="563" y="159" text-anchor="middle" fill="#607772" font-family="system-ui, sans-serif" font-size="17">对边 ÷ 邻边</text>
+  <text x="563" y="193" text-anchor="middle" fill="#315c55" font-family="ui-monospace, monospace" font-size="22" font-weight="700">tan(θ)=r/1=r</text>
+</svg>

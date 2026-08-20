@@ -204,7 +204,11 @@ OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，分母会增加 `k4、k5、k6`。它�
   <p data-kb-angle-explain aria-live="polite"></p>
 </div>
 
-在归一化成像平面上取焦距 `f = 1`，直角三角形给出 `r = tan(θ)`。KB 先反算光线角度：
+<figure class="coordinate-figure">
+  <img src="/assets/autonomous-driving/sensor-calibration/02-camera-distortion/pinhole-triangle.svg?v=1" alt="针孔投影中的直角三角形：邻边是焦距 1，对边是图像半径 r">
+</figure>
+
+看图中的直角三角形：邻边是 `f = 1`，对边是 `r`，所以 `tan(θ) = r / 1 = r`。反过来，`θ = atan(r)`。KB 就从这个角度开始建模：
 
 ```text
 r = √(x² + y²)
