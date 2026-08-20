@@ -189,14 +189,14 @@ OpenCV 开启 `CALIB_RATIONAL_MODEL` 后，分母会增加 `k4、k5、k6`。它�
 
 先把相机从侧面切开。`θ` 是光线与正前方光轴的夹角；180° 是左右两边的总视场，所以最边缘的光线相对光轴接近 ±90°。
 
-针孔模型假设光线保持直线。光线越接近 90°，就越接近平行于成像平面，交点会越跑越远。鱼眼镜头会强烈折射大角度光线；模型等效为把它们压到有限的图像半径。
+针孔中，光线穿过小孔后不改变方向；角度越接近 90°，落点就越远。鱼眼多了一组镜片：光线只在镜片处改变方向，镜片前后仍是直线。这个方向变化就是折射。
 
 <div class="kb-angle-lab" data-kb-angle-lab>
   <label class="kb-angle-lab__control">
     <span>光线与光轴夹角 θ <output data-kb-angle-output>75°</output></span>
     <input data-kb-angle-range type="range" min="0" max="89" step="1" value="75" aria-label="调整光线与光轴夹角">
   </label>
-  <canvas role="img" aria-label="针孔直线投影与鱼眼弯折光线的侧视对比"></canvas>
+  <canvas role="img" aria-label="针孔直线传播与鱼眼光线在镜片处折射的侧视对比"></canvas>
   <div class="kb-angle-lab__values">
     <span><i aria-hidden="true"></i>针孔交点 r = tan(θ)<output data-kb-pinhole-output>3.73</output></span>
     <span><i aria-hidden="true"></i>鱼眼位置 r = θ<output data-kb-fisheye-output>1.31</output></span>

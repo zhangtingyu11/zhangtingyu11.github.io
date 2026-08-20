@@ -229,24 +229,24 @@ function drawKbAngleGeometry(canvas, angleDegrees) {
     ctx.font = "700 13px system-ui, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillText(type === "pinhole" ? "针孔：光线保持直线" : "鱼眼：大角度光线压回图内", panel.x + 14, panel.y + 13);
+    ctx.fillText(type === "pinhole" ? "针孔：光线不改变方向" : "鱼眼：光线在镜片处折射", panel.x + 14, panel.y + 13);
 
-    const originX = panel.x + 38;
     const centerY = panel.y + panel.height * .59;
-    const focal = Math.min(76, panel.width * .27);
-    const sensorX = originX + focal;
+    const lensX = panel.x + panel.width * .5;
+    const focal = Math.min(62, panel.width * .21, panel.height * .27);
+    const sensorX = lensX - focal;
     const sensorHalf = Math.min(panel.height * .32, focal * 1.6);
     const sensorTop = centerY - sensorHalf;
     const sensorBottom = centerY + sensorHalf;
     const outputRadius = type === "pinhole" ? Math.tan(radians) : radians;
-    const targetY = centerY - focal * outputRadius;
+    const targetY = centerY + focal * outputRadius;
     const color = type === "pinhole" ? "#6f93a3" : "#58a99a";
 
     ctx.strokeStyle = "#9eb3ae";
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
-    ctx.moveTo(originX, centerY);
+    ctx.moveTo(panel.x + 16, centerY);
     ctx.lineTo(panel.x + panel.width - 16, centerY);
     ctx.stroke();
     ctx.setLineDash([]);
@@ -262,44 +262,90 @@ function drawKbAngleGeometry(canvas, angleDegrees) {
     ctx.stroke();
     ctx.fillStyle = "#70837f";
     ctx.textAlign = "center";
-    ctx.fillText("归一化平面", sensorX, sensorBottom + 7);
+    ctx.fillText("传感器", sensorX, sensorBottom + 7);
+
+    if (type === "fisheye") {
+      const lensHalf = Math.min(43, panel.height * .2);
+      const lensWidth = 11;
+      ctx.beginPath();
+      ctx.moveTo(lensX, centerY - lensHalf);
+      ctx.bezierCurveTo(lensX - lensWidth, centerY - lensHalf * .55, lensX - lensWidth, centerY + lensHalf * .55, lensX, centerY + lensHalf);
+      ctx.bezierCurveTo(lensX + lensWidth, centerY + lensHalf * .55, lensX + lensWidth, centerY - lensHalf * .55, lensX, centerY - lensHalf);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(117, 201, 186, .18)";
+      ctx.strokeStyle = "#79bfb2";
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#70837f";
+      ctx.textAlign = "center";
+      ctx.fillText("镜片", lensX, centerY + lensHalf + 8);
+    } else {
+      ctx.strokeStyle = "#809b95";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(lensX, centerY - 25);
+      ctx.lineTo(lensX, centerY - 7);
+      ctx.moveTo(lensX, centerY + 7);
+      ctx.lineTo(lensX, centerY + 25);
+      ctx.stroke();
+      ctx.fillStyle = "#70837f";
+      ctx.textAlign = "center";
+      ctx.fillText("针孔", lensX, centerY + 33);
+    }
+
+    const right = panel.x + panel.width - 14;
+    const top = panel.y + 43;
+    const cos = Math.max(Math.cos(radians), .001);
+    const sin = Math.max(Math.sin(radians), .001);
+    const incomingLength = Math.min((right - lensX) / cos, (centerY - top) / sin);
+    const incomingX = lensX + incomingLength * cos;
+    const incomingY = centerY - incomingLength * sin;
 
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(originX, centerY);
+    ctx.moveTo(incomingX, incomingY);
+    ctx.lineTo(lensX, centerY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(lensX, centerY);
     if (type === "pinhole") {
-      if (targetY >= sensorTop) {
+      if (targetY <= sensorBottom) {
         ctx.lineTo(sensorX, targetY);
       } else {
-        const topY = panel.y + 48;
-        const topX = originX + (centerY - topY) / Math.max(Math.tan(radians), .001);
-        ctx.lineTo(topX, topY);
+        const bottomY = panel.y + panel.height - 14;
+        const bottomX = lensX - (bottomY - centerY) / Math.max(Math.tan(radians), .001);
+        ctx.lineTo(bottomX, bottomY);
       }
     } else {
-      const controlLength = Math.min(52, focal * .72);
-      const controlX = originX + Math.cos(radians) * controlLength;
-      const controlY = centerY - Math.sin(radians) * controlLength;
-      ctx.quadraticCurveTo(controlX, controlY, sensorX, targetY);
+      ctx.lineTo(sensorX, targetY);
     }
     ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("入射光", (incomingX + lensX) / 2 + 7, (incomingY + centerY) / 2 - 13);
+    if (type === "fisheye") {
+      ctx.fillText("折射后", (lensX + sensorX) / 2 - 5, (centerY + targetY) / 2 + 8);
+    }
 
     ctx.strokeStyle = color;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.arc(originX, centerY, 22, -radians, 0);
+    ctx.arc(lensX, centerY, 22, -radians, 0);
     ctx.stroke();
     ctx.fillStyle = color;
     ctx.textAlign = "left";
-    ctx.fillText("θ", originX + 24, centerY - 18);
+    ctx.fillText("θ", lensX + 24, centerY - 18);
 
     ctx.beginPath();
-    ctx.arc(originX, centerY, 5, 0, Math.PI * 2);
+    ctx.arc(lensX, centerY, 5, 0, Math.PI * 2);
     ctx.fillStyle = "#315c55";
     ctx.fill();
-    ctx.fillStyle = "#526b66";
-    ctx.fillText("O", originX - 14, centerY + 8);
 
     if (targetY >= sensorTop && targetY <= sensorBottom) {
       ctx.beginPath();
@@ -312,7 +358,7 @@ function drawKbAngleGeometry(canvas, angleDegrees) {
     } else {
       ctx.fillStyle = "#6f7f85";
       ctx.textAlign = "left";
-      ctx.fillText("交点跑出画面", sensorX + 9, sensorTop + 2);
+      ctx.fillText("落点超出传感器", sensorX + 8, sensorBottom - 11);
     }
   };
 
@@ -452,8 +498,8 @@ function mountKbAngleLab(root) {
     pinholeOutput.value = pinhole.toFixed(2);
     fisheyeOutput.value = radians.toFixed(2);
     explain.textContent = pinhole > 1.6
-      ? "针孔光线的交点已经跑出成像平面；鱼眼把它映射回有限的图像位置。"
-      : "当前角度下两者都能成像；继续增大角度，针孔交点会更快向外移动。";
+      ? "针孔的落点已经超出传感器；鱼眼光线在镜片处折射后，仍能落在传感器内。"
+      : "注意折点：镜片前后都是直线，光线只在镜片处改变方向。";
     drawKbAngleGeometry(canvas, degrees);
   };
 
