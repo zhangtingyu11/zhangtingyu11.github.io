@@ -1,0 +1,127 @@
+.distortion-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 118px minmax(0, 1fr) 118px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid #dbe9e5;
+  border-radius: 18px;
+  background: #f7fbfa;
+}
+.distortion-flow > div {
+  display: grid;
+  gap: 7px;
+  min-height: 104px;
+  align-content: center;
+  border-radius: 14px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 9px 25px rgba(67, 105, 98, .07);
+}
+.distortion-flow > div:nth-of-type(2) { background: #edf6f4; }
+.distortion-flow > div:nth-of-type(3) { background: #f1f6f8; }
+.distortion-flow small { color: #718783; font-size: 12px; }
+.distortion-flow strong { color: #315c55 !important; font: 700 16px ui-monospace, monospace; }
+.distortion-flow > span { display: grid; gap: 10px; color: #607873; text-align: center; font-size: 11px; }
+.distortion-flow > span b { color: #607873 !important; font-weight: 650; }
+.distortion-flow i {
+  position: relative;
+  display: block;
+  height: 2px;
+  margin: 0 9px;
+  background: #6eb2a5;
+}
+.distortion-flow i::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid #6eb2a5;
+  border-right: 2px solid #6eb2a5;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.distortion-kind-cards,
+.distortion-model-cards,
+.distortion-parameter-cards {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+}
+.distortion-kind-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.distortion-model-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.distortion-parameter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.distortion-kind-cards > div,
+.distortion-model-cards > div,
+.distortion-parameter-cards > div {
+  padding: 16px 17px;
+  border: 1px solid #deebe7;
+  border-radius: 14px;
+  background: #f8fbfa;
+}
+.distortion-kind-cards strong,
+.distortion-model-cards strong,
+.distortion-parameter-cards strong { color: #315c55 !important; }
+.distortion-kind-cards p,
+.distortion-model-cards p,
+.distortion-parameter-cards p { margin: 6px 0 0 !important; color: #657a76 !important; font-size: 13px; }
+
+.distortion-lab {
+  margin: 26px 0;
+  padding: 18px;
+  border: 1px solid #d8e8e4;
+  border-radius: 18px;
+  background: #f7fbfa;
+  box-shadow: 0 16px 42px rgba(67, 105, 98, .08);
+}
+.distortion-lab__tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.distortion-lab button {
+  appearance: none;
+  padding: 8px 14px;
+  border: 1px solid #cddfdb;
+  border-radius: 999px;
+  color: #566d68;
+  background: #ffffff;
+  font: 650 13px system-ui, sans-serif;
+  cursor: pointer;
+}
+.distortion-lab button:hover { border-color: #83bfb4; }
+.distortion-lab button.is-active { border-color: #67aa9e; color: #244b45; background: #dff1ed; }
+.distortion-lab__control { display: grid; gap: 6px; margin-bottom: 16px; color: #526b66; font-size: 13px; }
+.distortion-lab__control span { display: flex; justify-content: space-between; gap: 12px; }
+.distortion-lab__control output { color: #3f756d; font: 700 13px ui-monospace, monospace; }
+.distortion-lab__control input { width: 100%; accent-color: #67aa9e; cursor: pointer; }
+.distortion-lab__comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.distortion-lab__comparison > div { display: grid; gap: 7px; }
+.distortion-lab__comparison strong { color: #344441 !important; font-size: 13px; }
+.distortion-lab canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid #d8e6e2;
+  border-radius: 11px;
+  background: #f3f8f7;
+}
+.distortion-lab > p { min-height: 1.5em; margin: 13px 0 0 !important; color: #5d746f !important; text-align: center; font-size: 13px; }
+
+@media (max-width: 700px) {
+  .distortion-flow { grid-template-columns: 1fr; padding: 15px; }
+  .distortion-flow > div { min-height: 82px; }
+  .distortion-flow > span { gap: 5px; }
+  .distortion-flow i { width: 2px; height: 28px; margin: 0 auto; }
+  .distortion-flow i::after {
+    top: auto;
+    right: 50%;
+    bottom: -1px;
+    transform: translateX(50%) rotate(135deg);
+  }
+  .distortion-kind-cards,
+  .distortion-model-cards,
+  .distortion-parameter-cards,
+  .distortion-lab__comparison { grid-template-columns: 1fr; }
+  .distortion-lab { padding: 14px; }
+}
+

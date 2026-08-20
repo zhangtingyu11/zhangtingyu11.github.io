@@ -1,4 +1,5 @@
 import { mountIntrinsicLabs } from "/assets/autonomous-driving/sensor-calibration/01-camera-intrinsics/demo.js?v=20260819-11";
+import { mountDistortionLabs } from "/assets/autonomous-driving/sensor-calibration/02-camera-distortion/demo.js?v=20260820-1";
 
 const mountHomeIntro = (root = document) => {
   const home = root.querySelector?.(".layout--home");
@@ -63,6 +64,7 @@ const mountPageFeatures = () => {
   mountHomeIntro(document);
   mountHeroTyping(document);
   mountIntrinsicLabs(document);
+  mountDistortionLabs(document);
 };
 
 if (document.readyState === "loading") {

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" role="img" aria-labelledby="title desc">
+  <title id="title">相机畸变</title>
+  <desc id="desc">浅色技术风封面，展示理想直线经过镜头后发生弯曲</desc>
+  <defs>
+    <linearGradient id="mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#72c5b5"/>
+      <stop offset="1" stop-color="#4f8f84"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#456f68" flood-opacity=".12"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="800" rx="48" fill="#f7fbfa"/>
+  <circle cx="1450" cy="80" r="260" fill="#dcecf1" opacity=".72"/>
+  <circle cx="130" cy="760" r="250" fill="#dff2ed" opacity=".78"/>
+
+  <g transform="translate(110 125)">
+    <rect width="58" height="28" rx="14" fill="#315c55"/>
+    <text x="29" y="20" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="15" font-weight="700">02</text>
+    <text x="76" y="21" fill="#567771" font-family="system-ui, sans-serif" font-size="20" font-weight="650" letter-spacing="2">CAMERA CALIBRATION</text>
+    <text x="0" y="160" fill="#294845" font-family="'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif" font-size="86" font-weight="760">相机畸变</text>
+    <text x="0" y="225" fill="#68807c" font-family="'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif" font-size="30">为什么直线会变弯？</text>
+    <g transform="translate(0 300)">
+      <rect width="350" height="74" rx="18" fill="#e5f3f0"/>
+      <circle cx="38" cy="37" r="9" fill="#5aa99a"/>
+      <text x="62" y="47" fill="#42655f" font-family="ui-monospace, monospace" font-size="24">RadTan · KB · UCM</text>
+    </g>
+  </g>
+
+  <g transform="translate(780 80)" filter="url(#shadow)">
+    <rect width="690" height="640" rx="34" fill="#ffffff" stroke="#d5e7e2" stroke-width="3"/>
+    <rect x="0" y="0" width="690" height="68" rx="34" fill="#eef7f5"/>
+    <rect x="0" y="34" width="690" height="34" fill="#eef7f5"/>
+    <circle cx="34" cy="34" r="8" fill="#6ab5a7"/>
+    <circle cx="60" cy="34" r="8" fill="#9fb9b4"/>
+    <circle cx="86" cy="34" r="8" fill="#c4d4d0"/>
+    <text x="640" y="42" text-anchor="end" fill="#738985" font-family="ui-monospace, monospace" font-size="16">distortion.lab</text>
+
+    <g transform="translate(48 105)">
+      <text x="0" y="0" fill="#315c55" font-family="'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif" font-size="20" font-weight="700">理想直线</text>
+      <g transform="translate(0 28)" fill="none" stroke="#8bb1aa" stroke-width="3">
+        <rect width="250" height="220" rx="14" fill="#f7fbfa" stroke="#d9e9e5"/>
+        <path d="M50 0V220M100 0V220M150 0V220M200 0V220M0 44H250M0 88H250M0 132H250M0 176H250"/>
+      </g>
+    </g>
+
+    <path d="M320 250H365" stroke="url(#mint)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M355 236L371 250L355 264" fill="none" stroke="#5aa99a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g transform="translate(392 105)">
+      <text x="0" y="0" fill="#315c55" font-family="'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif" font-size="20" font-weight="700">桶形畸变</text>
+      <g transform="translate(0 28)" fill="none" stroke="#6f98a7" stroke-width="3">
+        <rect width="250" height="220" rx="14" fill="#f4f8fa" stroke="#d9e6eb"/>
+        <path d="M54 0C42 60 42 160 54 220M103 0C96 64 96 156 103 220M147 0C154 64 154 156 147 220M196 0C208 60 208 160 196 220"/>
+        <path d="M0 48C68 36 182 36 250 48M0 91C72 85 178 85 250 91M0 129C72 135 178 135 250 129M0 172C68 184 182 184 250 172"/>
+      </g>
+    </g>
+
+    <g transform="translate(48 410)">
+      <rect width="594" height="150" rx="22" fill="#eff8f5"/>
+      <text x="30" y="47" fill="#57736d" font-family="'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif" font-size="18">从理想点到实际像素</text>
+      <text x="30" y="96" fill="#315c55" font-family="'DejaVu Sans Mono', monospace" font-size="21" font-weight="700">(x, y)  →  D  →  (xd, yd)  →  K  →  (u, v)</text>
+    </g>
+  </g>
+</svg>

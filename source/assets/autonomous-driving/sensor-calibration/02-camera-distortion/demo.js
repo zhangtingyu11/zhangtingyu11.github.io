@@ -1,0 +1,188 @@
+const MODES = {
+  barrel: {
+    label: "桶形畸变",
+    describe: "离主点越远，点越向中心收缩；建筑边缘和车道线向外鼓起。"
+  },
+  pincushion: {
+    label: "枕形畸变",
+    describe: "离主点越远，点越向外扩张；画面边缘呈现向内收紧的形状。"
+  },
+  tangential: {
+    label: "切向畸变",
+    describe: "镜头与传感器没有完全对正，画面出现不对称的斜向拉扯。"
+  },
+  fisheye: {
+    label: "鱼眼投影",
+    describe: "按光线夹角压缩大视场，越靠近边缘，直线弯曲越明显。"
+  }
+};
+
+function transformPoint(px, py, mode, strength) {
+  if (mode === "none" || strength === 0) return [px, py];
+  const focal = 360;
+  const x = (px - 400) / focal;
+  const y = (py - 225) / focal;
+  const r2 = x * x + y * y;
+  const amount = strength / 100;
+  let xd = x;
+  let yd = y;
+
+  if (mode === "barrel") {
+    const k1 = -.38 * amount;
+    const k2 = .07 * amount;
+    const scale = 1 + k1 * r2 + k2 * r2 * r2;
+    xd = x * scale;
+    yd = y * scale;
+  } else if (mode === "pincushion") {
+    const k1 = .2 * amount;
+    const k2 = .025 * amount;
+    const scale = 1 + k1 * r2 + k2 * r2 * r2;
+    xd = x * scale;
+    yd = y * scale;
+  } else if (mode === "tangential") {
+    const p1 = .09 * amount;
+    const p2 = -.075 * amount;
+    xd = x + 2 * p1 * x * y + p2 * (r2 + 2 * x * x);
+    yd = y + p1 * (r2 + 2 * y * y) + 2 * p2 * x * y;
+  } else if (mode === "fisheye") {
+    const r = Math.sqrt(r2);
+    if (r > 1e-8) {
+      const theta = Math.atan(r);
+      const theta2 = theta * theta;
+      const thetaDistorted = theta * (1 + .08 * amount * theta2 + .015 * amount * theta2 * theta2);
+      const fishScale = thetaDistorted / r;
+      const scale = 1 + amount * 1.35 * (fishScale - 1);
+      xd = x * scale;
+      yd = y * scale;
+    }
+  }
+
+  return [400 + focal * xd, 225 + focal * yd];
+}
+
+function sampleEdge(a, b, count = 22) {
+  const points = [];
+  for (let index = 0; index <= count; index += 1) {
+    const t = index / count;
+    points.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+  }
+  return points;
+}
+
+function samplePolygon(vertices) {
+  const points = [];
+  vertices.forEach((vertex, index) => {
+    const next = vertices[(index + 1) % vertices.length];
+    points.push(...sampleEdge(vertex, next));
+  });
+  return points;
+}
+
+function drawScene(canvas, mode, strength) {
+  const rect = canvas.getBoundingClientRect();
+  const cssWidth = Math.max(280, rect.width || 400);
+  const cssHeight = cssWidth * 9 / 16;
+  const ratio = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.round(cssWidth * ratio);
+  canvas.height = Math.round(cssHeight * ratio);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.setTransform(cssWidth / 800 * ratio, 0, 0, cssHeight / 450 * ratio, 0, 0);
+
+  const map = point => transformPoint(point[0], point[1], mode, strength);
+  const path = (points, { stroke = null, fill = null, width = 2, close = false, dash = [] } = {}) => {
+    const mapped = points.map(map);
+    ctx.beginPath();
+    mapped.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    if (close) ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = width;
+      ctx.setLineDash(dash);
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  };
+  const line = (a, b, color, width = 2, dash = []) => path(sampleEdge(a, b, 34), { stroke: color, width, dash });
+  const polygon = (vertices, fill, stroke = null, width = 2) => path(samplePolygon(vertices), { fill, stroke, width, close: true });
+  const circle = (center, radius, fill, stroke = null, width = 2) => {
+    const points = [];
+    for (let index = 0; index <= 72; index += 1) {
+      const angle = index / 72 * Math.PI * 2;
+      points.push([center[0] + Math.cos(angle) * radius, center[1] + Math.sin(angle) * radius]);
+    }
+    path(points, { fill, stroke, width, close: true });
+  };
+
+  ctx.fillStyle = "#f3f8f7";
+  ctx.fillRect(0, 0, 800, 450);
+  circle([655, 80], 35, "#f4d8a5");
+
+  polygon([[0, 110], [270, 110], [270, 325], [0, 350]], "#d9e8e5", "#6e938d", 2);
+  polygon([[540, 95], [800, 95], [800, 350], [540, 320]], "#dce8ef", "#728fa0", 2);
+  polygon([[285, 170], [515, 170], [515, 300], [285, 300]], "#e8efed", "#789b95", 2);
+
+  [55, 125, 195].forEach(x => {
+    [150, 220, 290].forEach(y => polygon([[x,y], [x+38,y], [x+38,y+36], [x,y+36]], "#f7fbfa", "#91aaa5", 1.4));
+  });
+  [575, 645, 715].forEach(x => {
+    [135, 205, 275].forEach(y => polygon([[x,y], [x+38,y], [x+38,y+36], [x,y+36]], "#f8fbfd", "#91a7b2", 1.4));
+  });
+  [320, 385, 450].forEach(x => polygon([[x,205], [x+34,205], [x+34,245], [x,245]], "#f8fbfa", "#9aafab", 1.2));
+
+  line([0, 325], [800, 325], "#638c85", 2.2);
+  polygon([[115,450], [685,450], [515,285], [285,285]], "#c9d6d3", "#6f8b86", 2);
+  line([400,450], [400,285], "#f7f1cf", 5, [24, 18]);
+  line([225,450], [335,285], "#f7fbfa", 3);
+  line([575,450], [465,285], "#f7fbfa", 3);
+
+  [365, 430].forEach(x => line([x, 350], [x, 325], "#537d76", 4));
+  line([365, 325], [430, 325], "#537d76", 4);
+  circle([397, 325], 18, "#e68b70", "#ffffff", 3);
+
+  line([75, 355], [75, 245], "#657f7b", 4);
+  line([75, 245], [112, 245], "#657f7b", 4);
+  circle([116, 245], 8, "#f1c879", "#ffffff", 2);
+  line([725, 355], [725, 230], "#657f7b", 4);
+  line([725, 230], [688, 230], "#657f7b", 4);
+  circle([684, 230], 8, "#f1c879", "#ffffff", 2);
+}
+
+function mountDistortionLab(root) {
+  if (root.dataset.mounted === "true") return;
+  root.dataset.mounted = "true";
+  const tabs = root.querySelector("[data-distortion-tabs]");
+  const range = root.querySelector("[data-distortion-range]");
+  const output = root.querySelector("[data-distortion-output]");
+  const explain = root.querySelector("[data-distortion-explain]");
+  const canvases = root.querySelectorAll("canvas");
+  let mode = "barrel";
+
+  const render = () => {
+    const strength = Number(range.value);
+    output.value = `${strength}%`;
+    explain.textContent = `${MODES[mode].label}：${MODES[mode].describe}`;
+    drawScene(canvases[0], "none", 0);
+    drawScene(canvases[1], mode, strength);
+  };
+
+  tabs.addEventListener("click", event => {
+    const button = event.target.closest("button[data-distortion-mode]");
+    if (!button) return;
+    mode = button.dataset.distortionMode;
+    tabs.querySelectorAll("button").forEach(item => item.classList.toggle("is-active", item === button));
+    render();
+  });
+  range.addEventListener("input", render);
+  const observer = new ResizeObserver(render);
+  canvases.forEach(canvas => observer.observe(canvas));
+  render();
+}
+
+export function mountDistortionLabs(scope = document) {
+  scope.querySelectorAll("[data-distortion-lab]").forEach(mountDistortionLab);
+}
+
