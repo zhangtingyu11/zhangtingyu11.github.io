@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-21 10:30:00
+updated: 2026-08-21 11:00:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -97,20 +97,30 @@ toc: true
   <div><small>畸变点</small><strong>(x<sub>d</sub>, y<sub>d</sub>)</strong></div>
 </div>
 
-先只看径向部分。下面三步回答的是：**一个理想点应该沿着原来的方向移动多远？**
+这里的 `(x, y)` 是**理想归一化图像坐标**，不是最终的像素坐标 `(u, v)`。可以把它理解成：先在理想图像上铺一张坐标网格，光轴穿过图像的位置是原点 `O`，向右是 `x`，向下是 `y`。内参 `K` 会在后面把这张网格换算成像素。
+
+先只看径向部分。下面三步回答的是：**图像中的一个理想点，应该沿着原来的方向移动多远？**
 
 <div class="formula-story">
   <div class="formula-story__with-visual">
     <b>1</b>
     <section><strong>先量它离光轴多远</strong><code>r² = x² + y²</code><p>原点 <code>(0, 0)</code> 是光轴位置。处在同一圆环上的点，<code>r</code> 相同，应使用相同的径向修正。</p></section>
     <figure class="formula-story__visual">
-      <svg viewBox="0 0 240 126" role="img" aria-label="点 P 到光轴原点 O 的平面距离是半径 r，同一圆环上的点半径相同">
-        <circle class="formula-story__ring" cx="106" cy="65" r="44"></circle>
-        <circle class="formula-story__ring formula-story__ring--inner" cx="106" cy="65" r="26"></circle>
-        <line class="formula-story__radius" x1="106" y1="65" x2="144" y2="43"></line>
-        <circle class="formula-story__origin" cx="106" cy="65" r="5"></circle>
-        <circle class="formula-story__point" cx="144" cy="43" r="6"></circle>
-        <text x="93" y="82">O</text><text x="151" y="39">P</text><text class="formula-story__accent-text" x="123" y="49">r</text>
+      <svg viewBox="0 0 300 170" role="img" aria-label="理想图像上铺有归一化坐标网格，点 P 的坐标是 x y，它到光轴原点 O 的距离是 r">
+        <rect class="formula-story__image-frame" x="8" y="8" width="284" height="154" rx="10"></rect>
+        <path class="formula-story__sky" d="M9 9h282v78H9z"></path>
+        <path class="formula-story__road" d="M70 161l60-74h42l63 74z"></path>
+        <path class="formula-story__building" d="M22 55h48v32H22zM230 47h43v40h-43z"></path>
+        <path class="formula-story__lane" d="M151 94v17m0 12v31"></path>
+        <path class="formula-story__grid" d="M79 9v152M150 9v152M221 9v152M9 48h282M9 87h282M9 126h282"></path>
+        <path class="formula-story__axis" d="M22 87h258m-8-5 8 5-8 5M150 21v128m-5-8 5 8 5-8"></path>
+        <line class="formula-story__radius" x1="150" y1="87" x2="221" y2="48"></line>
+        <circle class="formula-story__origin" cx="150" cy="87" r="5"></circle>
+        <circle class="formula-story__point" cx="221" cy="48" r="6"></circle>
+        <text class="formula-story__plane-label" x="20" y="28">理想图像 · 归一化坐标</text>
+        <text x="137" y="103">O</text><text x="229" y="45">P(x, y)</text>
+        <text class="formula-story__axis-label" x="276" y="79">x</text><text class="formula-story__axis-label" x="158" y="146">y</text>
+        <text class="formula-story__accent-text" x="185" y="58">r</text>
       </svg>
     </figure>
   </div>
@@ -118,14 +128,21 @@ toc: true
     <b>2</b>
     <section><strong>算这一圈要缩放多少</strong><code>L(r) = 1 + k1·r² + k2·r⁴ + k3·r⁶</code><p><code>1</code> 表示不移动；后面的三项让标定程序能够逐步修正中部、边缘和最外圈。</p></section>
     <figure class="formula-story__visual">
-      <svg viewBox="0 0 240 126" role="img" aria-label="缩放倍率小于一时点向原点移动，大于一时点远离原点">
-        <line class="formula-story__guide" x1="43" y1="86" x2="204" y2="36"></line>
-        <circle class="formula-story__origin" cx="43" cy="86" r="5"></circle>
-        <circle class="formula-story__base-point" cx="142" cy="55" r="6"></circle>
-        <circle class="formula-story__point" cx="113" cy="64" r="6"></circle>
-        <circle class="formula-story__out-point" cx="178" cy="44" r="6"></circle>
-        <text x="31" y="104">O</text><text x="126" y="77">L = 1</text>
-        <text class="formula-story__accent-text" x="66" y="55">L &lt; 1</text><text class="formula-story__warm-text" x="169" y="27">L &gt; 1</text>
+      <svg viewBox="0 0 300 170" role="img" aria-label="在同一张归一化图像上，缩放倍率小于一时点向光轴移动，大于一时点远离光轴">
+        <rect class="formula-story__image-frame" x="8" y="8" width="284" height="154" rx="10"></rect>
+        <path class="formula-story__sky" d="M9 9h282v78H9z"></path>
+        <path class="formula-story__road" d="M70 161l60-74h42l63 74z"></path>
+        <path class="formula-story__building" d="M22 55h48v32H22zM230 47h43v40h-43z"></path>
+        <path class="formula-story__lane" d="M151 94v17m0 12v31"></path>
+        <path class="formula-story__grid" d="M79 9v152M150 9v152M221 9v152M9 48h282M9 87h282M9 126h282"></path>
+        <line class="formula-story__guide" x1="150" y1="87" x2="266" y2="23"></line>
+        <circle class="formula-story__origin" cx="150" cy="87" r="5"></circle>
+        <circle class="formula-story__base-point" cx="221" cy="48" r="6"></circle>
+        <circle class="formula-story__point" cx="199" cy="60" r="6"></circle>
+        <circle class="formula-story__out-point" cx="247" cy="34" r="6"></circle>
+        <text class="formula-story__plane-label" x="20" y="28">同一张归一化图像</text>
+        <text x="137" y="103">O</text><text x="208" y="69">L = 1</text>
+        <text class="formula-story__accent-text" x="160" y="54">L &lt; 1</text><text class="formula-story__warm-text" x="236" y="23">L &gt; 1</text>
       </svg>
     </figure>
   </div>
@@ -133,14 +150,21 @@ toc: true
     <b>3</b>
     <section><strong>横纵坐标一起乘</strong><code>xr = x·L(r)，yr = y·L(r)</code><p><code>x、y</code> 乘同一个倍率，所以点只会沿着它与原点的连线移动，不会拐向侧面。</p></section>
     <figure class="formula-story__visual">
-      <svg viewBox="0 0 240 126" role="img" aria-label="原点、理想点和缩放后的点始终位于同一条射线上">
-        <line class="formula-story__guide" x1="43" y1="91" x2="202" y2="25"></line>
-        <line class="formula-story__radius" x1="43" y1="91" x2="147" y2="48"></line>
-        <circle class="formula-story__origin" cx="43" cy="91" r="5"></circle>
-        <circle class="formula-story__base-point" cx="178" cy="35" r="6"></circle>
-        <circle class="formula-story__point" cx="147" cy="48" r="6"></circle>
-        <text x="31" y="109">O</text><text x="183" y="31">P</text><text class="formula-story__accent-text" x="147" y="67">P′</text>
-        <text x="79" y="71">同一方向</text>
+      <svg viewBox="0 0 300 170" role="img" aria-label="在归一化图像中，理想点 P 和径向修正后的点 Pd 位于光轴原点 O 发出的同一条射线上">
+        <rect class="formula-story__image-frame" x="8" y="8" width="284" height="154" rx="10"></rect>
+        <path class="formula-story__sky" d="M9 9h282v78H9z"></path>
+        <path class="formula-story__road" d="M70 161l60-74h42l63 74z"></path>
+        <path class="formula-story__building" d="M22 55h48v32H22zM230 47h43v40h-43z"></path>
+        <path class="formula-story__lane" d="M151 94v17m0 12v31"></path>
+        <path class="formula-story__grid" d="M79 9v152M150 9v152M221 9v152M9 48h282M9 87h282M9 126h282"></path>
+        <line class="formula-story__guide" x1="150" y1="87" x2="254" y2="30"></line>
+        <line class="formula-story__radius" x1="150" y1="87" x2="199" y2="60"></line>
+        <circle class="formula-story__origin" cx="150" cy="87" r="5"></circle>
+        <circle class="formula-story__base-point" cx="221" cy="48" r="6"></circle>
+        <circle class="formula-story__point" cx="199" cy="60" r="6"></circle>
+        <text class="formula-story__plane-label" x="20" y="28">径向修正发生在图像平面内</text>
+        <text x="137" y="103">O</text><text x="225" y="45">P</text><text class="formula-story__accent-text" x="205" y="72">Pd</text>
+        <text x="159" y="52">方向不变</text>
       </svg>
     </figure>
   </div>

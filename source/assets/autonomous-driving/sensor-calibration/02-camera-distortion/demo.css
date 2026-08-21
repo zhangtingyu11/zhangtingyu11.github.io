@@ -160,7 +160,7 @@
   background: #f8fbfa;
 }
 .formula-story > .formula-story__with-visual {
-  grid-template-columns: 34px minmax(0, 1fr) minmax(190px, 240px);
+  grid-template-columns: 34px minmax(0, 1fr) minmax(240px, 300px);
   align-items: center;
 }
 .formula-story > div > b {
@@ -211,12 +211,15 @@
   fill: #627873;
   font: 650 11px system-ui, sans-serif;
 }
-.formula-story__ring {
-  fill: none;
-  stroke: #b8d9d2;
-  stroke-width: 1.5;
-}
-.formula-story__ring--inner { stroke-dasharray: 4 5; opacity: .72; }
+.formula-story__image-frame { fill: #f8fbfa; stroke: #cfe1dd; stroke-width: 1.5; }
+.formula-story__sky { fill: #eef7f5; }
+.formula-story__road { fill: #dbe8e5; }
+.formula-story__building { fill: #d6e8e4; stroke: #b9d6d0; stroke-width: 1; }
+.formula-story__lane { fill: none; stroke: #ffffff; stroke-width: 2; stroke-linecap: round; }
+.formula-story__grid { fill: none; stroke: #cfdfdc; stroke-width: 1; opacity: .72; }
+.formula-story__axis { fill: none; stroke: #617b76; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.formula-story__visual .formula-story__plane-label { fill: #315c55; font-weight: 700; }
+.formula-story__visual .formula-story__axis-label { fill: #405f59; font: 700 12px ui-monospace, monospace; }
 .formula-story__guide {
   fill: none;
   stroke: #aabcb8;
