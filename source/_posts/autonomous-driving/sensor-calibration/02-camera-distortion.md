@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-21 11:30:00
+updated: 2026-08-21 11:00:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -126,18 +126,7 @@ toc: true
   </div>
   <div class="formula-story__with-visual">
     <b>2</b>
-    <section>
-      <strong>算这一圈要缩放多少</strong>
-      <code>L(r) = 1 + k1·r² + k2·r⁴ + k3·r⁶</code>
-      <p><code>1</code> 表示不移动；后面的三项让标定程序能够逐步修正中部、边缘和最外圈。</p>
-      <aside class="formula-story__why">
-        <strong>为什么不用 L(r) = k·r + b？</strong>
-        <p><code>b</code> 会改变中心附近的整体尺度，这和内参中的焦距重复，所以约定 <code>b = 1</code>。</p>
-        <p><code>r = √(x²+y²)</code> 带有平方根；直接使用 <code>r</code>，曲线穿过中心时不如 <code>r²</code> 系列平滑。使用 <code>r²</code> 还能直接写成 <code>x²+y²</code>。</p>
-        <p>如果镜头畸变很轻，可以只用 <code>L(r)=1+k1·r²</code>。只有一项不够拟合边缘时，才继续加入 <code>k2、k3</code>。</p>
-        <p><code>k·r+b</code> 不是完全不能用，但它属于自定义模型，标定、投影和去畸变程序都必须使用同一公式，不能直接套用 OpenCV 的 RadTan 参数。</p>
-      </aside>
-    </section>
+    <section><strong>算这一圈要缩放多少</strong><code>L(r) = 1 + k1·r² + k2·r⁴ + k3·r⁶</code><p><code>1</code> 表示不移动；后面的三项让标定程序能够逐步修正中部、边缘和最外圈。</p></section>
     <figure class="formula-story__visual">
       <svg viewBox="0 0 300 170" role="img" aria-label="在同一张归一化图像上，缩放倍率小于一时点向光轴移动，大于一时点远离光轴">
         <rect class="formula-story__image-frame" x="8" y="8" width="284" height="154" rx="10"></rect>
@@ -183,7 +172,7 @@ toc: true
 
 这就解释了 `L(r)` 的含义：`L(r) < 1` 时点靠近原点，形成桶形；`L(r) > 1` 时点远离原点，形成枕形。比如 `(x, y) = (0.6, 0.8)`，若 `L(r) = 0.9`，新位置就是 `(0.54, 0.72)`——方向没变，只是半径缩短了 10%。
 
-径向误差通常平滑且近似对称，只与“离中心多远”有关。多项式给标定程序几档由内到外的调节能力；最高次项越高，影响越集中在画面边缘。
+为什么使用 `r²、r⁴、r⁶`？因为镜头的径向误差通常平滑且近似对称，只与“离中心多远”有关。多项式给标定程序几档由内到外的调节能力；最高次项越高，影响越集中在画面边缘。
 
 但径向缩放只能让点沿直线靠近或远离原点。如果实际角点还偏向一侧，就需要 `p1、p2` 产生一个二维偏移：
 
