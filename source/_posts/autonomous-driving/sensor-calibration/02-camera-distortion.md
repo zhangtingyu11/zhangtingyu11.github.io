@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-21 13:25:00
+updated: 2026-08-21 14:20:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -199,52 +199,44 @@ toc: true
   </figure>
 </div>
 
-但镜片没有装正时，点不仅会远离或靠近光轴，还会整体偏向镜片倾斜的一侧。这种不对称偏移就是这里说的**切向畸变**，通常和径向畸变一起写进 RadTan。
+镜片没有完全对正时，画面不会整齐地平移：光轴附近几乎不动，越靠边偏得越明显，这就是**切向畸变**。
 
-<div class="tangential-model-reason">
-  <section>
-    <strong>切向公式不是凭空凑出来的</strong>
-    <p>轻微偏心的镜组，可以近似成一个很弱的棱镜。Conrady 和 Brown 从光线如何通过偏心镜片出发，推导出它在图像平面上的位移；保留最主要的低阶项后，只需要 <code>p1、p2</code> 两个参数。</p>
-    <p><code>r²</code> 让中心不动、边缘变化更大；<code>x²、y²、xy</code> 用来判断点位于哪个方向；<code>p1、p2</code> 则记录镜组偏心的方向和强度。</p>
-  </section>
+先别看公式。光学推导得到的主要变形，可以拆成下面两张固定模板：`p1` 控制一种，`p2` 控制旋转 90° 后的另一种。每张模板都同时包含横向和纵向移动。灰色虚线是原网格，彩色线是变形后的网格。
+
+<div class="tangential-template-map" role="img" aria-label="p1 和 p2 分别控制两种方向相差九十度的切向畸变网格模板，光轴处不动，越靠边变形越明显">
   <figure>
-    <svg viewBox="0 0 430 220" role="img" aria-label="镜片偏心使光线产生不对称偏折；在图像平面上，点的位移由沿偏心方向和沿点自身方向的两部分合成">
-      <rect class="tangential-model-reason__panel" x="5" y="6" width="196" height="208" rx="13"></rect>
-      <rect class="tangential-model-reason__panel" x="215" y="6" width="210" height="208" rx="13"></rect>
-      <text class="tangential-model-reason__title" x="103" y="30" text-anchor="middle">镜片没有完全对正</text>
-      <path class="tangential-model-reason__optical-axis" d="M21 112H186"></path>
-      <path class="tangential-model-reason__ray" d="M24 70H65Q80 70 95 86L176 108M24 112H65Q81 112 96 105L176 112M24 154H65Q80 154 96 128L176 116"></path>
-      <path class="tangential-model-reason__lens" d="M72 54C90 66 90 142 72 154C54 142 54 66 72 54ZM108 43C128 57 128 132 108 146C88 132 88 57 108 43Z"></path>
-      <path class="tangential-model-reason__sensor" d="M180 54V170"></path>
-      <path class="tangential-model-reason__offset" d="M108 165V148m-5 7 5-7 5 7"></path>
-      <text class="tangential-model-reason__label" x="118" y="174">偏心方向</text>
-      <text class="tangential-model-reason__label" x="160" y="49">传感器</text>
-      <text class="tangential-model-reason__title" x="320" y="30" text-anchor="middle">图像上的两个位移分量</text>
-      <path class="tangential-model-reason__grid" d="M232 62H407M232 102H407M232 142H407M276 46V190M320 46V190M364 46V190"></path>
-      <path class="tangential-model-reason__axis" d="M232 118H407M320 46V190"></path>
-      <circle class="tangential-model-reason__origin" cx="320" cy="118" r="4"></circle>
-      <circle class="tangential-model-reason__point" cx="365" cy="83" r="5"></circle>
-      <circle class="tangential-model-reason__result" cx="394" cy="66" r="5"></circle>
-      <path class="tangential-model-reason__bias-arrow" d="M365 83L382 69m-7 1 7-1-1 7"></path>
-      <path class="tangential-model-reason__radial-arrow" d="M382 69L394 66m-6-3 6 3-5 4"></path>
-      <path class="tangential-model-reason__sum-arrow" d="M365 83L394 66"></path>
-      <text class="tangential-model-reason__label" x="306" y="133">光轴 O</text>
-      <text class="tangential-model-reason__label" x="355" y="77">P</text>
-      <text class="tangential-model-reason__label tangential-model-reason__label--bias" x="232" y="55">① 沿偏心方向</text>
-      <text class="tangential-model-reason__label tangential-model-reason__label--radial" x="324" y="181">② 按点的方向补偿</text>
-      <text class="tangential-model-reason__label tangential-model-reason__label--result" x="382" y="55">Pd</text>
-    </svg>
+  <svg viewBox="0 0 205 220">
+    <rect class="tangential-template-map__panel" x="5" y="5" width="195" height="210" rx="13"></rect>
+    <text class="tangential-template-map__title tangential-template-map__title--p1" x="102" y="25" text-anchor="middle">只开 p1 · 基础模板</text>
+    <text class="tangential-template-map__legend" x="25" y="43">虚线：原网格</text>
+    <path class="tangential-template-map__base-grid" d="M25 52V182M63.8 52V182M102.5 52V182M141.3 52V182M180 52V182M25 52H180M25 84.5H180M25 117H180M25 149.5H180M25 182H180"></path>
+    <path class="tangential-template-map__p1-grid" d="M37.4 72.8Q25 117 12.6 202.8M70 68.9Q63.8 117 57.6 198.9M102.5 67.6Q102.5 117 102.5 197.6M135.1 68.9Q141.3 117 147.4 198.9M167.6 72.8Q180 117 192.4 202.8M37.4 72.8Q102.5 59 167.6 72.8M31.2 93.6Q102.5 80 173.8 93.6M25 122.2Q102.5 108 180 122.2M18.8 158.6Q102.5 145 186.2 158.6M12.6 202.8Q102.5 189 192.4 202.8"></path>
+    <circle class="tangential-template-map__origin" cx="102.5" cy="117" r="4"></circle>
+    <text class="tangential-template-map__origin-label" x="108" y="130">光轴</text>
+  </svg>
+  </figure>
+  <figure>
+  <svg viewBox="0 0 220 220">
+    <rect class="tangential-template-map__panel" x="5" y="5" width="210" height="210" rx="13"></rect>
+    <text class="tangential-template-map__title tangential-template-map__title--p2" x="110" y="25" text-anchor="middle">只开 p2 · 基础模板</text>
+    <text class="tangential-template-map__legend" x="25" y="43">与 p1 模板相差 90°</text>
+    <path class="tangential-template-map__base-grid" d="M25 52V182M63.8 52V182M102.5 52V182M141.3 52V182M180 52V182M25 52H180M25 84.5H180M25 117H180M25 149.5H180M25 182H180"></path>
+    <path class="tangential-template-map__p2-grid" d="M49.8 62.4Q37 117 49.8 171.6M74.6 57.2Q62 117 74.6 176.8M108.7 52Q96 117 108.7 182M152.1 46.8Q139 117 152.1 187.2M204.8 41.6Q192 117 204.8 192.4M49.8 62.4Q109 40 204.8 41.6M45.2 89.7Q104 80 200.1 79.3M43.6 117H198.6M45.2 144.3Q104 154 200.1 154.7M49.8 171.6Q109 194 204.8 192.4"></path>
+    <circle class="tangential-template-map__origin" cx="102.5" cy="117" r="4"></circle>
+    <text class="tangential-template-map__origin-label" x="108" y="130">光轴</text>
+  </svg>
   </figure>
 </div>
 
-所以这组公式要同时带上“距离”和“方向”。把 Brown–Conrady 模型从极坐标换成 `x、y`，并省略通常很小的高阶项后，就是：
+真实镜片通常会朝任意方向偏一点，所以只要调节 `p1、p2` 的正负和大小，把这两张模板叠加，就能拟合斜向的不对称变形。展开成横向位移 `Δxt` 和纵向位移 `Δyt`，就是：
 
-```text
-Δxt = 2·p1·x·y + p2·(r² + 2·x²)
-Δyt = p1·(r² + 2·y²) + 2·p2·x·y
-```
+<div class="tangential-equation" role="img" aria-label="切向畸变公式中，p1 控制的项为绿色，p2 控制的项为橙色">
+  <div><b>Δxt</b><i>=</i><span data-kind="p1">2·p1·x·y</span><i>+</i><span data-kind="p2">p2·(r² + 2·x²)</span></div>
+  <div><b>Δyt</b><i>=</i><span data-kind="p1">p1·(r² + 2·y²)</span><i>+</i><span data-kind="p2">2·p2·x·y</span></div>
+  <small><em data-kind="p1"></em>绿色项组成 p1 模板　<em data-kind="p2"></em>橙色项组成 p2 模板</small>
+</div>
 
-公式里的系数 `2` 也来自这个坐标转换，不是标定时人为选择的。实际标定只负责寻找最合适的 `p1、p2`。
+这里的 `r² = x² + y²`，表示点离光轴多远。这些项都是 `x、y` 的二次项，所以在光轴处全部为 0，离中心越远通常越明显。`x²、y²、xy` 不需要分开背，它们合在一起，负责把每个位置的移动量分到横向和纵向。式中的 `2` 是光学推导得到的固定比例；标定真正要寻找的只有 `p1、p2`。
 
 最后把“径向位置”和“切向偏移”相加：
 
