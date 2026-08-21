@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-21 11:40:00
+updated: 2026-08-21 12:10:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -172,9 +172,32 @@ toc: true
 
 这就解释了 `L(r)` 的含义：`L(r) < 1` 时点靠近原点，形成桶形；`L(r) > 1` 时点远离原点，形成枕形。比如 `(x, y) = (0.6, 0.8)`，若 `L(r) = 0.9`，新位置就是 `(0.54, 0.72)`——方向没变，只是半径缩短了 10%。
 
-为什么不用更简单的 `L(r) = k·r + b`？沿图像中心画一条横线，半径其实是 `r = |x|`。一次项会变成 `k·|x|`，曲线在光轴处有一个尖角，意味着点刚越过光轴，变化规律就突然换了一边。但镜片在光轴处没有接缝，成像变化也应该平滑地穿过中心。
-
-既要左右对称，又要平滑，公式自然会使用 `r²、r⁴、r⁶…`。开头的 `1` 表示光轴附近先保持原位；整体放大多少已经交给 `fx、fy`，不必在畸变公式里重复。畸变简单时 `k1` 就够，不够再用 `k2、k3` 修正更靠外的区域。
+<div class="radial-polynomial-reason">
+  <section>
+    <strong>为什么选择偶次多项式？</strong>
+    <p>径向畸变只看离光轴多远，因此光轴左右两侧应该对称；镜片表面又是连续的，缩放规律经过光轴时也应该平滑，不能突然拐出尖角。</p>
+    <p>同时满足“对称”和“平滑”的多项式，会留下 <code>r²、r⁴、r⁶…</code>。常数取 <code>1</code>，表示光轴处不做畸变缩放；整体放大则由 <code>fx、fy</code> 负责。</p>
+  </section>
+  <figure>
+    <svg viewBox="0 0 380 190" role="img" aria-label="一次半径项的缩放曲线在光轴处形成尖角，偶次项的曲线平滑并且左右对称">
+      <rect class="radial-polynomial-reason__panel" x="5" y="6" width="178" height="178" rx="12"></rect>
+      <rect class="radial-polynomial-reason__panel" x="197" y="6" width="178" height="178" rx="12"></rect>
+      <text class="radial-polynomial-reason__title" x="94" y="29" text-anchor="middle">中心有尖角</text>
+      <text class="radial-polynomial-reason__title radial-polynomial-reason__title--good" x="286" y="29" text-anchor="middle">平滑穿过中心</text>
+      <path class="radial-polynomial-reason__axis" d="M20 151H168M94 42V162M212 151H360M286 42V162"></path>
+      <path class="radial-polynomial-reason__sharp" d="M27 63L94 137L161 63"></path>
+      <path class="radial-polynomial-reason__smooth" d="M219 63C243 103 260 137 286 137C312 137 329 103 353 63"></path>
+      <circle class="radial-polynomial-reason__sharp-dot" cx="94" cy="137" r="4"></circle>
+      <circle class="radial-polynomial-reason__smooth-dot" cx="286" cy="137" r="4"></circle>
+      <text class="radial-polynomial-reason__axis-symbol" x="101" y="50">L</text>
+      <text class="radial-polynomial-reason__axis-symbol" x="293" y="50">L</text>
+      <text class="radial-polynomial-reason__axis-label" x="94" y="174" text-anchor="middle">光轴</text>
+      <text class="radial-polynomial-reason__axis-label" x="286" y="174" text-anchor="middle">光轴</text>
+      <text class="radial-polynomial-reason__curve-label radial-polynomial-reason__curve-label--sharp" x="30" y="54">一次半径项</text>
+      <text class="radial-polynomial-reason__curve-label" x="327" y="54" text-anchor="end">偶次项</text>
+    </svg>
+  </figure>
+</div>
 
 但径向缩放只能让点沿直线靠近或远离原点。如果实际角点还偏向一侧，就需要 `p1、p2` 产生一个二维偏移：
 

@@ -238,6 +238,34 @@
 .formula-story__out-point { fill: #d78a6d; stroke: #ffffff; stroke-width: 2; }
 .formula-story__visual .formula-story__accent-text { fill: #3f756d; font-weight: 700; }
 .formula-story__visual .formula-story__warm-text { fill: #ad684f; font-weight: 700; }
+.radial-polynomial-reason {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 380px);
+  gap: 22px;
+  align-items: center;
+  margin: 20px 0;
+  padding: 18px 20px;
+  border: 1px solid #dbe9e5;
+  border-radius: 16px;
+  background: #f8fbfa;
+}
+.radial-polynomial-reason section { display: grid; gap: 9px; }
+.radial-polynomial-reason strong { color: #315c55 !important; }
+.radial-polynomial-reason p { margin: 0 !important; color: #657a76 !important; font-size: 13px; }
+.radial-polynomial-reason figure { width: 100%; margin: 0; }
+.radial-polynomial-reason svg { display: block; width: 100%; height: auto; }
+.radial-polynomial-reason__panel { fill: #ffffff; stroke: #d5e5e1; stroke-width: 1.4; }
+.radial-polynomial-reason__axis { fill: none; stroke: #bdceca; stroke-width: 1.2; }
+.radial-polynomial-reason__sharp { fill: none; stroke: #d38a70; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.radial-polynomial-reason__smooth { fill: none; stroke: #62aa9d; stroke-width: 3; stroke-linecap: round; }
+.radial-polynomial-reason__sharp-dot { fill: #d38a70; }
+.radial-polynomial-reason__smooth-dot { fill: #62aa9d; }
+.radial-polynomial-reason__title { fill: #9a634f; font: 700 12px system-ui, sans-serif; }
+.radial-polynomial-reason__title--good { fill: #315c55; }
+.radial-polynomial-reason__axis-label { fill: #71847f; font: 600 10px system-ui, sans-serif; }
+.radial-polynomial-reason__axis-symbol { fill: #71847f; font: 700 10px ui-monospace, monospace; }
+.radial-polynomial-reason__curve-label { fill: #3f756d; font: 650 10px system-ui, sans-serif; }
+.radial-polynomial-reason__curve-label--sharp { fill: #ad684f; }
 .formula-reference {
   margin: 18px 0;
   border: 1px solid #dbe9e5;
@@ -447,5 +475,7 @@
   .formula-story > .formula-story__with-visual { grid-template-columns: 28px minmax(0, 1fr); padding: 13px; }
   .formula-story > div > b { width: 26px; height: 26px; }
   .formula-story__visual { grid-column: 1 / -1; width: min(100%, 280px); justify-self: center; }
+  .radial-polynomial-reason { grid-template-columns: 1fr; gap: 12px; padding: 15px; }
+  .radial-polynomial-reason figure { width: min(100%, 380px); justify-self: center; }
   .distortion-lab { padding: 14px; }
 }
