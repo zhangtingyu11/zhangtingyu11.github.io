@@ -198,6 +198,18 @@
   color: #657a76 !important;
   font-size: 13px;
 }
+.formula-story__why {
+  margin-top: 4px;
+  padding-left: 12px;
+  border-left: 3px solid #8bc3b8;
+}
+.formula-story__why > strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #42665f !important;
+  font-size: 13px;
+}
+.formula-story__why p + p { margin-top: 6px !important; }
 .formula-story__visual {
   width: 100%;
   margin: 0;
