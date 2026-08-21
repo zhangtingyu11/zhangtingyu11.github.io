@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-21 12:10:00
+updated: 2026-08-21 12:25:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -194,7 +194,7 @@ toc: true
       <text class="radial-polynomial-reason__axis-label" x="94" y="174" text-anchor="middle">光轴</text>
       <text class="radial-polynomial-reason__axis-label" x="286" y="174" text-anchor="middle">光轴</text>
       <text class="radial-polynomial-reason__curve-label radial-polynomial-reason__curve-label--sharp" x="30" y="54">一次半径项</text>
-      <text class="radial-polynomial-reason__curve-label" x="327" y="54" text-anchor="end">偶次项</text>
+      <text class="radial-polynomial-reason__curve-label" x="348" y="82" text-anchor="end">偶次项</text>
     </svg>
   </figure>
 </div>
