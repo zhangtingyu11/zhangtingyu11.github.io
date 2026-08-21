@@ -144,6 +144,69 @@
   transform: translateY(-50%) rotate(45deg);
 }
 
+.formula-story {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+}
+.formula-story > div {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 13px;
+  align-items: start;
+  padding: 15px 17px;
+  border: 1px solid #dbe9e5;
+  border-radius: 14px;
+  background: #f8fbfa;
+}
+.formula-story > div > b {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  color: #315c55 !important;
+  background: #dff1ed;
+  font: 700 13px ui-monospace, monospace;
+}
+.formula-story section {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+.formula-story strong { color: #315c55 !important; }
+.formula-story code {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: #375c56 !important;
+  font-size: 13px;
+}
+.formula-story p {
+  margin: 0 !important;
+  color: #657a76 !important;
+  font-size: 13px;
+}
+.formula-reference {
+  margin: 18px 0;
+  border: 1px solid #dbe9e5;
+  border-radius: 14px;
+  background: #f8fbfa;
+  overflow: hidden;
+}
+.formula-reference summary {
+  padding: 14px 17px;
+  color: #315c55;
+  font-weight: 700;
+  cursor: pointer;
+}
+.formula-reference pre {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
 .radtan-parameter-lab {
   margin: 22px 0;
   padding: 18px;
@@ -330,5 +393,7 @@
     bottom: -1px;
     transform: translateX(50%) rotate(135deg);
   }
+  .formula-story > div { grid-template-columns: 28px minmax(0, 1fr); padding: 13px; }
+  .formula-story > div > b { width: 26px; height: 26px; }
   .distortion-lab { padding: 14px; }
 }

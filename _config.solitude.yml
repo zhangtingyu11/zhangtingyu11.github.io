@@ -748,7 +748,7 @@ extends:
   # Insert in head
   # 插入到 head
   head:
-    - <link rel="stylesheet" href="/assets/site.css?v=20260820-11">
+    - <link rel="stylesheet" href="/assets/site.css?v=20260821-1">
 
   # Insert in body
   # 插入到 body
