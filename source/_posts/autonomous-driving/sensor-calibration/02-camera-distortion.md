@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-21 13:10:00
+updated: 2026-08-21 13:25:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -199,7 +199,7 @@ toc: true
   </figure>
 </div>
 
-但镜片没有装正时，点不仅会远离或靠近光轴，还会整体偏向镜片倾斜的一侧。这种误差叫**去心畸变**，通常和径向畸变一起写进 RadTan。
+但镜片没有装正时，点不仅会远离或靠近光轴，还会整体偏向镜片倾斜的一侧。这种不对称偏移就是这里说的**切向畸变**，通常和径向畸变一起写进 RadTan。
 
 <div class="tangential-model-reason">
   <section>
