@@ -266,6 +266,41 @@
 .radial-polynomial-reason__axis-symbol { fill: #71847f; font: 700 10px ui-monospace, monospace; }
 .radial-polynomial-reason__curve-label { fill: #3f756d; font: 650 10px system-ui, sans-serif; }
 .radial-polynomial-reason__curve-label--sharp { fill: #ad684f; }
+.tangential-model-reason {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
+  gap: 22px;
+  align-items: center;
+  margin: 20px 0;
+  padding: 18px 20px;
+  border: 1px solid #dbe9e5;
+  border-radius: 16px;
+  background: #f8fbfa;
+}
+.tangential-model-reason section { display: grid; gap: 9px; }
+.tangential-model-reason strong { color: #315c55 !important; }
+.tangential-model-reason p { margin: 0 !important; color: #657a76 !important; font-size: 13px; }
+.tangential-model-reason figure { width: 100%; margin: 0; }
+.tangential-model-reason svg { display: block; width: 100%; height: auto; }
+.tangential-model-reason__panel { fill: #ffffff; stroke: #d5e5e1; stroke-width: 1.4; }
+.tangential-model-reason__title { fill: #315c55; font: 700 12px system-ui, sans-serif; }
+.tangential-model-reason__optical-axis { fill: none; stroke: #aebfbb; stroke-width: 1.3; stroke-dasharray: 5 5; }
+.tangential-model-reason__ray { fill: none; stroke: #d38a70; stroke-width: 1.8; stroke-linecap: round; }
+.tangential-model-reason__lens { fill: #dff1ed; fill-opacity: .72; stroke: #62aa9d; stroke-width: 2; }
+.tangential-model-reason__sensor { fill: none; stroke: #496760; stroke-width: 3; stroke-linecap: round; }
+.tangential-model-reason__offset { fill: none; stroke: #62aa9d; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tangential-model-reason__grid { fill: none; stroke: #e3ece9; stroke-width: 1; }
+.tangential-model-reason__axis { fill: none; stroke: #bdceca; stroke-width: 1.2; }
+.tangential-model-reason__origin { fill: #315c55; }
+.tangential-model-reason__point { fill: #829691; stroke: #ffffff; stroke-width: 2; }
+.tangential-model-reason__result { fill: #d38a70; stroke: #ffffff; stroke-width: 2; }
+.tangential-model-reason__bias-arrow { fill: none; stroke: #62aa9d; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.tangential-model-reason__radial-arrow { fill: none; stroke: #d38a70; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.tangential-model-reason__sum-arrow { fill: none; stroke: #8b9d99; stroke-width: 1.4; stroke-dasharray: 4 4; }
+.tangential-model-reason__label { fill: #667c77; font: 600 9.5px system-ui, sans-serif; }
+.tangential-model-reason__label--bias { fill: #3f756d; }
+.tangential-model-reason__label--radial { fill: #ad684f; }
+.tangential-model-reason__label--result { fill: #ad684f; font-weight: 700; }
 .formula-reference {
   margin: 18px 0;
   border: 1px solid #dbe9e5;
@@ -477,5 +512,7 @@
   .formula-story__visual { grid-column: 1 / -1; width: min(100%, 280px); justify-self: center; }
   .radial-polynomial-reason { grid-template-columns: 1fr; gap: 12px; padding: 15px; }
   .radial-polynomial-reason figure { width: min(100%, 380px); justify-self: center; }
+  .tangential-model-reason { grid-template-columns: 1fr; gap: 12px; padding: 15px; }
+  .tangential-model-reason figure { width: min(100%, 430px); justify-self: center; }
   .distortion-lab { padding: 14px; }
 }
