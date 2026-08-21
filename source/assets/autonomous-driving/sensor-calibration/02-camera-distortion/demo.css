@@ -159,6 +159,10 @@
   border-radius: 14px;
   background: #f8fbfa;
 }
+.formula-story > .formula-story__with-visual {
+  grid-template-columns: 34px minmax(0, 1fr) minmax(190px, 240px);
+  align-items: center;
+}
 .formula-story > div > b {
   display: grid;
   width: 30px;
@@ -175,7 +179,7 @@
   gap: 7px;
 }
 .formula-story strong { color: #315c55 !important; }
-.formula-story code {
+.formula-story section > code {
   display: block;
   width: fit-content;
   max-width: 100%;
@@ -183,11 +187,54 @@
   color: #375c56 !important;
   font-size: 13px;
 }
+.formula-story p code {
+  display: inline;
+  width: auto;
+  max-width: none;
+  overflow-wrap: normal;
+}
 .formula-story p {
   margin: 0 !important;
   color: #657a76 !important;
   font-size: 13px;
 }
+.formula-story__visual {
+  width: 100%;
+  margin: 0;
+}
+.formula-story__visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.formula-story__visual text {
+  fill: #627873;
+  font: 650 11px system-ui, sans-serif;
+}
+.formula-story__ring {
+  fill: none;
+  stroke: #b8d9d2;
+  stroke-width: 1.5;
+}
+.formula-story__ring--inner { stroke-dasharray: 4 5; opacity: .72; }
+.formula-story__guide {
+  fill: none;
+  stroke: #aabcb8;
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+}
+.formula-story__radius {
+  fill: none;
+  stroke: #67aa9e;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.formula-story__origin { fill: #315c55; }
+.formula-story__point { fill: #62b4a5; stroke: #ffffff; stroke-width: 2; }
+.formula-story__base-point { fill: #8b9d99; stroke: #ffffff; stroke-width: 2; }
+.formula-story__out-point { fill: #d78a6d; stroke: #ffffff; stroke-width: 2; }
+.formula-story__visual .formula-story__accent-text { fill: #3f756d; font-weight: 700; }
+.formula-story__visual .formula-story__warm-text { fill: #ad684f; font-weight: 700; }
 .formula-reference {
   margin: 18px 0;
   border: 1px solid #dbe9e5;
@@ -393,7 +440,9 @@
     bottom: -1px;
     transform: translateX(50%) rotate(135deg);
   }
-  .formula-story > div { grid-template-columns: 28px minmax(0, 1fr); padding: 13px; }
+  .formula-story > div,
+  .formula-story > .formula-story__with-visual { grid-template-columns: 28px minmax(0, 1fr); padding: 13px; }
   .formula-story > div > b { width: 26px; height: 26px; }
+  .formula-story__visual { grid-column: 1 / -1; width: min(100%, 280px); justify-self: center; }
   .distortion-lab { padding: 14px; }
 }

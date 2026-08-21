@@ -1,7 +1,7 @@
 ---
 title: 自动驾驶传感器标定（二）：相机畸变
 date: 2026-08-20 12:00:00
-updated: 2026-08-21 10:00:00
+updated: 2026-08-21 10:30:00
 permalink: posts/camera-distortion/
 categories:
   - 自动驾驶
@@ -100,9 +100,50 @@ toc: true
 先只看径向部分。下面三步回答的是：**一个理想点应该沿着原来的方向移动多远？**
 
 <div class="formula-story">
-  <div><b>1</b><section><strong>先量它离光轴多远</strong><code>r² = x² + y²</code><p>原点 <code>(0, 0)</code> 是光轴位置。处在同一圆环上的点，<code>r</code> 相同，应使用相同的径向修正。</p></section></div>
-  <div><b>2</b><section><strong>算这一圈要缩放多少</strong><code>L(r) = 1 + k1·r² + k2·r⁴ + k3·r⁶</code><p><code>1</code> 表示不移动；后面的三项让标定程序能够逐步修正中部、边缘和最外圈。</p></section></div>
-  <div><b>3</b><section><strong>横纵坐标一起乘</strong><code>xr = x·L(r)，yr = y·L(r)</code><p><code>x、y</code> 乘同一个倍率，所以点只会沿着它与原点的连线移动，不会拐向侧面。</p></section></div>
+  <div class="formula-story__with-visual">
+    <b>1</b>
+    <section><strong>先量它离光轴多远</strong><code>r² = x² + y²</code><p>原点 <code>(0, 0)</code> 是光轴位置。处在同一圆环上的点，<code>r</code> 相同，应使用相同的径向修正。</p></section>
+    <figure class="formula-story__visual">
+      <svg viewBox="0 0 240 126" role="img" aria-label="点 P 到光轴原点 O 的平面距离是半径 r，同一圆环上的点半径相同">
+        <circle class="formula-story__ring" cx="106" cy="65" r="44"></circle>
+        <circle class="formula-story__ring formula-story__ring--inner" cx="106" cy="65" r="26"></circle>
+        <line class="formula-story__radius" x1="106" y1="65" x2="144" y2="43"></line>
+        <circle class="formula-story__origin" cx="106" cy="65" r="5"></circle>
+        <circle class="formula-story__point" cx="144" cy="43" r="6"></circle>
+        <text x="93" y="82">O</text><text x="151" y="39">P</text><text class="formula-story__accent-text" x="123" y="49">r</text>
+      </svg>
+    </figure>
+  </div>
+  <div class="formula-story__with-visual">
+    <b>2</b>
+    <section><strong>算这一圈要缩放多少</strong><code>L(r) = 1 + k1·r² + k2·r⁴ + k3·r⁶</code><p><code>1</code> 表示不移动；后面的三项让标定程序能够逐步修正中部、边缘和最外圈。</p></section>
+    <figure class="formula-story__visual">
+      <svg viewBox="0 0 240 126" role="img" aria-label="缩放倍率小于一时点向原点移动，大于一时点远离原点">
+        <line class="formula-story__guide" x1="43" y1="86" x2="204" y2="36"></line>
+        <circle class="formula-story__origin" cx="43" cy="86" r="5"></circle>
+        <circle class="formula-story__base-point" cx="142" cy="55" r="6"></circle>
+        <circle class="formula-story__point" cx="113" cy="64" r="6"></circle>
+        <circle class="formula-story__out-point" cx="178" cy="44" r="6"></circle>
+        <text x="31" y="104">O</text><text x="126" y="77">L = 1</text>
+        <text class="formula-story__accent-text" x="66" y="55">L &lt; 1</text><text class="formula-story__warm-text" x="169" y="27">L &gt; 1</text>
+      </svg>
+    </figure>
+  </div>
+  <div class="formula-story__with-visual">
+    <b>3</b>
+    <section><strong>横纵坐标一起乘</strong><code>xr = x·L(r)，yr = y·L(r)</code><p><code>x、y</code> 乘同一个倍率，所以点只会沿着它与原点的连线移动，不会拐向侧面。</p></section>
+    <figure class="formula-story__visual">
+      <svg viewBox="0 0 240 126" role="img" aria-label="原点、理想点和缩放后的点始终位于同一条射线上">
+        <line class="formula-story__guide" x1="43" y1="91" x2="202" y2="25"></line>
+        <line class="formula-story__radius" x1="43" y1="91" x2="147" y2="48"></line>
+        <circle class="formula-story__origin" cx="43" cy="91" r="5"></circle>
+        <circle class="formula-story__base-point" cx="178" cy="35" r="6"></circle>
+        <circle class="formula-story__point" cx="147" cy="48" r="6"></circle>
+        <text x="31" y="109">O</text><text x="183" y="31">P</text><text class="formula-story__accent-text" x="147" y="67">P′</text>
+        <text x="79" y="71">同一方向</text>
+      </svg>
+    </figure>
+  </div>
 </div>
 
 这就解释了 `L(r)` 的含义：`L(r) < 1` 时点靠近原点，形成桶形；`L(r) > 1` 时点远离原点，形成枕形。比如 `(x, y) = (0.6, 0.8)`，若 `L(r) = 0.9`，新位置就是 `(0.54, 0.72)`——方向没变，只是半径缩短了 10%。
