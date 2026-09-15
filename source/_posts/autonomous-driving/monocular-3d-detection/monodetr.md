@@ -21,7 +21,7 @@ toc: true
 <link rel="stylesheet" href="/assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="/assets/autonomous-driving/monocular-3d-detection/monodetr/paper.css">
 
-单目三维检测中，物体中心附近的视觉特征可以同时承担定位、尺寸和深度预测，但局部外观并不总能提供足够的距离线索。MonoDETR 关注的是检测过程中的特征获取：**先从图像中学习前景深度，再让物体查询读取这些深度特征，随后结合视觉信息完成三维预测**。
+单目三维检测中，物体中心附近的视觉特征可以同时承担定位、尺寸和深度预测，但局部外观并不总能提供足够的距离线索。MonoDETR 关注的是检测过程中的特征获取：<strong>先从图像中学习前景深度，再让物体查询读取这些深度特征，随后结合视觉信息完成三维预测</strong>。
 
 这条思路涉及两个问题：没有额外稠密深度标注时，怎样得到可用的深度表示；得到表示之后，又怎样让它影响候选物体的预测。下面围绕这两点展开，相关消融放在设计说明之后。图表截自 [论文 v4](https://arxiv.org/abs/2203.13310v4)，结果沿用作者报告，未独立复现。
 
@@ -57,7 +57,7 @@ toc: true
 
 图 3 中，1/8、1/16、1/32 三个尺度的骨干特征先对齐到 1/16 分辨率，逐元素相加，再经过两层 3×3 卷积得到深度特征。顶部的 1×1 卷积输出深度类别分布。这个分支接受监督后，下面的深度特征才具有明确的距离学习目标。
 
-**监督直接由检测标注构造：二维框内填入对应物体的深度，多个框重叠时保留最近物体的标签**。这样省去了额外稠密深度标注，但框内共享的是物体级距离，并不是每个可见表面点的真实深度。
+<strong>监督直接由检测标注构造：二维框内填入对应物体的深度，多个框重叠时保留最近物体的标签</strong>。这样省去了额外稠密深度标注，但框内共享的是物体级距离，并不是每个可见表面点的真实深度。
 
 深度采用 LID（线性递增宽度分箱），近处区间窄，远处区间宽。为避免原文中分箱数与索引使用相同符号，这里用 K 表示分箱总数、b 表示从零开始的索引：
 
@@ -77,7 +77,7 @@ $$
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-6.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-6.png" alt="MonoDETR 原论文表 6：深度编码器的选择" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 6 · 深度编码器的选择（<a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文第 8 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 6 替换的是深度编码器。全局自注意力得到 20.61，可变形自注意力为 18.91，两层卷积为 18.36，不加编码器为 18.38。**全局编码相对直接使用深度特征提高了 2.23 个百分点**；卷积版本与不加编码器接近。这里的证据对应深度分支，并不否定视觉分支使用可变形注意力。
+表 6 替换的是深度编码器。全局自注意力得到 20.61，可变形自注意力为 18.91，两层卷积为 18.36，不加编码器为 18.38。<strong>全局编码相对直接使用深度特征提高了 2.23 个百分点</strong>；卷积版本与不加编码器接近。这里的证据对应深度分支，并不否定视觉分支使用可变形注意力。
 
 ### 从深度分布到位置编码
 
@@ -95,7 +95,7 @@ $$
 p(d)=(1-\alpha)p_m+\alpha p_{m+1},\qquad m=\lfloor d\rfloor,\quad\alpha=d-m
 $$
 
-α 是距离的小数部分，$p_{m}$ 和 $p_{m+1}$ 是相邻整数距离的向量。插值结果逐像素加到深度嵌入上，供后面的交叉注意力使用**。LID 决定分类监督的粒度，逐米编码提供连续距离提示，两者承担不同的作用。**
+α 是距离的小数部分，$p_{m}$ 和 $p_{m+1}$ 是相邻整数距离的向量。插值结果逐像素加到深度嵌入上，供后面的交叉注意力使用<strong>。LID 决定分类监督的粒度，逐米编码提供连续距离提示，两者承担不同的作用。</strong>
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-9.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-9.png" alt="MonoDETR 原论文表 9：深度位置编码" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 9 · 深度位置编码（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
@@ -113,11 +113,11 @@ $$
 
 Q 来自物体查询，$K_{D}$、$V_{D}$ 来自深度嵌入，C 是通道维度。$A_{D}$ 的每一行给出一个查询对不同深度特征位置的权重，softmax 沿空间位置归一化。乘上 $V_{D}$ 后，查询得到与自身相关的场景深度信息。
 
-之后才进行查询之间的交互和视觉读取，即 D → I → V → FFN**。深度信息在候选交互之前进入查询，会影响后续的特征更新。**论文使用 50 个查询、256 维通道和三个解码块；50 是候选槽位数，不是固定的最终检测数量。
+之后才进行查询之间的交互和视觉读取，即 D → I → V → FFN<strong>。深度信息在候选交互之前进入查询，会影响后续的特征更新。</strong>论文使用 50 个查询、256 维通道和三个解码块；50 是候选槽位数，不是固定的最终检测数量。
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-7.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-7.png" alt="MonoDETR 原论文表 7：解码层的注意力顺序" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 7 · 解码层的注意力顺序（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 7 直接检验顺序：D → I → V 为 20.61，I → D → V 为 19.28，I → V → D 为 18.85。最后一行将深度与视觉特征相加后统一读取，结果为 18.41，并非依次执行两次独立交叉注意力**。在这组配置下，先读深度再进行候选交互与视觉读取更有效。**
+表 7 直接检验顺序：D → I → V 为 20.61，I → D → V 为 19.28，I → V → D 为 18.85。最后一行将深度与视觉特征相加后统一读取，结果为 18.41，并非依次执行两次独立交叉注意力<strong>。在这组配置下，先读深度再进行候选交互与视觉读取更有效。</strong>
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-fig-6.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-fig-6.png" alt="MonoDETR 原论文图 6：深度注意力的分布" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>图 6 · 深度注意力的分布（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
@@ -139,9 +139,9 @@ r 是回归头输出，σ 是 sigmoid，ε 用于数值稳定；H 是预测物�
 
 ### 匹配与训练目标
 
-查询输出没有固定顺序，训练需要先与真值配对。MonoDETR 用匈牙利算法进行二分匹配，但**匹配代价只包含类别、二维尺寸和三维中心投影**，记为 $L_{2D}$。深度、三维尺寸和朝向组成 $L_{3D}$，不参与配对代价。作者的理由是训练初期三维预测不稳定，加入匹配可能扰乱对应关系。
+查询输出没有固定顺序，训练需要先与真值配对。MonoDETR 用匈牙利算法进行二分匹配，但<strong>匹配代价只包含类别、二维尺寸和三维中心投影</strong>，记为 $L_{2D}$。深度、三维尺寸和朝向组成 $L_{3D}$，不参与配对代价。作者的理由是训练初期三维预测不稳定，加入匹配可能扰乱对应关系。
 
-**配对确定后，三维属性仍然参与训练**。论文式（6）将目标概括为：
+<strong>配对确定后，三维属性仍然参与训练</strong>。论文式（6）将目标概括为：
 
 $$
 \mathcal{L}_{\mathrm{overall}}=\frac{1}{N_{\mathrm{gt}}}\sum_{n=1}^{N_{\mathrm{gt}}}\left(\mathcal{L}_{2D}^{(n)}+\mathcal{L}_{3D}^{(n)}\right)+\mathcal{L}_{\mathrm{dmap}}
@@ -155,7 +155,7 @@ $N_{\mathrm{gt}}$ 是匹配到的真值数量，$L_{\mathrm{dmap}}$ 是前景深
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-5.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-5.png" alt="MonoDETR 原论文表 5：深度分支的作用" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 5 · 深度分支的作用（<a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文第 8 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 5 中，去掉整个深度引导 Transformer 及深度预测器的中心基线为 15.15；仅为中心基线加入深度预测器为 16.05；采用视觉 Transformer 而不加深度引导分支为 17.81。完整模型为 20.61，**比纯视觉 Transformer 高 2.80 个百分点**。这表明增加一个深度监督分支的收益，和让深度参与整个特征获取过程的收益并不相同。由于比较涉及多个组件，不能将差值全部归给单层注意力。
+表 5 中，去掉整个深度引导 Transformer 及深度预测器的中心基线为 15.15；仅为中心基线加入深度预测器为 16.05；采用视觉 Transformer 而不加深度引导分支为 17.81。完整模型为 20.61，<strong>比纯视觉 Transformer 高 2.80 个百分点</strong>。这表明增加一个深度监督分支的收益，和让深度参与整个特征获取过程的收益并不相同。由于比较涉及多个组件，不能将差值全部归给单层注意力。
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-2.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-2.png" alt="MonoDETR 原论文表 2：KITTI 检测结果" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 2 · KITTI 检测结果（<a href="https://arxiv.org/pdf/2203.13310v4#page=7">原论文第 7 页</a>，点击图片查看大图）</figcaption></figure>
 
@@ -175,7 +175,7 @@ PETRv2 在解码器中加入深度交叉注意力，直接更新物体查询。B
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-4.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-4.png" alt="MonoDETR 原论文表 4：nuScenes 多视角结果" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 4 · nuScenes 多视角结果（<a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文第 8 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 4 应按相同框架的前后结果成对比较：PETRv2 的 NDS 从 0.496 提升至 0.508，BEVFormer 从 0.517 提升至 0.526，mAP 也有提高。但 PETRv2 的速度误差从 0.394 增至 0.419，属性误差从 0.184 增至 0.187，**收益并未覆盖所有属性**。
+表 4 应按相同框架的前后结果成对比较：PETRv2 的 NDS 从 0.496 提升至 0.508，BEVFormer 从 0.517 提升至 0.526，mAP 也有提高。但 PETRv2 的速度误差从 0.394 增至 0.419，属性误差从 0.184 增至 0.187，<strong>收益并未覆盖所有属性</strong>。
 
 NDS 为综合检测分数；mATE、mASE、mAOE、mAVE、mAAE 分别衡量平移、尺寸、朝向、速度和属性误差，越低越好。* 表示两阶段微调与测试增强，† 表示 CBGS；论文的两组扩展实验未采用这些增强，读其他行时需要保留这一条件区别。
 
