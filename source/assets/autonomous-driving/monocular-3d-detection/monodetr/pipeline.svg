@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+<title id="title">MonoDETR：深度引导的单目三维目标检测</title>
+<desc id="desc">自绘简化流程。图像经主干分成视觉和深度两路；物体查询先读深度、再做查询间交互、再读视觉，最后输出三维属性。深度图由物体级标签监督。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#6c7e8c" stroke-width="1.5"/></marker></defs>
+<rect width="1200" height="630" fill="#f4f6f3"/>
+<g font-family="Microsoft YaHei, PingFang SC, sans-serif" fill="#203440">
+<text x="54" y="64" font-size="17" letter-spacing="3" fill="#557b73">PAPER NOTES / MONOCULAR 3D DETECTION</text>
+<text x="54" y="124" font-size="44" font-weight="700">MonoDETR</text>
+<text x="352" y="124" font-size="25">让深度信息参与物体查询的更新</text>
+<g fill="white" stroke="#a5b4bd" stroke-width="1.6">
+<rect x="54" y="284" width="150" height="80" rx="10"/>
+<rect x="274" y="213" width="190" height="74" rx="10"/>
+<rect x="274" y="366" width="190" height="74" rx="10"/>
+<rect x="554" y="209" width="324" height="300" rx="14" stroke="#568579"/>
+<rect x="948" y="322" width="198" height="104" rx="10"/>
+</g>
+<g stroke="#6c7e8c" stroke-width="2" fill="none" marker-end="url(#arrow)">
+<path d="M204 312H235V250H274"/><path d="M204 336H235V403H274"/>
+<path d="M464 250H505V438H576"/><path d="M464 403H526V304H576"/>
+<path d="M878 374H948"/><path d="M716 176V256"/>
+<path d="M716 327V345"/><path d="M716 395V414"/>
+</g>
+<g text-anchor="middle" font-size="21">
+<text x="129" y="318">单目图像</text><text x="129" y="346" font-size="16" fill="#637783">ResNet-50</text>
+<text x="369" y="245">视觉编码器</text><text x="369" y="271" font-size="16" fill="#637783">外观与语义</text>
+<text x="369" y="398">深度预测与编码</text><text x="369" y="424" font-size="16" fill="#637783">距离相关特征</text>
+<text x="716" y="178" font-size="19">可学习物体查询 q</text>
+<text x="716" y="241" font-size="18" fill="#42695f">深度引导解码器 · 重复 3 次</text>
+<rect x="578" y="274" width="276" height="53" rx="7" fill="#d9ebe4"/>
+<text x="716" y="308">① 深度交叉注意力</text>
+<rect x="578" y="345" width="276" height="50" rx="7" fill="#edf0ed"/>
+<text x="716" y="378">② 查询间自注意力</text>
+<rect x="578" y="414" width="276" height="50" rx="7" fill="#e2eaf2"/>
+<text x="716" y="447">③ 视觉交叉注意力</text>
+<text x="716" y="491" font-size="15" fill="#637783">随后经过前馈网络</text>
+<text x="1047" y="360">预测三维属性</text><text x="1047" y="390" font-size="16" fill="#637783">位置 · 尺寸 · 朝向等</text>
+</g>
+<path d="M369 506V443" stroke="#568579" stroke-width="2" stroke-dasharray="5 4" fill="none" marker-end="url(#arrow)"/>
+<text x="369" y="534" text-anchor="middle" font-size="17" fill="#42695f">前景深度图监督（仅训练）</text>
+<path d="M54 567H1146" stroke="#ccd5d3"/>
+<text x="54" y="600" font-size="16" fill="#637783">根据原文第 3 节自绘；两路特征均来自同一张 RGB 图像。</text>
+</g></svg>
