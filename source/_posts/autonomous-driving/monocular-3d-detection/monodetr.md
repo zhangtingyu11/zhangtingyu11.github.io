@@ -169,7 +169,9 @@ $$
 
 深度编码器已经让图像位置之间交换了信息，但还没有回答某个候选物体应该读取哪些深度位置。这个任务由解码器中的深度交叉注意力完成。
 
-<strong>自注意力更新的是深度图上的位置；深度交叉注意力更新的是物体查询。</strong>前者的查询、键和值都来自深度特征，后者的查询来自候选物体，键和值来自编码后的深度特征。若有 $N$ 个物体查询和 $S$ 个深度位置，后者的注意力矩阵为 $N\times S$，每一行对应一个候选对整幅深度特征图的读取。
+<strong>深度编码器的自注意力更新深度图上的位置；解码器的 D、I、V 都更新物体查询。</strong>这里的 I 是查询间自注意力，不能与深度编码器的自注意力混为一谈。深度编码器的查询、键和值都来自深度特征；D 的查询来自候选物体，键和值来自编码后的深度特征。若有 $N$ 个物体查询和 $S$ 个深度位置，后者的注意力矩阵为 $N\times S$，每一行对应一个候选对整幅深度特征图的读取。
+
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/query-operations.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/query-operations.svg" alt="D读取深度图，I在候选查询之间交互，V读取视觉图；三者都更新查询" loading="lazy"></a><figcaption>D、I、V 的输入对象与更新对象，补充示意。</figcaption></figure>
 
 回到图 4 的解码器。设物体查询为 q，加入距离编码后的深度嵌入为 $F_{D}$，忽略多头拆分、残差和归一化，论文式（2）–（4）的读取过程可以写成：
 
@@ -179,15 +181,17 @@ $$
 
 Q 来自物体查询，$K_{D}$、$V_{D}$ 来自深度嵌入，C 是通道维度。$A_{D}$ 的每一行给出一个查询对不同深度特征位置的权重，softmax 沿空间位置归一化。乘上 $V_{D}$ 后，查询得到与自身相关的场景深度信息。
 
-因此，MonoDETR 的两处全局深度交互有前后关系：深度编码器先组织场景内的深度信息，解码器再为各个物体候选读取这些信息。视觉编码器与视觉交叉注意力仍采用可变形注意力。表 6 检验前一步的编码机制，表 7 则检验后一步的深度读取放在什么顺序更合适。
+<strong>换顺序会改变注意力操作的输入 query，因此也会改变后续怎样取信息。</strong>在 D → I → V 中，D 先更新查询，I 的查询间相关性由这批已读深度的查询计算；V 再基于交互后的查询读取视觉特征。若改成 I → D → V，当前层的 I 已经在 D 之前完成，新读到的深度只能影响后面的 V，不能回头修改刚才的 I。
 
-之后才进行查询之间的交互和视觉读取，即 D → I → V → FFN。<strong>深度信息在候选交互之前进入查询，会影响后续的特征更新。</strong>论文使用 50 个查询、256 维通道和三个解码块；50 是候选槽位数，不是固定的最终检测数量。
+这里传递的是不断更新的特征向量，不是把一次操作得到的深度数值直接当作下一步输入。D、V 读取各自的特征图；交换顺序并不把深度图变成视觉图，也不使前一操作改写后一操作的特征图。
 
 <figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-order.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-order.svg" alt="表 7 补充示意：查询更新顺序与融合特征对照" loading="lazy"></a><figcaption>表 7 补充示意 · 查询更新顺序与融合特征对照。非原论文图，点击放大。</figcaption></figure>
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-7.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-7.png" alt="MonoDETR 原论文表 7：解码层的注意力顺序" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 7 · 解码层的注意力顺序（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 7 中 D → I → V 最好。<strong>深度先进入查询，再参与候选交互与视觉读取</strong>；第四行则先融合深度与视觉特征，只做一次交叉注意力，不能理解为依次执行 D 和 V。
+表 7 中 D → I → V 最好。I → V → D 的深度读取虽然排在末尾，仍会影响该层输出和下一层，不能解释为“视觉读取永远用不到深度”。论文堆叠三个解码层，后续层的输入已经继承之前的更新。
+
+第四行除顺序外还改变了融合方式：原文明确写的是先将深度、视觉嵌入逐元素相加，再用一次统一交叉注意力读取，不是两路独立注意力的输出相加。正文没有展开这项对照的具体特征对齐操作。图中解释的是计算依赖；性能差异由消融结果报告，不能仅凭这些箭头证明模型具体学到了哪种关系。
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-fig-6.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-fig-6.png" alt="MonoDETR 原论文图 6：深度注意力的分布" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>图 6 · 深度注意力的分布（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
