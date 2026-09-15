@@ -78,9 +78,49 @@ $$
 | Fore. UD | 与第一行相同的物体级前景监督 | UD：Uniform Discretization，等宽分箱 | 只更换分箱方式 |
 | Fore. SID | 与第一行相同的物体级前景监督 | SID：Spacing-Increasing Discretization，按对数尺度划分，远处区间更宽 | 只更换分箱方式 |
 
-例如，一辆车的物体深度标注是 20 m。Fore. 的做法是把它的二维框内像素都赋成该物体的 20 m 标签，再将 20 m 转成相应的深度类别；框外按背景处理，框重叠时采用较近物体的标签。它不要求车头、车尾或框内露出的背景各自具有准确的表面深度。Dense 则改用随像素位置变化的深度监督，不再把整个框看成同一个距离。<strong>论文正文没有交代 Dense 对照的具体标签生成来源、补全方式和有效像素处理细节</strong>，因此不能据此认定它用了哪种稠密深度生成算法。
+#### 一次训练中，Fore. LID 实际怎样生成监督
 
-UD、LID 和 SID 则决定“20 m 被归到哪一类”。UD 在设定范围内等宽划分；LID 让相邻区间的宽度按固定增量增加；SID 按对数尺度安排边界。LID 与 SID 都会使远处区间更宽，但增宽规律不同。改变它们会改变深度预测器的分类目标，不是改变最终三维框的类别，也不是表 9 中逐米位置编码的消融。
+先看默认配置的完整计算。以下细节核对自官方代码 [DDNLoss](https://github.com/ZrrSkywalker/MonoDETR/blob/main/lib/models/monodetr/depth_predictor/ddn_loss/ddn_loss.py) 和 [DepthPredictor](https://github.com/ZrrSkywalker/MonoDETR/blob/main/lib/models/monodetr/depth_predictor/depth_predictor.py)，用于解释实现；当前主分支不等同于论文全部消融配置的复现脚本。
+
+1. **网络先输出每个位置的深度分类分数。** 若深度特征图大小为 $H_d\times W_d$，批量大小为 $B$，最后的 1×1 卷积输出 $B\times81\times H_d\times W_d$ 的 logits。每个位置有 80 个距离类别和一个背景类别，此时不是一个直接回归的米数。
+2. **在相同分辨率上构造目标深度图。** 把真值二维框映射到深度图坐标，初始化一张零值图。代码按物体深度从远到近遍历框，在框内写入该物体的中心深度；近框后写，因此会覆盖重叠处的远框。填的是框，不是实例分割轮廓。代码对左上角向下取整、右下角向上取整，以得到填充范围。
+3. **把米数图转换成整数类别图。** 调用 LID 分箱函数，把每个前景位置的距离变成 0–79 的类别索引。当前 loss 代码默认最小深度为 0.001 m，初始化的零值背景因越界或非有限索引被映射到类别 80。最终监督张量大小为 $B\times H_d\times W_d$，每个位置只存一个类别编号。
+4. **计算分类 loss 并反向传播。** 将 81 通道 logits 与整数标签送入 focal loss，再按二维框确定的前景、背景区域加权汇总。当前代码的默认前景权重为 13、背景权重为 1。该 loss 与检测损失共同训练网络，梯度经过深度分类头传回深度特征及其上游网络。
+
+可以把这段操作压缩成以下伪代码。它说明默认监督路径，不是可直接运行的消融脚本：
+
+```python
+logits = depth_classifier(depth_features)  # [B, 81, Hd, Wd]
+target_depth = zeros(B, Hd, Wd)
+for box, z in objects_sorted_far_to_near:
+    target_depth[box] = z                 # 近框覆盖远框
+labels = bin_depths(target_depth, mode="LID")
+labels[invalid_or_background] = 80
+pixel_loss = focal_loss(logits, labels)
+loss_depth_map = balance_foreground_background(pixel_loss)
+```
+
+例如，一辆车的标注深度为 20 m。Fore. 会把它框内的位置都填为 20 m，再映射到同一个距离类别；不会分别监督车头和车尾的真实表面距离。<strong>学习目标是“这个位置属于哪个距离区间”，不是把 20 这个米数直接与每个通道做回归。</strong>推理时不再填入真值框和距离，而是用预测概率与各类别代表距离加权求和，得到后面用于位置编码的连续深度图。
+
+#### 切换 UD、SID 时，具体改哪一步
+
+Fore. UD 与 Fore. SID 保留上面的框内填深度操作，改变第三步的“距离 → 类别索引”函数。以便于计算的 0–60 m、80 个前景区间为例，同样的 20 m 标签得到的零起始索引分别为：UD 的 26、LID 的 45、SID 的 59。编号不同是因为每个类别对应的距离区间不同，并不是把同一物体预测成了三个不同距离。
+
+UD 将范围等分成 80 份，每份宽 0.75 m，因而 20 m 归入第 26 号区间；LID 用前面的平方根公式求索引；官方 `bin_depths` 的 SID 分支采用以下变换，再取整数索引：
+
+$$
+b_{\mathrm{SID}}(d)=\left\lfloor K\,\frac{\log(1+d)-\log(1+d_{\min})}{\log(1+d_{\max})-\log(1+d_{\min})}\right\rfloor
+$$
+
+<strong>更换分箱后需要按新目标重新训练，同时使概率转回米数时使用的类别距离与新分箱一致。</strong>否则第 26 类在标签端可能表示 UD 的约 20 m，在解码端却被当成 LID 的另一段距离。不能只在测试时改一个名称，就认为完成了这项消融。
+
+官方当前代码的 `bin_depths` 包含 UD、LID、SID 三个分支，但默认 loss 调用采用 LID，预测器里的 `depth_bin_values` 也按 LID 构造。因此，切换其他分箱需要检查并同步这两端，不能假定主分支已有一键复现表 8 的完整配置。这里说明的是切换所需的操作与一致性条件，不声称已经复现作者的 UD、SID 实验。
+
+#### Dense LID 的改动落在目标深度图的构造
+
+Dense LID 保留 LID 分箱，替换上面第二步的框内填充式监督。它需要一张与图像位置对齐的稠密深度标签图：每个有效位置使用该位置的深度，再按 LID 转成类别，而不是把整个物体框填成统一的中心距离。例如，若稠密标签中两个位置分别为 19.2 m、20.8 m，它们就分别分箱；这两个数只是说明操作的假设示例，不是原文数据。
+
+<strong>原文能确认 Dense 使用稠密深度监督，但没有给出其完整标签生成流程。</strong>正文没有说明这张标签图来自哪种方法、怎样补全、怎样处理无效像素；检查到的官方默认 loss 仍调用框内填充函数。因而目前可以定位到需要更换的监督构造环节，不能把某种 LiDAR 投影或深度补全方案编成作者实际做法。表中的 Dense 也不表示推理时额外输入一张深度图：它讨论的是深度预测分支的监督表示。
 
 下文消融均采用 KITTI 验证集汽车 $\mathrm{AP}_{3D}$（IoU = 0.7，40 个召回率点），正文引用 Moderate 列。<strong>表里的数值是完整检测器的三维检测精度，不是深度图误差。</strong>对照关系应分两组理解：
 
