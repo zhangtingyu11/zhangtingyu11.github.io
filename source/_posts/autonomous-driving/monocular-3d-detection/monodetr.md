@@ -127,26 +127,17 @@ $$
 
 ### 全局深度编码
 
-预测分支输出深度特征之后，还需要让不同区域交换信息。论文在这里选择了全局自注意力。理解这个选择，需要先区分“局部”可能指的几种操作：
+预测分支输出深度特征之后，还需要让不同区域交换信息。论文在这里选择了全局自注意力。图中把同一个位置的读取范围并排画出：全局注意力允许全部位置参与，可变形注意力只采样少量可学习位置，卷积采用固定邻域。“无编码器”则直接向后传递深度特征。
 
-| 特征获取方式 | 一次更新直接读取哪些位置 | 位置与权重怎样确定 |
-|---|---|---|
-| 中心附近取特征 | 物体投影中心对应的位置或邻域 | 按预测或指定的中心取特征；它本身不是一种注意力算法 |
-| 固定窗口注意力 | 当前窗口内的位置 | 窗口范围固定，在窗口内计算相关性权重 |
-| 可变形注意力 | 每个头、每个尺度上的少量采样位置 | 由查询预测相对参考点的偏移与聚合权重，对特征插值采样 |
-| 全局注意力 | 当前特征图的全部有效位置 | 查询与全部键计算相关性，再归一化得到聚合权重 |
-
-<strong>表 6 比较的是全局自注意力与可变形自注意力，不是全局注意力与固定窗口注意力。</strong>可变形注意力的采样点能够移动，未必落在狭小的局部区域；更准确的区别是稀疏采样与全位置参与。中心引导也不能等同于固定窗口注意力，骨干网络可能已经把更大范围的上下文融入中心特征。
-
-以图像中的一辆车为例。可变形注意力可能学着在车顶、车底或其他位置采样，用少量特征更新当前表示；这些只是帮助理解的例子，并不代表论文实测的采样位置。全局注意力则让当前特征与整张深度特征图计算相关性，其他车辆或远处区域也有机会参与。所有位置进入计算，不意味着它们获得相同权重，更不保证模型一定使用了正确的几何关系。
-
-设深度特征图共有 $S$ 个位置。全局自注意力为每个位置计算与其余位置的关联，单个头的注意力矩阵为 $S\times S$；可变形注意力只读取预设数量的采样点，不显式构造这个完整矩阵。全局方式扩大了直接交互范围，也增加了计算与存储开销。这解释了为什么模型没有把所有分支都换成全局注意力。
+<strong>可变形注意力不等于固定局部窗口</strong>，采样点可以移动到较远处。中心引导是在物体中心附近取特征，也不能等同于一种注意力算法。
 
 <strong>深度编码器中的更新对象是深度特征图本身：每个深度位置读取其他深度位置，再更新自己的特征。</strong>这里还没有物体查询参与。例如，某辆车所在区域的深度特征可以融合其他前景区域的信息，然后才交给检测解码器。MonoDETR 为这一步设置一个全局自注意力编码块；视觉编码器使用三个块，采用可变形注意力控制计算量。
 
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-attention.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-attention.svg" alt="表 6 补充示意：四种深度编码方式的空间读取范围" loading="lazy"></a><figcaption>表 6 补充示意 · 四种深度编码方式的空间读取范围。非原论文图，点击放大。</figcaption></figure>
+
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-6.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-6.png" alt="MonoDETR 原论文表 6：深度编码器的选择" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 6 · 深度编码器的选择（<a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文第 8 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 6 保留检测框架，替换深度编码器的聚合机制：完整模型使用全局自注意力，替代项分别为可变形自注意力、两层卷积，或直接将深度特征送给解码器。“无编码器”不等于删除整个深度分支。全局自注意力得到 20.61，可变形自注意力为 18.91，两层卷积为 18.36，不加编码器为 18.38。<strong>全局编码相对直接使用深度特征提高了 2.23 个百分点</strong>；卷积版本与不加编码器接近。全局版本比可变形版本高 1.70 个百分点；这不是“把整个网络从局部改成全局”的收益，而是深度编码器这一个位置的对照结果。深度交叉注意力仍在后续解码器中，下面会说明它与这里的自注意力有什么区别。
+表 6 只替换深度编码器，后续解码器保持在比较范围之外。全局注意力比可变形版本高 1.70 个百分点，比无编码器高 2.23 个百分点；“无编码器”保留深度预测与后续深度读取，不等于删除深度分支。
 
 ### 从深度分布到位置编码
 
@@ -166,9 +157,11 @@ $$
 
 α 是距离的小数部分，$p_{m}$ 和 $p_{m+1}$ 是相邻整数距离的向量。插值结果逐像素加到深度嵌入上，供后面的交叉注意力使用。<strong>LID 决定分类监督的粒度，逐米编码提供连续距离提示，两者承担不同的作用。</strong>
 
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-position.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-position.svg" alt="表 9 补充示意：逐米、分箱与 sin/cos 位置编码对照" loading="lazy"></a><figcaption>表 9 补充示意 · 逐米、分箱与 sin/cos 位置编码对照。非原论文图，点击放大。</figcaption></figure>
+
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-9.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-9.png" alt="MonoDETR 原论文表 9：深度位置编码" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 9 · 深度位置编码（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 9 中，逐米编码得到 20.61，按分箱学习编码为 19.68，深度 sin/cos 为 19.57；只编码二维位置为 18.63，不加编码为 18.94。与二维坐标相比，显式的距离提示更适合这里的深度特征读取。
+表 9 的最佳项是逐米可学习编码。它同时保留距离的细粒度变化和编码的可学习性；按分箱编码、固定函数编码及不加编码的对照见图。这里修改的是位置提示，不是表 8 的深度分类目标。
 
 ## 深度引导解码与三维预测
 
@@ -190,9 +183,11 @@ Q 来自物体查询，$K_{D}$、$V_{D}$ 来自深度嵌入，C 是通道维度�
 
 之后才进行查询之间的交互和视觉读取，即 D → I → V → FFN。<strong>深度信息在候选交互之前进入查询，会影响后续的特征更新。</strong>论文使用 50 个查询、256 维通道和三个解码块；50 是候选槽位数，不是固定的最终检测数量。
 
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-order.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-order.svg" alt="表 7 补充示意：查询更新顺序与融合特征对照" loading="lazy"></a><figcaption>表 7 补充示意 · 查询更新顺序与融合特征对照。非原论文图，点击放大。</figcaption></figure>
+
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-7.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-7.png" alt="MonoDETR 原论文表 7：解码层的注意力顺序" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 7 · 解码层的注意力顺序（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 7 直接检验顺序：D → I → V 为 20.61，I → D → V 为 19.28，I → V → D 为 18.85。最后一行将深度与视觉特征相加后统一读取，结果为 18.41，并非依次执行两次独立交叉注意力。<strong>在这组配置下，先读深度再进行候选交互与视觉读取更有效。</strong>
+表 7 中 D → I → V 最好。<strong>深度先进入查询，再参与候选交互与视觉读取</strong>；第四行则先融合深度与视觉特征，只做一次交叉注意力，不能理解为依次执行 D 和 V。
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-fig-6.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-fig-6.png" alt="MonoDETR 原论文图 6：深度注意力的分布" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>图 6 · 深度注意力的分布（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
@@ -228,9 +223,11 @@ $N_{\mathrm{gt}}$ 是匹配到的真值数量，$L_{\mathrm{dmap}}$ 是前景深
 
 前面的实验分别检查了监督、编码和读取方式，完整模型的收益还要与更简单的架构比较。表 5–9 都报告 KITTI 验证集汽车 $\mathrm{AP}_{3D}$，采用 IoU = 0.7、40 个召回率点；上文引用的是 Moderate 列。
 
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-modules.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/ablation-modules.svg" alt="表 5 补充示意：各变体保留与移除的模块" loading="lazy"></a><figcaption>表 5 补充示意 · 各变体保留与移除的模块。非原论文图，点击放大。</figcaption></figure>
+
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-5.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-5.png" alt="MonoDETR 原论文表 5：深度分支的作用" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 5 · 深度分支的作用（<a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文第 8 页</a>，点击图片查看大图）</figcaption></figure>
 
-表 5 中，去掉整个深度引导 Transformer 及深度预测器的中心基线为 15.15；仅为中心基线加入深度预测器为 16.05；采用视觉 Transformer 而不加深度引导分支为 17.81。完整模型为 20.61，<strong>比纯视觉 Transformer 高 2.80 个百分点</strong>。这表明增加一个深度监督分支的收益，和让深度参与整个特征获取过程的收益并不相同。由于比较涉及多个组件，不能将差值全部归给单层注意力。
+表 5 中，完整模型比纯视觉 Transformer 高 2.80 个百分点。仅给中心基线加入深度预测器的收益小于完整架构，说明深度如何参与检测也很重要。图中可以看到，“去掉深度引导”涉及三个组件，不能把全部差值归给单层注意力。
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-2.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-2.png" alt="MonoDETR 原论文表 2：KITTI 检测结果" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 2 · KITTI 检测结果（<a href="https://arxiv.org/pdf/2203.13310v4#page=7">原论文第 7 页</a>，点击图片查看大图）</figcaption></figure>
 
