@@ -27,6 +27,18 @@ toc: true
 
 依据 [原论文 arXiv:2410.19590v2](https://arxiv.org/abs/2410.19590v2)（2025-03-12，含补充材料）和 [官方代码](https://github.com/PuFanqi23/MonoDGP)。图表及指标均来自作者，未独立复现。
 
+## 主要贡献
+
+MonoDGP 在 MonoDETR 框架上做了三项改动，其中前两项分别改变深度输出和查询的处理方式：
+
+| 改动 | 具体做法 | 需要分清的区别 |
+|---|---|---|
+| <strong>几何深度＋学习残差</strong> | 用预测车高和二维框高计算几何深度，再由网络预测距离修正量 | 训练监督相加后的最终深度，推理也使用这个和；不是仅增加一项残差损失 |
+| <strong>二维、三维查询解耦</strong> | 二维头读取视觉解码器输出的 2D Query；这份查询继续经过深度引导解码器，得到供三维头使用的 3D Query | 两者是前后衔接的查询状态，不是两组互不相关的查询；三维解码器的 D → I → V 顺序仍沿用 MonoDETR |
+| <strong>RSH 前景区域增强</strong> | 用预测前景概率加权特征，并添加前景/背景的可学习向量 | 连续概率负责加权，阈值划分负责选择区域向量；后者借鉴 BERT 的 segment embedding |
+
+这三项分别回答：<strong>距离怎样算、二维与三维预测分别使用哪一步的特征、输入特征怎样利用前景信息。</strong> 主模型沿用检测标注构造监督，不需要额外的稠密深度或像素级轮廓标注。后文依次解释机制，并用对应消融区分各项改动的作用。
+
 ## 从预测深度改为预测几何误差
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodgp/fig-1.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodgp/fig-1.png" alt="MonoDGP 图 1：与 MonoDETR 的结构及预测量比较" loading="lazy"></a><figcaption>图 1 · 与 MonoDETR 的结构及预测量比较（<a href="https://arxiv.org/pdf/2410.19590v2#page=1">原文第 1 页</a>，点击放大）</figcaption></figure>
