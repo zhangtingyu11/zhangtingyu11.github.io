@@ -69,14 +69,17 @@ $$
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-8.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-8.png" alt="MonoDETR 原论文表 8：深度监督与分箱方式" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 8 · 深度监督与分箱方式（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
-<strong>表 8 的消融对象是图 3 中深度预测器所学习的深度图表示：一部分改变监督标签，另一部分改变深度类别的划分。</strong>这里没有替换注意力机制，也不是删除整个深度分支。行名由两个部分组成，前半段表示用什么标签训练，后半段表示怎样将连续距离转换成分类标签。
+表 8 改的是深度预测分支的训练目标：<strong>Fore. / Dense 改监督标签，LID / UD / SID 改距离分箱。</strong>
 
-| 原表配置 | 深度监督标签 | 分箱方式 | 相对默认配置修改了什么 |
-|---|---|---|---|
-| Fore. LID | Foreground：物体级前景深度，框内填入对应物体距离 | LID：区间宽度随距离线性递增 | 默认配置 |
-| Dense LID | Dense：稠密深度监督，用位置相关的深度标签代替框内统一的物体级距离 | 仍为 LID | 更换监督表示，保留分箱方式 |
-| Fore. UD | 与第一行相同的物体级前景监督 | UD：Uniform Discretization，等宽分箱 | 只更换分箱方式 |
-| Fore. SID | 与第一行相同的物体级前景监督 | SID：Spacing-Increasing Discretization，按对数尺度划分，远处区间更宽 | 只更换分箱方式 |
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-ablation.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-ablation.svg" alt="表 8 消融流程：Fore 框内填深度，Dense 改监督，UD/SID 改分箱，类别标签与预测计算 focal loss" loading="lazy"></a><figcaption>补充示意，非论文原图。Dense 的具体标签生成流程未公开，图中不作推断。</figcaption></figure>
+
+- **Fore. LID ↔ Dense LID：** 分箱不变，换监督表示。Moderate AP 从 20.61 变为 19.85。
+- **Fore. LID ↔ Fore. UD / SID：** 框内填深度不变，换分箱。结果分别为 20.61、18.90、18.95。
+
+这些数值是 KITTI 验证集汽车 $\mathrm{AP}_{3D}$（IoU = 0.7，40 个召回率点），不是深度误差。后续消融也沿用这一评价设置。
+
+<details>
+<summary>实现细节：标签张量、loss 和分箱切换</summary>
 
 #### 一次训练中，Fore. LID 实际怎样生成监督
 
@@ -116,18 +119,8 @@ $$
 
 官方当前代码的 `bin_depths` 包含 UD、LID、SID 三个分支，但默认 loss 调用采用 LID，预测器里的 `depth_bin_values` 也按 LID 构造。因此，切换其他分箱需要检查并同步这两端，不能假定主分支已有一键复现表 8 的完整配置。这里说明的是切换所需的操作与一致性条件，不声称已经复现作者的 UD、SID 实验。
 
-#### Dense LID 的改动落在目标深度图的构造
 
-Dense LID 保留 LID 分箱，替换上面第二步的框内填充式监督。它需要一张与图像位置对齐的稠密深度标签图：每个有效位置使用该位置的深度，再按 LID 转成类别，而不是把整个物体框填成统一的中心距离。例如，若稠密标签中两个位置分别为 19.2 m、20.8 m，它们就分别分箱；这两个数只是说明操作的假设示例，不是原文数据。
-
-<strong>原文能确认 Dense 使用稠密深度监督，但没有给出其完整标签生成流程。</strong>正文没有说明这张标签图来自哪种方法、怎样补全、怎样处理无效像素；检查到的官方默认 loss 仍调用框内填充函数。因而目前可以定位到需要更换的监督构造环节，不能把某种 LiDAR 投影或深度补全方案编成作者实际做法。表中的 Dense 也不表示推理时额外输入一张深度图：它讨论的是深度预测分支的监督表示。
-
-下文消融均采用 KITTI 验证集汽车 $\mathrm{AP}_{3D}$（IoU = 0.7，40 个召回率点），正文引用 Moderate 列。<strong>表里的数值是完整检测器的三维检测精度，不是深度图误差。</strong>对照关系应分两组理解：
-
-- **监督表示：** Fore. LID 对 Dense LID，分箱方式相同，20.61 对 19.85，相差 0.76 个百分点。它检验在这套检测网络里，用物体级前景标签还是稠密深度标签来训练深度分支更有效。
-- **分箱方式：** Fore. LID 对 Fore. UD、Fore. SID，前景监督相同，20.61 对 18.90、18.95，分别相差 1.71、1.66 个百分点。它检验同样的物体距离标签采用哪种离散表示更适合后续检测。
-
-Dense LID 与 Fore. UD 同时改变了监督表示和分箱方式，不能用它们的差值单独归因于其中一项。表 8 支持作者在当前配置中采用 Fore. LID；它并不证明稠密深度通常无效，也没有直接测量哪种配置的像素深度更准确。
+</details>
 
 ### 全局深度编码
 
