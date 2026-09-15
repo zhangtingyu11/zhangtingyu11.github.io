@@ -71,7 +71,10 @@ $$
 
 表 8 改的是深度预测分支的训练目标：<strong>Fore. / Dense 改监督标签，LID / UD / SID 改距离分箱。</strong>
 
-<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-ablation.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-ablation.svg" alt="表 8 消融流程：Fore 框内填深度，Dense 改监督，UD/SID 改分箱，类别标签与预测计算 focal loss" loading="lazy"></a><figcaption>补充示意，非论文原图。Dense 的具体标签生成流程未公开，图中不作推断。</figcaption></figure>
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-bins.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-bins.svg" alt="UD、LID、SID 在相同 0–60 米坐标上的分箱宽度对比，示意采用八个分箱" loading="lazy"></a><figcaption>三种深度分箱的补充示意：每个色块是一个类别，共用同一距离刻度。为方便观察画成 8 箱，论文实际为 80 箱。</figcaption></figure>
+
+<strong>UD 等宽切分；LID 的区间宽度逐段增加固定量；SID 在 log(1 + d) 空间等分，远处区间增宽更快。</strong>图中的近处、远处始终使用同一坐标比例，没有为了显示窄区间而拉伸距离轴。
+
 
 - **Fore. LID ↔ Dense LID：** 分箱不变，换监督表示。Moderate AP 从 20.61 变为 19.85。
 - **Fore. LID ↔ Fore. UD / SID：** 框内填深度不变，换分箱。结果分别为 20.61、18.90、18.95。
