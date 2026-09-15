@@ -31,7 +31,30 @@ toc: true
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodgp/fig-1.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodgp/fig-1.png" alt="MonoDGP 图 1：与 MonoDETR 的结构及预测量比较" loading="lazy"></a><figcaption>图 1 · 与 MonoDETR 的结构及预测量比较（<a href="https://arxiv.org/pdf/2410.19590v2#page=1">原文第 1 页</a>，点击放大）</figcaption></figure>
 
-图 1 上半部分比较网络结构，下半部分比较预测量的分布。核心改动在最终距离：<strong>保留几何计算，把学习任务改成预测几何深度到物体中心深度的修正量。</strong> 深度预测分支仍然存在，用于生成解码器读取的深度特征。
+### 图 1：从 MonoDETR 到 MonoDGP
+
+图 1(a) 是 MonoDETR：视觉、深度两路编码得到特征，物体查询通过深度引导解码器读取它们，再进行检测预测。图 1(b) 保留这套主体，在三个位置做了改动：
+
+| 图中的位置 | MonoDGP 的具体操作 | 与后续预测的关系 |
+|---|---|---|
+| 顶部 Region Segmentation Head | 预测前景概率，用概率调整特征权重，并生成前景/背景标记 | 为视觉、深度分支提供经过区域增强的输入 |
+| 中间 Visual Decoder → 2D Queries | 先从视觉特征更新查询，输出二维预测，再把查询和参考点交给三维解码器 | 三维解码从已经获得二维定位信息的状态开始 |
+| 底部 GE Prior | 用预测车高和二维框高计算几何距离，再加上预测的深度误差 | 最终距离改为“几何初值＋残差”，不再使用三路平均 |
+
+以图中一辆车为例，RSH 先给车所在区域较高的前景概率；这些概率用于调整特征，并非把车辆裁出来单独处理。一个可学习查询经过视觉解码器后逐渐对应这辆车，二维头从它预测框的位置与大小。随后，<strong>同一个候选的查询状态继续进入深度引导解码器</strong>，结合深度和视觉特征，预测三维尺寸、朝向及距离修正量。
+
+这里的 <strong>2D Queries 是经过二维解码更新的特征向量</strong>，不是二维框坐标；参考点另行提供空间定位信息。图中的 2D Prediction 从这个阶段分出，3D Prediction 则使用继续更新后的查询。
+
+最后把预测量接起来。假设焦距为 $700\,\mathrm{px}$，预测车高为 $1.5\,\mathrm m$、二维框高为 $50\,\mathrm{px}$，几何式先给出 $21\,\mathrm m$。若三维头预测的残差为 $+2\,\mathrm m$，最终中心距离就是：
+
+$$
+\widehat Z=\underbrace{\frac{700\times1.5}{50}}_{\text{几何初值 }21\,\mathrm m}
++\underbrace{2}_{\text{预测残差，单位 m}}=23\,\mathrm m.
+$$
+
+这只是数值示意。训练时，用相加后的距离与真实中心深度比较，学习修正量。<strong>深度分支仍然提供解码所需的特征；最终距离如何计算，是另一处改动。</strong>
+
+图 1(c) 左边统计完整深度，右边统计几何深度与中心深度的差值。中间箭头表示<strong>将学习目标从完整距离改为剩余误差</strong>，不是网络把一张分布图转换成另一张。作者认为几何式解释了距离变化的主要部分后，剩余误差更集中，可能更容易学习；下面先说明这个误差从何而来，再讨论支撑它的实验。
 
 ### 二维框高为何不能直接代替中心投影高
 
