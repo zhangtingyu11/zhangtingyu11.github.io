@@ -1,5 +1,5 @@
 ---
-title: MonoDETR 论文解读：深度引导的单目三维目标检测
+title: MonoDETR 图解：读懂 6 幅图与 9 张表
 date: 2026-09-15 18:00:00
 updated: 2026-09-15 18:00:00
 permalink: posts/monodetr/
@@ -11,193 +11,143 @@ tags:
   - MonoDETR
   - Transformer
   - 深度估计
-description: 从单目深度歧义出发，理解 MonoDETR 的前景深度监督、双分支编码器、深度引导查询与二维匹配，并结合消融实验分析其贡献和局限。
+description: 用六幅中文示意图和九张完整实验表，读懂 MonoDETR 的深度引导机制与实验依据。
 cover: /assets/autonomous-driving/monocular-3d-detection/monodetr/pipeline.svg
 top_img: /assets/autonomous-driving/monocular-3d-detection/monodetr/pipeline.svg
 aside: true
 toc: true
 ---
 
-一辆车在图片里被框得很准，并不意味着它在三维空间里的位置也很准。二维检测只需要找到图像中的区域，三维检测还要估计距离、实际尺寸和朝向。对于只有一张 RGB 图像的检测器，深度往往是最难确定的信息之一。
+<link rel="stylesheet" href="/assets/autonomous-driving/monocular-3d-detection/monodetr/visual-guide.css">
 
-**MonoDETR 的核心思路，是让候选物体先读取深度相关特征，再结合视觉外观预测三维属性。** 深度不仅是模型最后输出的一个数值，也参与中间的特征获取过程。
+**一张图像，怎样预测物体的三维位置？** MonoDETR 让物体查询先读取深度线索，再结合视觉特征输出三维框。下面沿着论文的 **6 幅图、9 张表** 来理解它。
 
-本文依据 [MonoDETR 的 arXiv v4 版本](https://arxiv.org/abs/2203.13310v4)（2023 年 8 月 24 日）展开，先梳理信息如何流动，再解释关键设计和实验。以下结果均来自论文，未独立复现实验；“领先”仅指论文当时列出的对比方法。
+图为中文自绘示意，表格按论文数值重排；每项均链接到 [论文 v4](https://arxiv.org/abs/2203.13310v4) 对应页。实验结果来自原文，未独立复现。
 
-<!-- more -->
+## 六幅图：先理解方法
 
-## 问题背景：单目深度歧义与局部特征
+### 图 1 · 从中心到全局深度
 
-在针孔相机模型下，物体的图像尺寸同时受到实际尺寸和距离影响。同样大的图像轮廓，可能来自近处的小物体，也可能来自远处的大物体。单张图片缺少直接测距信息，模型需要借助外观、几何先验和场景线索估计深度。
+<figure class="md-figure"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/figure-1.svg" alt="沿上下两条路径比较候选物体如何读取特征。深度引导让 query 获取非局部前景信息，缓解只依赖中心附近特征的限制。" loading="lazy"><figcaption>中文阅读示意 · <a href="https://arxiv.org/pdf/2203.13310v4#page=1">查看原论文图 1（第 1 页）</a></figcaption></figure>
 
-这一点可以与[相机内参](/posts/camera-intrinsics/)联系起来。在忽略倾斜参数的常见约定下，已知三维中心的投影位置 `(u, v)` 和沿相机 Z 轴的深度 `Z`，可以恢复：
+<div class="md-explain"><p><b>怎么看</b>沿上下两条路径比较候选物体如何读取特征。</p><p><b>记住什么</b>深度引导让 query 获取非局部前景信息，缓解只依赖中心附近特征的限制。</p><p class="md-caveat"><b>边界</b>中心引导不意味着骨干网络完全没有上下文。</p></div>
 
-```text
-X = (u − cx) · Z / fx
-Y = (v − cy) · Z / fy
-```
+### 图 2 · 与 DETR、PETR、BEVFormer 的关系
 
-例如，`fx = 1000 px`、`u − cx = 100 px` 时，预测 `Z = 20 m` 得到 `X = 2 m`；若深度被误估为 `25 m`，横向位置也会变成 `2.5 m`。深度误差会同时影响物体的前后位置和横向位置。
+<figure class="md-figure"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/figure-2.svg" alt="从左往右看输入条件、特征表示和输出。MonoDETR 用单目输入做三维检测；PETR(v2)、BEVFormer 面向多视角。" loading="lazy"><figcaption>中文阅读示意 · <a href="https://arxiv.org/pdf/2203.13310v4#page=2">查看原论文图 2（第 2 页）</a></figcaption></figure>
 
-作者在原文图 1 中，把许多已有方法概括为中心引导流程：先找到物体在图像中的投影中心，再聚合附近特征，预测深度、尺寸和朝向。作者认为，这种方式没有充分利用场景级深度关系。
+<div class="md-explain"><p><b>怎么看</b>从左往右看输入条件、特征表示和输出。</p><p><b>记住什么</b>MonoDETR 用单目输入做三维检测；PETR(v2)、BEVFormer 面向多视角。</p><p class="md-caveat"><b>边界</b>这张图用于定位方法，不能据此比较谁更强。</p></div>
 
-这里的“局部”主要指物体属性预测时的特征获取方式，并不意味着这些模型的主干网络完全没有上下文。MonoDETR 更具体的改动，是为候选物体增加一条显式读取全局深度表示的路径。
+### 图 3 · 轻量深度预测器
 
-## 整体架构：视觉与深度的双分支表示
+<figure class="md-figure"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/figure-3.svg" alt="先对齐多尺度特征，再预测深度分箱的概率分布。只用物体标注构造前景深度监督，不需要额外的稠密深度真值。" loading="lazy"><figcaption>中文阅读示意 · <a href="https://arxiv.org/pdf/2203.13310v4#page=3">查看原论文图 3（第 3 页）</a></figcaption></figure>
 
-MonoDETR 沿用 DETR 的集合预测思路，使用一组可学习的 **object queries（物体查询）** 表示候选物体。可以把每个 query 理解为一个等待获得物体信息的槽位：它是一段高维向量，经过多次更新后，输出一个候选物体的类别与三维属性。
+<div class="md-explain"><p><b>怎么看</b>先对齐多尺度特征，再预测深度分箱的概率分布。</p><p><b>记住什么</b>只用物体标注构造前景深度监督，不需要额外的稠密深度真值。</p><p class="md-caveat"><b>边界</b>框内使用物体级深度，不代表每个表面像素的真实距离。</p></div>
 
-query 不是一开始就指定给某辆车的坐标。论文使用 50 个 query 槽位，训练时将预测与真实物体配对，推理时过滤低置信度结果；50 个槽位并不意味着每幅图都会输出 50 个物体。
+### 图 4 · 完整网络
 
-<figure>
-  <img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/pipeline.svg" alt="MonoDETR 信息流：单目图像经过主干后分成视觉和深度两路，查询依次进行深度交叉注意力、查询间自注意力和视觉交叉注意力，最后预测三维属性" loading="lazy">
-  <figcaption>根据原文第 3 节自绘的信息流示意图。省略残差、归一化和部分预测头细节；前景深度标签仅在训练时使用。</figcaption>
-</figure>
+<figure class="md-figure"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/figure-4.svg" alt="沿两条编码分支走到解码器，重点看 D → I → V 的顺序。先读深度，再让候选交互、读取视觉，最后回归三维属性。" loading="lazy"><figcaption>中文阅读示意 · <a href="https://arxiv.org/pdf/2203.13310v4#page=4">查看原论文图 4（第 4 页）</a></figcaption></figure>
 
-图像经过 ResNet-50 后，信息分成两路：
+<div class="md-explain"><p><b>怎么看</b>沿两条编码分支走到解码器，重点看 D → I → V 的顺序。</p><p><b>记住什么</b>先读深度，再让候选交互、读取视觉，最后回归三维属性。</p><p class="md-caveat"><b>边界</b>50 个 query 是候选槽位，不代表每张图固定输出 50 个物体；推理不输入训练标签。</p></div>
 
-| 分支 | 输入与处理 | 提供的信息 |
-| --- | --- | --- |
-| 视觉分支 | 正文使用 1/32 尺度特征，经过视觉编码器 | 外观、类别与视觉语义 |
-| 深度分支 | 融合 1/8、1/16、1/32 特征到 1/16 尺度，经过深度预测器和深度编码器 | 与距离及场景深度关系有关的表示 |
+### 图 5 · 扩展到多视角
 
-视觉编码器有 3 个模块，深度编码器有 1 个模块。论文的实现细节进一步说明：视觉编码器和视觉交叉注意力使用可变形注意力，深度编码器和深度交叉注意力使用全局注意力。因此，不能把所有分支都理解成标准的稠密全局注意力。
+<figure class="md-figure"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/figure-5.svg" alt="上行看 PETRv2 的解码器，下行看 BEVFormer 的 BEV 编码器。深度引导可以作为模块接入其他三维检测框架，实验对应表 4。" loading="lazy"><figcaption>中文阅读示意 · <a href="https://arxiv.org/pdf/2203.13310v4#page=6">查看原论文图 5（第 6 页）</a></figcaption></figure>
 
-**两路信息都来自同一张图像。** 推理阶段没有真实深度图作为额外输入。
+<div class="md-explain"><p><b>怎么看</b>上行看 PETRv2 的解码器，下行看 BEVFormer 的 BEV 编码器。</p><p><b>记住什么</b>深度引导可以作为模块接入其他三维检测框架，实验对应表 4。</p><p class="md-caveat"><b>边界</b>两个框架的插入位置不同，多视角结果不能当作单目结果。</p></div>
 
-## 前景深度监督：从物体标签学习距离信息
+### 图 6 · 注意力可视化
 
-### 物体级标签如何形成深度图
+<figure class="md-figure"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/figure-6.svg" alt="在原图中先定位白色 query 标记，再看对应行的暖色区域。可视化显示部分响应分布在非局部区域，与全局深度聚合的设计一致。" loading="lazy"><figcaption>中文阅读示意 · <a href="https://arxiv.org/pdf/2203.13310v4#page=9">查看原论文图 6（第 9 页）</a></figcaption></figure>
 
-深度分支需要学到与距离有关的特征，但作者不额外要求逐像素的真实深度标注，而是利用已有的物体级三维标注构造监督。
+<div class="md-explain"><p><b>怎么看</b>在原图中先定位白色 query 标记，再看对应行的暖色区域。</p><p><b>记住什么</b>可视化显示部分响应分布在非局部区域，与全局深度聚合的设计一致。</p><p class="md-caveat"><b>边界</b>注意力图提供定性证据，不能单独证明模型学会了正确的几何推理。</p></div>
 
-具体方法是：把一个物体的深度标签赋给它的二维包围框内所有位置；多个框重叠时，使用距离相机最近的物体深度。假设某辆车的标注深度为 20 米，其二维框内区域就被赋予相应的深度类别。
+## 九张表：再检验结论
 
-这是一种粗粒度监督。车身表面各点并不处于同一深度，二维框也可能包含背景。因此，这张图表达的是物体级前景深度，而不是精确的表面几何。
+表 2–3 为 KITTI 对比，表 4 为 nuScenes；表 5–9 为 KITTI 验证集消融，数值为汽车 AP₃D（IoU = 0.7，40 个召回率点）。**↑ 越高越好，↓ 越低越好。**
 
-论文中的“无需额外稠密深度标注”，应理解为**仍然使用物体级二维、三维标注，只是不额外依赖稠密深度图**。这与无监督学习有明确区别。
+### 表 1 · 方法定位
 
-### 深度分箱与深度特征
+<div class="md-table" tabindex="0" role="region" aria-label="表 1：方法定位，可横向滚动"><table><caption>表 1 · 方法定位（原表数值重排）</caption><thead><tr><th scope="col">方法 / 输入</th><th scope="col">DETR</th><th scope="col">额外数据</th><th scope="col">引导</th><th scope="col">Query</th><th scope="col">聚合</th></tr></thead><tbody><tr><th scope="row">DETR3D / 多视角</th><td>是</td><td>—</td><td>视觉</td><td>3D</td><td>局部</td></tr><tr><th scope="row">PETR(v2) / 多视角</th><td>是</td><td>时序</td><td>视觉</td><td>3D</td><td>全局</td></tr><tr><th scope="row">BEVFormer / 多视角</th><td>是</td><td>时序</td><td>视觉</td><td>BEV、3D</td><td>全局</td></tr><tr><th scope="row">MonoDTR / 单目</th><td>否</td><td>LiDAR</td><td>中心</td><td>无</td><td>局部</td></tr><tr><th scope="row">MonoDETR / 单目</th><td>是</td><td>—</td><td>深度</td><td>深度感知</td><td>全局</td></tr></tbody></table></div>
 
-深度预测器输出每个位置属于不同深度区间的概率。论文设置 80 个前景深度分箱，范围为 0–60 米，另设一个背景类别。
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=3">原论文表 1 · 第 3 页</a></p>
 
-分箱采用 LID，即线性递增离散化：越远的深度区间越宽。它的出发点是，远处物体通常有更大的深度估计误差，用较宽的区间进行分类更容易容纳这种误差。
+<div class="md-explain"><p><b>怎么看</b>按行比较输入、是否采用 DETR、额外数据和特征聚合方式。</p><p><b>记住什么</b>MonoDETR 的组合是：单目输入 + DETR 查询 + 全局深度引导。</p><p class="md-caveat"><b>边界</b>MonoDTR 与 MonoDETR 名字相近，但检测范式不同；这张表是原论文对所列版本的概括。</p></div>
 
-阅读网络结构时，需要区分以下三个对象：
+### 表 2 · KITTI 主结果
 
-| 对象 | 含义 | 作用 |
-| --- | --- | --- |
-| 前景深度分布 | 每个位置对不同深度区间的预测概率 | 接受物体级深度监督，并用于估计位置深度 |
-| 深度特征 | 每个位置的一段高维向量 | 经过编码后供 query 读取 |
-| 物体深度输出 | 每个候选物体最终预测的深度 | 与其他属性共同恢复三维框 |
+<div class="md-stat"><strong>16.47</strong><span>Test AP₃D · Moderate · +1.08 个百分点</span></div>
 
-注意力读取的是深度特征向量，不能把整个过程简化为“对一张距离图取平均”。
+<details class="md-details"><summary>展开完整实验表（含所有方法与指标）</summary><div class="md-table" tabindex="0" role="region" aria-label="表 2：KITTI 主结果，可横向滚动"><table><caption>表 2 · KITTI 主结果（原表数值重排）</caption><thead><tr><th scope="col">方法</th><th scope="col">额外数据</th><th scope="col">Test 3D·易</th><th scope="col">Test 3D·中</th><th scope="col">Test 3D·难</th><th scope="col">Test BEV·易</th><th scope="col">Test BEV·中</th><th scope="col">Test BEV·难</th><th scope="col">Val 3D·易</th><th scope="col">Val 3D·中</th><th scope="col">Val 3D·难</th></tr></thead><tbody><tr><th scope="row">PatchNet</th><td>Depth</td><td>15.68</td><td>11.12</td><td>10.17</td><td>22.97</td><td>16.86</td><td>14.97</td><td>-</td><td>-</td><td>-</td></tr><tr><th scope="row">D4LCN</th><td>Depth</td><td>16.65</td><td>11.72</td><td>9.51</td><td>22.51</td><td>16.02</td><td>12.55</td><td>-</td><td>-</td><td>-</td></tr><tr><th scope="row">DDMP-3D</th><td>Depth</td><td>19.71</td><td>12.78</td><td>9.80</td><td>28.08</td><td>17.89</td><td>13.44</td><td>-</td><td>-</td><td>-</td></tr><tr><th scope="row">Kinematic3D</th><td>Video</td><td>19.07</td><td>12.72</td><td>9.17</td><td>26.69</td><td>17.52</td><td>13.10</td><td>19.76</td><td>14.10</td><td>10.47</td></tr><tr><th scope="row">MonoRUn</th><td>LiDAR</td><td>19.65</td><td>12.30</td><td>10.58</td><td>27.94</td><td>17.34</td><td>15.24</td><td>20.02</td><td>14.65</td><td>12.61</td></tr><tr><th scope="row">CaDDN</th><td>LiDAR</td><td>19.17</td><td>13.41</td><td>11.46</td><td>27.94</td><td>18.91</td><td>17.19</td><td>23.57</td><td>16.31</td><td>13.84</td></tr><tr><th scope="row">MonoDTR</th><td>LiDAR</td><td>21.99</td><td>15.39</td><td>12.73</td><td>28.59</td><td>20.38</td><td>17.14</td><td>24.52</td><td>18.57</td><td>15.51</td></tr><tr><th scope="row">AutoShape</th><td>CAD</td><td>22.47</td><td>14.17</td><td>11.36</td><td>30.66</td><td>20.08</td><td>15.59</td><td>20.09</td><td>14.65</td><td>12.07</td></tr><tr><th scope="row">SMOKE</th><td>None</td><td>14.03</td><td>9.76</td><td>7.84</td><td>20.83</td><td>14.49</td><td>12.75</td><td>14.76</td><td>12.85</td><td>11.50</td></tr><tr><th scope="row">MonoPair</th><td>None</td><td>13.04</td><td>9.99</td><td>8.65</td><td>19.28</td><td>14.83</td><td>12.89</td><td>16.28</td><td>12.30</td><td>10.42</td></tr><tr><th scope="row">RTM3D</th><td>None</td><td>13.61</td><td>10.09</td><td>8.18</td><td>-</td><td>-</td><td>-</td><td>19.47</td><td>16.29</td><td>15.57</td></tr><tr><th scope="row">PGD</th><td>None</td><td>19.05</td><td>11.76</td><td>9.39</td><td>26.89</td><td>16.51</td><td>13.49</td><td>19.27</td><td>13.23</td><td>10.65</td></tr><tr><th scope="row">IAFA</th><td>None</td><td>17.81</td><td>12.01</td><td>10.61</td><td>25.88</td><td>17.88</td><td>15.35</td><td>18.95</td><td>14.96</td><td>14.84</td></tr><tr><th scope="row">MonoDLE</th><td>None</td><td>17.23</td><td>12.26</td><td>10.29</td><td>24.79</td><td>18.89</td><td>16.00</td><td>17.45</td><td>13.66</td><td>11.68</td></tr><tr><th scope="row">MonoRCNN</th><td>None</td><td>18.36</td><td>12.65</td><td>10.03</td><td>25.48</td><td>18.11</td><td>14.10</td><td>16.61</td><td>13.19</td><td>10.65</td></tr><tr><th scope="row">MonoGeo</th><td>None</td><td>18.85</td><td>13.81</td><td>11.52</td><td>25.86</td><td>18.99</td><td>16.19</td><td>18.45</td><td>14.48</td><td>12.87</td></tr><tr><th scope="row">MonoFlex</th><td>None</td><td>19.94</td><td>13.89</td><td>12.07</td><td>28.23</td><td>19.75</td><td>16.89</td><td>23.64</td><td>17.51</td><td>14.83</td></tr><tr><th scope="row">GUPNet</th><td>None</td><td>20.11</td><td>14.20</td><td>11.77</td><td>-</td><td>-</td><td>-</td><td>22.76</td><td>16.46</td><td>13.72</td></tr><tr class="md-best"><th scope="row">MonoDETR</th><td>None</td><td>25.00</td><td>16.47</td><td>13.58</td><td>33.60</td><td>22.11</td><td>18.60</td><td>28.84</td><td>20.61</td><td>16.38</td></tr><tr><th scope="row">相对各列次优提升</th><td>—</td><td>+2.53</td><td>+1.08</td><td>+0.85</td><td>+2.94</td><td>+1.73</td><td>+1.41</td><td>+4.32</td><td>+2.04</td><td>+0.81</td></tr></tbody></table></div></details>
 
-## 深度引导解码器：让 query 先读取几何线索
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=7">原论文表 2 · 第 7 页</a></p>
 
-### 三种注意力的执行顺序
+<div class="md-explain"><p><b>怎么看</b>固定一种指标与数据划分，再横向看 Easy / Moderate / Hard。AP 使用 40 个召回率点，类别为汽车。</p><p><b>记住什么</b>Test 3D 中等难度为 16.47，比表中次优 MonoDTR 的 15.39 高 1.08 个百分点。</p><p class="md-caveat"><b>边界</b>不要把 Test 与 Val，或 AP₃D 与 APBEV 混比；跨论文还需核对 IoU 阈值、额外监督和增强。</p></div>
 
-原文图 4 中，每个解码器模块依次执行：
+### 表 3 · 速度与计算量
 
-**深度交叉注意力 → query 间自注意力 → 视觉交叉注意力 → 前馈网络。**
+<div class="md-table" tabindex="0" role="region" aria-label="表 3：速度与计算量，可横向滚动"><table><caption>表 3 · 速度与计算量（原表数值重排）</caption><thead><tr><th scope="col">方法</th><th scope="col">耗时 ms ↓</th><th scope="col">GFLOPs ↓</th><th scope="col">Test AP₃D·中 ↑</th></tr></thead><tbody><tr><th scope="row">MonoDLE</th><td>40</td><td>79.12</td><td>12.26</td></tr><tr><th scope="row">GUPNet</th><td>34</td><td>62.32</td><td>15.02</td></tr><tr><th scope="row">MonoDTR</th><td>37</td><td>120.48</td><td>15.39</td></tr><tr class="md-best"><th scope="row">MonoDETR</th><td>38</td><td>62.12</td><td>16.47</td></tr></tbody></table></div>
 
-第一步，query 从深度嵌入中聚合信息。第二步，各个 query 交换已有信息。第三步，已经携带深度线索的 query 再读取视觉表示。论文堆叠 3 个这样的模块。
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=7">原论文表 3 · 第 7 页</a></p>
 
-这个顺序使深度能够影响后续的信息获取。它不是只在末端增加一个深度预测头，而是在候选物体逐步形成表示的过程中加入距离线索。
+<div class="md-explain"><p><b>怎么看</b>在 RTX 3090、batch=1 下看耗时，再看计算量与精度。</p><p><b>记住什么</b>MonoDETR 为 38 ms、62.12 GFLOPs，在该比较中取得最高精度，但不是最快。</p><p class="md-caveat"><b>边界</b>表 3 的 GUPNet 为 15.02，表 2 为 14.20；保留原表数值，不把二者当作同一设置。</p></div>
 
-### 深度交叉注意力的计算
+### 表 4 · 多视角扩展结果
 
-把物体查询记为 `q`，编码后的深度特征记为 `Fᴰ`。线性变换后得到查询 `Q`、键 `K` 和值 `V`。省略多头、残差等实现细节，原文式（2）至（4）的核心计算可以写成：
+<div class="md-stat"><strong>+0.012 / +0.009</strong><span>PETRv2 / BEVFormer · NDS · 同框架前后对比</span></div>
 
-<p><code>Q = Linear(q)</code>，<code>K, V = Linear(Fᴰ)</code></p>
-<p><code>A = softmax(QKᵀ / √C)</code>，<code>q′ = Linear(AV)</code></p>
+<details class="md-details"><summary>展开完整实验表（含所有方法与指标）</summary><div class="md-table" tabindex="0" role="region" aria-label="表 4：多视角扩展结果，可横向滚动"><table><caption>表 4 · 多视角扩展结果（原表数值重排）</caption><thead><tr><th scope="col">方法</th><th scope="col">图像尺寸</th><th scope="col">NDS ↑</th><th scope="col">mAP ↑</th><th scope="col">mATE ↓</th><th scope="col">mASE ↓</th><th scope="col">mAOE ↓</th><th scope="col">mAVE ↓</th><th scope="col">mAAE ↓</th></tr></thead><tbody><tr><th scope="row">CenterNet</th><td>—</td><td>0.328</td><td>0.306</td><td>0.716</td><td>0.264</td><td>0.609</td><td>1.426</td><td>0.658</td></tr><tr><th scope="row">FCOS3D*</th><td>1600×900</td><td>0.415</td><td>0.343</td><td>0.725</td><td>0.263</td><td>0.422</td><td>1.292</td><td>0.153</td></tr><tr><th scope="row">PGD*</th><td>1600×900</td><td>0.428</td><td>0.369</td><td>0.683</td><td>0.260</td><td>0.439</td><td>1.268</td><td>0.185</td></tr><tr><th scope="row">DETR3D†</th><td>1600×900</td><td>0.434</td><td>0.349</td><td>0.716</td><td>0.268</td><td>0.379</td><td>0.842</td><td>0.200</td></tr><tr><th scope="row">BEVDet†</th><td>1408×512</td><td>0.417</td><td>0.349</td><td>0.637</td><td>0.269</td><td>0.490</td><td>0.914</td><td>0.268</td></tr><tr><th scope="row">PETR†</th><td>1600×900</td><td>0.442</td><td>0.370</td><td>0.711</td><td>0.267</td><td>0.383</td><td>0.865</td><td>0.201</td></tr><tr><th scope="row">PETRv2</th><td>800×320</td><td>0.496</td><td>0.401</td><td>0.745</td><td>0.268</td><td>0.448</td><td>0.394</td><td>0.184</td></tr><tr class="md-best"><th scope="row">PETRv2 + 深度引导</th><td>800×320</td><td>0.508</td><td>0.410</td><td>0.727</td><td>0.265</td><td>0.389</td><td>0.419</td><td>0.187</td></tr><tr><th scope="row">BEVFormer</th><td>1600×900</td><td>0.517</td><td>0.416</td><td>0.673</td><td>0.274</td><td>0.372</td><td>0.394</td><td>0.198</td></tr><tr class="md-best"><th scope="row">BEVFormer + 深度引导</th><td>1600×900</td><td>0.526</td><td>0.423</td><td>0.661</td><td>0.272</td><td>0.349</td><td>0.371</td><td>0.192</td></tr></tbody></table></div></details>
 
-如果有 `N` 个 query、`M` 个深度特征位置，那么注意力矩阵 `A` 的形状就是 `N × M`。第 n 行表示第 n 个 query 应当从各个位置获取多少信息。`AV` 根据这些权重汇总特征，产生更新后的 query。
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文表 4 · 第 8 页</a></p>
 
-`QKᵀ` 衡量的是学习到的特征相容性，不是两个物体的物理距离。全局注意力允许访问整个特征图，也不代表每个位置都同样重要。
+<div class="md-explain"><p><b>怎么看</b>先看 PETRv2、BEVFormer 各自加入模块前后的配对行。* 表示两阶段微调及测试增强，† 表示 CBGS；两组扩展实验均不用这些增强。</p><p><b>记住什么</b>PETRv2 的 NDS：0.496 → 0.508；BEVFormer：0.517 → 0.526。</p><p class="md-caveat"><b>边界</b>增益并非覆盖所有指标：PETRv2 的速度误差 0.394 → 0.419，属性误差 0.184 → 0.187，均变差。</p></div>
 
-### 深度位置编码
+<p class="md-source">NDS 为综合检测分数；mAP 为平均精度。mATE、mASE、mAOE、mAVE、mAAE 分别衡量平移、尺寸、朝向、速度、属性误差。</p>
 
-仅有特征内容，还需要告诉模型这些位置对应怎样的距离。MonoDETR 为每一米设置一个可学习编码，并根据预测的连续深度插值得到具体位置的编码，再加到深度嵌入上。
+### 表 5 · 大模块消融
 
-例如，预测深度为 12.3 米时，可以理解为在相邻米级编码之间进行插值。这与前面的 80 个非均匀深度分箱是两个设计：分箱用于深度分类，逐米编码用于提供位置提示。
+<div class="md-table" tabindex="0" role="region" aria-label="表 5：大模块消融，可横向滚动"><table><caption>表 5 · 大模块消融（原表数值重排）</caption><thead><tr><th scope="col">架构</th><th scope="col">Easy</th><th scope="col">Moderate</th><th scope="col">Hard</th></tr></thead><tbody><tr class="md-best"><th scope="row">完整 MonoDETR</th><td>28.84</td><td><span class="md-bar" style="--bar:68.70%">20.61</span></td><td>16.38</td></tr><tr><th scope="row">去掉整个深度引导 Transformer</th><td>19.69</td><td><span class="md-bar" style="--bar:50.50%">15.15</span></td><td>13.93</td></tr><tr><th scope="row">深度预测器 + 中心基线，无 Transformer</th><td>20.19</td><td><span class="md-bar" style="--bar:53.50%">16.05</span></td><td>14.18</td></tr><tr><th scope="row">视觉 Transformer，无深度引导分支</th><td>24.14</td><td><span class="md-bar" style="--bar:59.37%">17.81</span></td><td>15.60</td></tr></tbody></table></div>
 
-因此，query 读取到的信息既包括深度相关内容，也包括距离位置编码。
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文表 5 · 第 8 页</a></p>
 
-## 训练目标：二维匹配与三维属性学习
+<div class="md-explain"><p><b>怎么看</b>四行分别去掉大模块，观察完整架构相比对应基线的变化。</p><p><b>记住什么</b>完整模型比纯视觉 Transformer 高 2.80 个百分点：20.61 − 17.81。</p><p class="md-caveat"><b>边界</b>“无深度引导”移除预测器、深度编码器与深度交叉注意力，不能把增益全归给一个 attention 层。</p></div>
 
-解码器之后，每个 query 预测类别、二维尺寸、投影三维中心、深度、三维尺寸和朝向。推理时结合相机参数恢复三维框，并过滤类别置信度低于 0.2 的结果，不使用 NMS。
+### 表 6 · 深度编码器
 
-训练中，queries 是无序的，需要先决定每个预测由哪个真实物体监督。MonoDETR 使用匈牙利算法寻找一对一匹配，将属性损失分成两组：
+<div class="md-table" tabindex="0" role="region" aria-label="表 6：深度编码器，可横向滚动"><table><caption>表 6 · 深度编码器（原表数值重排）</caption><thead><tr><th scope="col">机制</th><th scope="col">Easy</th><th scope="col">Moderate</th><th scope="col">Hard</th></tr></thead><tbody><tr class="md-best"><th scope="row">全局自注意力</th><td>28.84</td><td><span class="md-bar" style="--bar:68.70%">20.61</span></td><td>16.38</td></tr><tr><th scope="row">可变形自注意力</th><td>26.43</td><td><span class="md-bar" style="--bar:63.03%">18.91</span></td><td>15.55</td></tr><tr><th scope="row">两层 3×3 卷积</th><td>25.55</td><td><span class="md-bar" style="--bar:61.20%">18.36</span></td><td>15.28</td></tr><tr><th scope="row">无深度编码器</th><td>24.25</td><td><span class="md-bar" style="--bar:61.27%">18.38</span></td><td>15.41</td></tr></tbody></table></div>
 
-| 损失组 | 包含的属性 |
-| --- | --- |
-| L₂ᴅ | 类别、二维尺寸、投影三维中心 |
-| L₃ᴅ | 深度、三维尺寸、朝向 |
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=8">原论文表 6 · 第 8 页</a></p>
 
-**匹配时只使用 L₂ᴅ，匹配后同时计算 L₂ᴅ 和 L₃ᴅ。** 作者给出的理由是：训练初期三维预测不稳定，直接把三维误差加入匹配代价，可能干扰配对。
+<div class="md-explain"><p><b>怎么看</b>替换深度编码器，而不是视觉编码器；“无”表示深度特征直接送入 decoder。</p><p><b>记住什么</b>全局自注意力最好；相对无编码器，中等 AP 提高 2.23 个百分点。</p><p class="md-caveat"><b>边界</b>支持此设置下非局部深度编码的价值，不能推出可变形注意力在所有任务中都更差。</p></div>
 
-这里需要分清匹配代价和优化目标。前者决定“哪个 query 负责哪个物体”，后者决定“确定配对之后，要改进哪些预测”。只用二维代价匹配，不意味着只训练二维检测。
+### 表 7 · 解码器的顺序
 
-总损失可以概括为匹配对上的二维与三维属性损失，加上前景深度图的分类损失。论文正文式（6）给出了总体形式；具体属性权重、未匹配 query 的分类处理等仍需结合补充材料和代码核查。
+<div class="md-table" tabindex="0" role="region" aria-label="表 7：解码器的顺序，可横向滚动"><table><caption>表 7 · 解码器的顺序（原表数值重排）</caption><thead><tr><th scope="col">顺序</th><th scope="col">Easy</th><th scope="col">Moderate</th><th scope="col">Hard</th></tr></thead><tbody><tr class="md-best"><th scope="row">D → I → V</th><td>28.84</td><td><span class="md-bar" style="--bar:68.70%">20.61</span></td><td>16.38</td></tr><tr><th scope="row">I → D → V</th><td>26.24</td><td><span class="md-bar" style="--bar:64.27%">19.28</span></td><td>16.03</td></tr><tr><th scope="row">I → V → D</th><td>25.84</td><td><span class="md-bar" style="--bar:62.83%">18.85</span></td><td>15.72</td></tr><tr><th scope="row">I → (D + V)</th><td>24.94</td><td><span class="md-bar" style="--bar:61.37%">18.41</span></td><td>15.39</td></tr></tbody></table></div>
 
-## 实验结果：深度引导带来了什么
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文表 7 · 第 9 页</a></p>
 
-### 主结果与比较条件
+<div class="md-explain"><p><b>怎么看</b>D＝深度交叉注意力；I＝查询间自注意力；V＝视觉交叉注意力。最后一行先融合特征，再统一交叉注意力。</p><p><b>记住什么</b>D → I → V 最好：先用深度更新 query，再进行物体交互与视觉聚合。</p><p class="md-caveat"><b>边界</b>这是顺序实验；I → (D + V) 不是先后执行两个独立 attention 层。</p></div>
 
-论文在 KITTI 上报告汽车类别的结果，使用 40 个召回率采样点计算 AP。下面只列三维 AP，避免与鸟瞰图 AP 混在一起：
+### 表 8 · 前景监督与深度分箱
 
-| 数据划分 | 简单 | 中等 | 困难 |
-| --- | ---: | ---: | ---: |
-| KITTI Test，MonoDETR | 25.00 | 16.47 | 13.58 |
-| KITTI Val，MonoDETR | 28.84 | 20.61 | 16.38 |
+<div class="md-table" tabindex="0" role="region" aria-label="表 8：前景监督与深度分箱，可横向滚动"><table><caption>表 8 · 前景监督与深度分箱（原表数值重排）</caption><thead><tr><th scope="col">深度图 / 分箱</th><th scope="col">Easy</th><th scope="col">Moderate</th><th scope="col">Hard</th></tr></thead><tbody><tr class="md-best"><th scope="row">前景 + LID</th><td>28.84</td><td><span class="md-bar" style="--bar:68.70%">20.61</span></td><td>16.38</td></tr><tr><th scope="row">稠密 + LID</th><td>27.69</td><td><span class="md-bar" style="--bar:66.17%">19.85</span></td><td>15.98</td></tr><tr><th scope="row">前景 + UD</th><td>25.61</td><td><span class="md-bar" style="--bar:63.00%">18.90</span></td><td>15.49</td></tr><tr><th scope="row">前景 + SID</th><td>26.05</td><td><span class="md-bar" style="--bar:63.17%">18.95</span></td><td>15.59</td></tr></tbody></table></div>
 
-数据来自原文表 2。测试集与验证集是不同划分，不能把 16.47 和 20.61 当成同一协议下的两个模型结果。与其他论文比较时，还应核对类别、IoU 阈值、额外训练信息和测试增强。原表标题没有写明 IoU 阈值，严格复现时需要继续核查评测配置。
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文表 8 · 第 9 页</a></p>
 
-在论文列出的测试集中等难度结果中，MonoDTR 为 15.39，MonoDETR 为 16.47，相差 **1.08 个百分点**。MonoDTR 与 MonoDETR 也不是同一个方法：根据本文对比，前者使用 Transformer，但不采用 DETR 的 query 集合预测流程，并依赖额外深度监督、锚框和 NMS。
+<div class="md-explain"><p><b>怎么看</b>先对比前两行的监督形式，再保持前景监督，对比 UD、SID、LID 的分箱方式。</p><p><b>记住什么</b>前景 LID 比稠密 LID 高 0.76 个百分点；比前景 UD 高 1.71。</p><p class="md-caveat"><b>边界</b>不能推出“稠密深度无用”。结果只支持该网络与监督配置下的选择。</p></div>
 
-### 关键消融
+<p class="md-source">UD：均匀分箱；SID：按对数尺度分箱；LID：分箱宽度随距离线性增大。</p>
 
-表 5 比排行榜更直接地回答了深度引导的作用。以下均为 KITTI 验证集汽车类别的中等难度三维 AP：
+### 表 9 · 深度位置编码
 
-| 配置 | AP |
-| --- | ---: |
-| 移除整个深度引导 Transformer，构造中心引导基线 | 15.15 |
-| 中心引导基线加深度预测器，不使用 Transformer | 16.05 |
-| 视觉 Transformer，移除深度引导分支 | 17.81 |
-| 完整 MonoDETR | **20.61** |
+<div class="md-table" tabindex="0" role="region" aria-label="表 9：深度位置编码，可横向滚动"><table><caption>表 9 · 深度位置编码（原表数值重排）</caption><thead><tr><th scope="col">编码方式</th><th scope="col">Easy</th><th scope="col">Moderate</th><th scope="col">Hard</th></tr></thead><tbody><tr class="md-best"><th scope="row">逐米可学习编码</th><td>28.84</td><td><span class="md-bar" style="--bar:68.70%">20.61</span></td><td>16.38</td></tr><tr><th scope="row">按分箱可学习编码</th><td>28.06</td><td><span class="md-bar" style="--bar:65.60%">19.68</span></td><td>16.04</td></tr><tr><th scope="row">深度 sin/cos</th><td>27.42</td><td><span class="md-bar" style="--bar:65.23%">19.57</span></td><td>15.82</td></tr><tr><th scope="row">二维 sin/cos</th><td>26.48</td><td><span class="md-bar" style="--bar:62.10%">18.63</span></td><td>15.52</td></tr><tr><th scope="row">无位置编码</th><td>26.76</td><td><span class="md-bar" style="--bar:63.13%">18.94</span></td><td>15.85</td></tr></tbody></table></div>
 
-完整模型相对视觉 Transformer 变体提高 2.80 个百分点。这支持深度引导设计的价值，但不能把全部提升归给单个注意力层：按照正文描述，该变体同时移除了深度预测器、深度编码器和深度交叉注意力。
+<p class="md-source"><a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文表 9 · 第 9 页</a></p>
 
-其他消融进一步检验具体选择：
+<div class="md-explain"><p><b>怎么看</b>区分编码什么（深度或二维位置）与怎样编码（学习向量或 sin/cos）。</p><p><b>记住什么</b>逐米编码最好；比无编码的 18.94 高 1.67 个百分点。</p><p class="md-caveat"><b>边界</b>逐米位置编码不同于 80 个 LID 深度分箱：前者提供距离提示，后者用于深度分类。</p></div>
 
-| 对照问题 | 结果：中等难度 AP | 对应原表 |
-| --- | --- | --- |
-| 深度 encoder 使用全局还是可变形注意力 | 20.61 对 18.91 | 表 6 |
-| 先读深度，还是先做 query 间交互 | D→I→V 为 20.61；I→D→V 为 19.28 | 表 7 |
-| 使用前景还是稠密深度监督 | 前景 LID 20.61；稠密 LID 19.85 | 表 8 |
-| 是否提供逐米深度位置编码 | 20.61 对无编码的 18.94 | 表 9 |
+## 读完带走什么
 
-这些实验支持论文所选配置，但没有报告多次训练的方差，也不能把不同消融表中的增益简单相加。表 8 更不能推出“精确稠密深度普遍无用”，因为它比较的是特定网络和监督设置。
+**核心贡献：把深度用于中间的信息读取。** 图 4 串起网络，表 5 检验深度分支，表 7 检验解码顺序。读后续方法时，也可以沿着“深度从哪里来、在哪里用、增益由什么实验支撑”这三个问题展开。
 
-作者还将深度引导模块接入 PETRv2 和 BEVFormer：在 nuScenes 验证集上，NDS 分别从 0.496 提高到 0.508、从 0.517 提高到 0.526（表 4）。这说明模块有跨框架应用潜力；它属于多相机扩展实验，应与单帧单目的 KITTI 主实验分开理解。
-
-## 局限与阅读启示
-
-MonoDETR 建立了一条清楚的信息路径：**物体级深度监督帮助形成深度表示，深度表示再通过交叉注意力更新 queries，参与后续视觉聚合与三维预测。** 它的重要性在于把深度信息融入集合预测过程。
-
-但仍有几个问题值得保留：
-
-- **前景标签是近似。** 框内恒深可能包含背景和表面深度误差，不能把前景深度图当作精确场景重建。
-- **可视化不是因果证明。** 原文图 6 展示了非局部注意力响应，但不能单靠热力图证明模型进行了正确的物理几何推理。
-- **匹配与三维目标之间存在取舍。** 二维匹配有助于回避训练早期不稳定，也留下了如何可靠利用三维代价的问题。
-- **结论依赖实验条件。** 深度范围、训练样本筛选和相机条件值得在复现及跨数据集实验中检查。作者本人提出的未来方向是进一步利用多模态信息，例如几何知识蒸馏。
-
-继续阅读后续方法时，可以用三个问题定位其贡献：它改变了深度信息的来源，改变了 query 获取信息的方式，还是改变了匹配与优化目标？先确认改动发生在哪一步，再判断新模块解决了什么问题，会比只记模型名称更有效。
-
-## 参考资料
-
-1. Renrui Zhang 等，[MonoDETR: Depth-guided Transformer for Monocular 3D Object Detection](https://arxiv.org/abs/2203.13310v4)，arXiv v4，2023。架构与方法见第 3–6 页，实验见第 7–9 页。
-2. [MonoDETR 作者代码仓库](https://github.com/ZrrSkywalker/MonoDETR)。本文解释以论文版本为准，未核验仓库各版本与论文设置的全部差异。
-
-本文为基于论文的中文解读；流程图为自绘示意，实验数字注明原表来源。
+论文：Renrui Zhang et al., *MonoDETR: Depth-guided Transformer for Monocular 3D Object Detection*, ICCV 2023. [arXiv v4](https://arxiv.org/abs/2203.13310v4) · [官方代码](https://github.com/ZrrSkywalker/MonoDETR)
