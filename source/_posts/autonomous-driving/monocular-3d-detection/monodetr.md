@@ -69,7 +69,25 @@ $$
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-8.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/original-table-8.png" alt="MonoDETR 原论文表 8：深度监督与分箱方式" loading="lazy" style="background:white;width:100%;height:auto"></a><figcaption>表 8 · 深度监督与分箱方式（<a href="https://arxiv.org/pdf/2203.13310v4#page=9">原论文第 9 页</a>，点击图片查看大图）</figcaption></figure>
 
-下文的消融均采用 KITTI 验证集汽车 $\mathrm{AP}_{3D}$（IoU = 0.7，40 个召回率点），正文引用 Moderate 列。表 8 先比较监督形式：前景 LID 的 Moderate $\mathrm{AP}_{3D}$ 为 20.61，稠密 LID 为 19.85。保持前景监督，改用均匀分箱 UD 或对数间隔分箱 SID，结果为 18.90、18.95。这组结果支持当前网络采用物体级监督和 LID，但不能由此断定稠密深度在其他配置中也没有帮助。
+<strong>表 8 的消融对象是图 3 中深度预测器所学习的深度图表示：一部分改变监督标签，另一部分改变深度类别的划分。</strong>这里没有替换注意力机制，也不是删除整个深度分支。行名由两个部分组成，前半段表示用什么标签训练，后半段表示怎样将连续距离转换成分类标签。
+
+| 原表配置 | 深度监督标签 | 分箱方式 | 相对默认配置修改了什么 |
+|---|---|---|---|
+| Fore. LID | Foreground：物体级前景深度，框内填入对应物体距离 | LID：区间宽度随距离线性递增 | 默认配置 |
+| Dense LID | Dense：稠密深度监督，用位置相关的深度标签代替框内统一的物体级距离 | 仍为 LID | 更换监督表示，保留分箱方式 |
+| Fore. UD | 与第一行相同的物体级前景监督 | UD：Uniform Discretization，等宽分箱 | 只更换分箱方式 |
+| Fore. SID | 与第一行相同的物体级前景监督 | SID：Spacing-Increasing Discretization，按对数尺度划分，远处区间更宽 | 只更换分箱方式 |
+
+例如，一辆车的物体深度标注是 20 m。Fore. 的做法是把它的二维框内像素都赋成该物体的 20 m 标签，再将 20 m 转成相应的深度类别；框外按背景处理，框重叠时采用较近物体的标签。它不要求车头、车尾或框内露出的背景各自具有准确的表面深度。Dense 则改用随像素位置变化的深度监督，不再把整个框看成同一个距离。<strong>论文正文没有交代 Dense 对照的具体标签生成来源、补全方式和有效像素处理细节</strong>，因此不能据此认定它用了哪种稠密深度生成算法。
+
+UD、LID 和 SID 则决定“20 m 被归到哪一类”。UD 在设定范围内等宽划分；LID 让相邻区间的宽度按固定增量增加；SID 按对数尺度安排边界。LID 与 SID 都会使远处区间更宽，但增宽规律不同。改变它们会改变深度预测器的分类目标，不是改变最终三维框的类别，也不是表 9 中逐米位置编码的消融。
+
+下文消融均采用 KITTI 验证集汽车 $\mathrm{AP}_{3D}$（IoU = 0.7，40 个召回率点），正文引用 Moderate 列。<strong>表里的数值是完整检测器的三维检测精度，不是深度图误差。</strong>对照关系应分两组理解：
+
+- **监督表示：** Fore. LID 对 Dense LID，分箱方式相同，20.61 对 19.85，相差 0.76 个百分点。它检验在这套检测网络里，用物体级前景标签还是稠密深度标签来训练深度分支更有效。
+- **分箱方式：** Fore. LID 对 Fore. UD、Fore. SID，前景监督相同，20.61 对 18.90、18.95，分别相差 1.71、1.66 个百分点。它检验同样的物体距离标签采用哪种离散表示更适合后续检测。
+
+Dense LID 与 Fore. UD 同时改变了监督表示和分箱方式，不能用它们的差值单独归因于其中一项。表 8 支持作者在当前配置中采用 Fore. LID；它并不证明稠密深度通常无效，也没有直接测量哪种配置的像素深度更准确。
 
 ### 全局深度编码
 
