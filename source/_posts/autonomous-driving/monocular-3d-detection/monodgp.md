@@ -41,7 +41,7 @@ toc: true
 | 中间 Visual Decoder → 2D Queries | 先从视觉特征更新查询，输出二维预测，再把查询和参考点交给三维解码器 | 三维解码从已经获得二维定位信息的状态开始 |
 | 底部 GE Prior | 用预测车高和二维框高计算几何距离，再加上预测的深度误差 | 最终距离改为“几何初值＋残差”，不再使用三路平均 |
 
-以图中一辆车为例，RSH 先给车所在区域较高的前景概率；这些概率用于调整特征，并非把车辆裁出来单独处理。一个可学习查询经过视觉解码器后逐渐对应这辆车，二维头从它预测框的位置与大小。随后，<strong>同一个候选的查询状态继续进入深度引导解码器</strong>，结合深度和视觉特征，预测三维尺寸、朝向及距离修正量。
+以图中一辆车为例，RSH 根据图像预测各位置的前景概率，用连续概率加权特征，并以 0.5 为阈值生成前景/背景标记。<strong>概率由网络预测，0.5 只是标记阈值，不是车辆区域必然达到的概率。</strong> 一个可学习查询经过视觉解码器后逐渐对应这辆车，二维头从它预测框的位置与大小。随后，<strong>同一个候选的查询状态继续进入深度引导解码器</strong>，结合深度和视觉特征，预测三维尺寸、朝向及距离修正量。
 
 这里的 <strong>2D Queries 是经过二维解码更新的特征向量</strong>，不是二维框坐标；参考点另行提供空间定位信息。图中的 2D Prediction 从这个阶段分出，3D Prediction 则使用继续更新后的查询。
 
@@ -133,7 +133,9 @@ $$
 
 <figure class="paper-original"><a href="/assets/autonomous-driving/monocular-3d-detection/monodgp/fig-3.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodgp/fig-3.png" alt="MonoDGP 图 3：区域分割头 RSH" loading="lazy"></a><figcaption>图 3 · 区域分割头 RSH（<a href="https://arxiv.org/pdf/2410.19590v2#page=4">原文第 4 页</a>，点击放大）</figcaption></figure>
 
-图 3 左侧逐级上采样、融合多尺度特征，并通过 SE 通道注意力和分割头生成概率图。它有两个用途：连续概率与原特征逐元素相乘，增强前景的相对权重；概率经过阈值后，选择前景或背景向量，加入深度编码的 token 与位置表示。
+图 3 左侧逐级上采样、融合多尺度特征，并通过 SE 通道注意力、分割头和 sigmoid 输出每个位置的前景概率 $p\in[0,1]$。它有两个用途：连续概率与原特征逐元素相乘；概率超过默认阈值 0.5 时选择前景向量，否则选择背景向量，再加入深度编码的 token 与位置表示。
+
+例如下图的 0.2、0.4、0.6、0.8 是示意预测值：特征分别乘以这些数值；阈值为 0.5 时，后两个位置使用前景向量。<strong>概率加权保留连续数值，区域标记才进行二值划分。</strong> 训练希望框内概率接近 1、框外接近 0，但不保证车辆区域都超过 0.5；论文也没有规定车辆区域统一输出多少。
 
 <figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodgp/region-example.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodgp/region-example.png" alt="概率加权与离散区域向量" loading="lazy"></a><figcaption>自绘补充示意 · 概率加权与离散区域向量，非论文实验图。点击放大。</figcaption></figure>
 
