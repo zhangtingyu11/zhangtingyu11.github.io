@@ -205,6 +205,12 @@ $$
 
 r 是回归头输出，σ 是 sigmoid，ε 用于数值稳定；H 是预测物体高度，h 是对应二维框的像素高度，f 是相机焦距。实现对 h 设置至少一个像素的下限，焦距读取自相机矩阵的 [0, 0] 项。$d_{\mathrm{sample}}$ 来自预测中心处的深度图采样。这段公式说明官方代码中的输出计算，并不把当前代码的全部训练配置视为原论文设置。
 
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-training-inference.svg" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodetr/depth-training-inference.svg" alt="三路距离先取平均，训练对平均结果监督，推理使用同一个平均深度" loading="lazy"></a><figcaption>三种距离估计的训练与推理关系，依据官方实现补充绘制。</figcaption></figure>
+
+<strong>三路距离先取平均，再对平均结果计算物体深度 loss；推理同样使用这个平均值，不从三路中选择一路。</strong>代码的 `loss_depths` 读取融合后的 `pred_depth`，使用带预测不确定性的绝对误差损失。梯度通过求平均运算传回三条距离计算路径，并非每路距离分别与物体真值计算一份 loss。
+
+这里还有两类相关监督：几何距离用到的二维框、三维尺寸有各自检测损失；整张深度图另有深度分类 focal loss。<strong>深度图分类损失与融合后的物体深度损失是两个训练目标。</strong>深度图采样坐标在代码中做了 `detach`，因此该采样路径的梯度能回到深度图，但不会通过采样坐标回传到中心预测。
+
 得到中心投影 (u, v) 和深度 Z 后，相机内参将其恢复为相机坐标中的中心。对标准针孔模型，有 $X=\frac{(u-c_x)Z}{f_x}$、$Y=\frac{(v-c_y)Z}{f_y}$，再结合尺寸和朝向得到三维框；实际数据还需遵循标定矩阵和框中心约定。论文推理时过滤低置信度查询，不使用预定义锚框或 NMS。
 
 ### 匹配与训练目标
