@@ -121,7 +121,11 @@ $$
 
 图 2 中，视觉和深度编码仍并行存在；新增的二维视觉解码器先输出二维查询及参考点，二维检测头在这里预测类别、投影中心和二维尺寸。随后，这些查询进入三维深度引导解码器，预测三维尺寸、朝向和深度误差。
 
-<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodgp/query-example.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodgp/query-example.png" alt="二维查询如何进入三维解码" loading="lazy"></a><figcaption>自绘补充示意 · 二维查询如何进入三维解码，非论文实验图。点击放大。</figcaption></figure>
+下面只比较两个预测头接在哪一步。“查询”是候选物体的特征向量，“预测头”则把这份特征转换为框、尺寸等数值。上半图让两个头读取同一阶段的查询；下半图让二维头提前输出，查询再继续传入三维解码器。
+
+<figure class="paper-original supplement"><a href="/assets/autonomous-driving/monocular-3d-detection/monodgp/query-branches.png" target="_blank" rel="noopener"><img src="/assets/autonomous-driving/monocular-3d-detection/monodgp/query-branches.png" alt="共享查询与 MonoDGP 的预测头连接位置：二维头接在视觉解码后，三维头接在深度引导解码后" loading="lazy"></a><figcaption>自绘补充示意 · 二维、三维预测头使用的查询阶段。箭头表示特征传递；省略解码器内部操作与最终几何计算，非论文实验图。点击放大。</figcaption></figure>
+
+以一辆车为例，二维阶段先提取适合图像定位的特征并预测框；三维阶段接着使用这个候选的特征和参考点估计三维属性。<strong>继续传下去的是查询特征和参考点，不只是二维框坐标。</strong>
 
 二维解码器中的 I 只让候选查询彼此交互，V 再通过多尺度可变形注意力读取视觉特征。三维解码器接收更新后的二维状态，按 D → I → V → FFN 继续更新：D 读取全局深度特征，I 交换已经带有深度信息的查询，V 再围绕参考位置采样视觉信息。每一步都接收前一步的结果。
 
